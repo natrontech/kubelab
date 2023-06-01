@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  kubelab:
+    build: .
+    # image: ghcr.io/natrontech/kubelab:latest
+    ports:
+      - "8090:8090"
+    volumes:
+      # * This is the path to the data folder on your local machine
+      - $PWD/kubelab-backend/pb_data:/app/kubelab/pb_data

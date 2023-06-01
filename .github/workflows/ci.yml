@@ -1,0 +1,56 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ '*' ]
+
+jobs:
+
+  go-build:
+    name: Backend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kubelab-backend
+    strategy:
+      matrix:
+        goVer: [1.20]
+
+    steps:
+    - name: Set up Go ${{ matrix.goVer }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.goVer }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        go get gopkg.in/check.v1
+
+    - name: Test
+      run: |
+        go test -v ./...
+
+    - name: Build
+      run: |
+        go build -v ./...
+
+  ui-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kubelab-ui
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build

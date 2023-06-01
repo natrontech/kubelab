@@ -1,0 +1,5 @@
+/.cache
+/pocketbase
+/pocketbase*.zip
+/pb_data
+/tmp
