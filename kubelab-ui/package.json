@@ -16,7 +16,6 @@
     "format": "prettier --plugin-search-dir . --write ."
   },
   "devDependencies": {
-    "@skeletonlabs/skeleton": "^0.132.5",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/kit": "^1.5.0",
     "@tailwindcss/forms": "^0.5.3",
@@ -26,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "autoprefixer": "^10.4.13",
+    "daisyui": "^3.0.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
@@ -39,6 +39,7 @@
     "tailwindcss": "^3.2.7",
     "tslib": "^2.4.1",
     "typescript": "^4.9.3",
+    "svelte-splitpanes": "^0.7.13",
     "vite": "^4.0.0"
   },
   "type": "module",
@@ -47,10 +48,14 @@
     "@picocss/pico": "^1.5.10",
     "@sveltejs/adapter-node": "^1.2.1",
     "@sveltejs/adapter-static": "^2.0.2",
+    "@webcontainer/api": "^1.1.4",
     "lucide-svelte": "^0.220.0",
     "pocketbase-typegen": "^1.1.9",
     "svelte-french-toast": "^1.0.4-beta.0",
     "svelte-icons-pack": "^2.1.0",
-    "svelte-material-icons": "^3.0.4"
+    "svelte-local-storage-store": "^0.4.0",
+    "svelte-material-icons": "^3.0.4",
+    "xterm": "^5.1.0",
+    "xterm-addon-fit": "^0.7.0"
   }
 }

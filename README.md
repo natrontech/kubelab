@@ -33,6 +33,12 @@ KubeLab is a state-of-the-art web platform offering an immersive collection of h
 
 *Powered by [Natron](https://natron.io)*
 
+Built with:
+
+- [WebContainers](https://webcontainers.io)
+- [CodeMirror](https://codemirror.net/)
+- [xterm.js](https://xtermjs.org/)
+
 ---
 
 ## Key Features
@@ -92,8 +98,6 @@ With KubeLab Interactive, each lab becomes a step closer to mastering Kubernetes
 ### Prerequisites
 
 - Kubernetes cluster (v1.23+)
-- Helm (v3.0+)
-- FluxCD (v2.0.0)
 
 ## Installation
 
