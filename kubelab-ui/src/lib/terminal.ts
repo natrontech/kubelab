@@ -8,13 +8,22 @@ export const terminal = new Terminal({
     fontFamily: "monospace",
     fontSize: 14,
     theme: {
-        background: "#000000",
+        background: "#282C34",
         foreground: "#FFFFFF",
         cursor: "#FFFFFF"
     }
 });
 
 const socket = new WebSocket("ws://localhost:8080/ws");
+
+socket.onclose = () => {
+    terminal.write("\r\nConnection closed.\r\n");
+    terminal.dispose();
+};
+
+socket.onerror = (error) => {
+    terminal.write(`\r\nWebSocket error: ${error}\r\n`);
+};
 
 export const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
@@ -25,6 +34,8 @@ terminal.write("$ ");
 let commandBuffer = "";
 const commandHistory: any = [];
 let historyIndex = -1;
+let autoCompleteIndex = -1;
+let autoCompleteList: any = [];
 
 terminal.onKey((e) => {
     // prevent default keydown action
@@ -33,74 +44,74 @@ terminal.onKey((e) => {
 
 socket.onopen = () => {
     terminal.onData((data) => {
-        // Write the user's input to the terminal
-        if (data.charCodeAt(0) === 127) {
-            // Handle backspace
-            terminal.write('\b \b');
-            if (commandBuffer.length > 0) {
-                commandBuffer = commandBuffer.slice(0, -1);
-            }
-        } else {
-            terminal.write(data);
-        }
+        const code = data.charCodeAt(0);
 
-        if (data.charCodeAt(0) === 3) {
-            // Handle Ctrl+C
-            terminal.write('^C\r\n$ ');
-            commandBuffer = '';
-            return;
-        }
-
-        // arrow keys should not go up and down
-        if (data === "\x1b[A" || data === "\x1b[B") {
-            return;
-        }
-
-        // Handle enter
-        if (data.charCodeAt(0) === 13) {
+        if (code === 127) {
+            // backspace
+            terminal.write("\b \b");
+            commandBuffer = commandBuffer.slice(0, -1);
+        } else if (code === 3) {
+            // Ctrl+C
+            terminal.write("^C\r\n$ ");
+            commandBuffer = "";
+        } else if (code === 13) {
+            // enter
             console.log(commandBuffer);
-
-            // Execute the command
             socket.send(commandBuffer);
-
-            // Add the command to the history
             commandHistory.push(commandBuffer);
-
-            // Reset the command buffer and history index
             commandBuffer = "";
             historyIndex = -1;
-
-            // Display the prompt
-            terminal.write("$ ");
-        }
-        // Handle up arrow
-        else if (data === "\x1b[A") {
+            autoCompleteList = [];
+            autoCompleteIndex = -1;
+        } else if (data === "\x1b[A") {
+            // up arrow
             if (historyIndex < commandHistory.length - 1) {
-                // Go back in the history
                 historyIndex++;
-
-                // Display the command from the history
-                terminal.write(commandHistory[historyIndex]);
+                terminal.write("\x1b[2K\r"); // clear line before displaying history
+                terminal.write("$ " + commandHistory[historyIndex]);
+                commandBuffer = commandHistory[historyIndex];
             }
-        }
-        // Handle down arrow
-        else if (data === "\x1b[B") {
+        } else if (data === "\x1b[B") {
+            // down arrow
             if (historyIndex > 0) {
-                // Go forward in the history
                 historyIndex--;
-
-                // Display the command from the history
-                terminal.write(commandHistory[historyIndex]);
+                terminal.write("\x1b[2K\r"); // clear line before displaying history
+                terminal.write("$ " + commandHistory[historyIndex]);
+                commandBuffer = commandHistory[historyIndex];
             }
-        }
-        // Handle other input
-        else {
+        } else if (code === 4) {
+            // Ctrl+D
+            socket.close();
+        } else if (code === 9) {
+            // Tab
+            // send auto-complete request to the server but don't clear the line
+            socket.send("\t" + commandBuffer);
+        } else if (data.startsWith("less ")) {
+            socket.send("less " + data.slice(5));
+        } else {
+            terminal.write(data);
             commandBuffer += data;
         }
     });
 };
 
 socket.onmessage = (message) => {
-    // Display the command output and a new prompt
-    terminal.write("\r\n" + message.data + "\r\n$ ");
+    // check if the message is for auto-completion
+    if (message.data.startsWith("\t")) {
+        autoCompleteList = message.data.slice(1).split(",");
+        if (autoCompleteList.length > 0) {
+            autoCompleteIndex = 0;
+            terminal.write("\x1b[2K\r"); // clear line before displaying history
+            terminal.write("$ " + autoCompleteList[autoCompleteIndex]);
+            commandBuffer = autoCompleteList[autoCompleteIndex];
+        }
+    } else {
+        // Check if this is the output of the 'pwd' command
+        if (message.data.startsWith("/")) {
+            // Update the prompt with the current path
+            terminal.write("\r\n" + message.data + " $ ");
+        } else {
+            terminal.write("\r\n" + message.data + "\r\n$ ");
+        }
+    }
 };

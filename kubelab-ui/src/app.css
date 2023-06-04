@@ -4,3 +4,7 @@ a {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    background-color: #001220;
+}

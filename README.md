@@ -39,6 +39,10 @@ Built with:
 - [CodeMirror](https://codemirror.net/)
 - [xterm.js](https://xtermjs.org/)
 
+<p align="center">
+	<img height="500px" src="assets/screenshots/login.png" />
+</p>
+
 ---
 
 ## Key Features

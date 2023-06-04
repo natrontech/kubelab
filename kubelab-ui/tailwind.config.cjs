@@ -1,14 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
-  content: [
-    "./src/**/*.{html,js,svelte,ts}",
-    require("path").join("../**/*.{html,js,svelte,ts}")
-  ],
+  content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
     extend: {
       screens: {
-        'hover-hover': {'raw': '(hover: hover)'},
+        "hover-hover": { raw: "(hover: hover)" }
       }
     }
   },
@@ -17,5 +14,8 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("@tailwindcss/line-clamp"),
     require("daisyui")
-  ]
+  ],
+  daisyui: {
+    logs: false
+  }
 };

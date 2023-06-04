@@ -1,9 +1,9 @@
 <script lang="ts">
-    import tableView from "$lib/stores/tableView";
-    import { RadioGroup, RadioItem } from "@skeletonlabs/skeleton";
-    import { LayoutGrid, LayoutList } from "lucide-svelte";
-
+  import tableView from "$lib/stores/tableView";
+  import { RadioGroup, RadioItem } from "@skeletonlabs/skeleton";
+  import { LayoutGrid, LayoutList } from "lucide-svelte";
 </script>
+
 <div class="flex justify-between items-center mb-6">
   <RadioGroup active="variant-filled-primary" hover="hover:variant-soft-primary">
     <RadioItem

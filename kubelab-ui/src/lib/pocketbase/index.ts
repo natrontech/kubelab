@@ -2,6 +2,8 @@ import { browser } from "$app/environment";
 import PocketBase, { ListResult } from "pocketbase";
 import { readable, writable, type Readable, type Subscriber } from "svelte/store";
 import type { BaseSystemFields } from "./generated-types";
+import toast from "svelte-french-toast";
+import { goto } from "$app/navigation";
 
 export const client = new PocketBase();
 
@@ -26,6 +28,9 @@ export async function login(
 
 export function logout() {
     client.authStore.clear();
+    currentUser.set(null);
+    goto("/login/");
+    toast.success("Successfully logged out.");
 }
 
 /*
