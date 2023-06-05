@@ -1,18 +1,24 @@
-# Build stage
-FROM golang:1.19 as build
-WORKDIR /go/src/github.com/natrongmbh/kubelab-agent
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kubelab-agent .
+FROM golang:1.20-alpine AS backend
+WORKDIR /go/src/kubelab-agent
+COPY ./cmd ./cmd
+COPY ./internal ./internal
+COPY ./pkg ./pkg
+COPY ./go.mod .
+COPY ./go.sum .
+ENV CGO_ENABLED=0
+RUN go mod vendor
+ARG VERSION_INFO=dev-build
+RUN go build -a -v \
+  -ldflags " \
+  -s -w \
+  -extldflags 'static' \
+  -X main.VersionInfo='${VERSION_INFO}' \
+  " \
+  -o ./bin/kubelab-agent \
+  ./cmd/kubelab-agent
 
-# Production build
 FROM ubuntu:22.04
-
 WORKDIR /app
-
-# Adding group and user
-RUN groupadd -g 1001 kubelab-agent
-RUN useradd -s /bin/bash -u 1001 -g 1001 -m kubelab-agent
-
 # Adding base utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -49,10 +55,13 @@ RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/
 # Installing cri-o
 RUN curl https://raw.githubusercontent.com/cri-o/cri-o/main/scripts/get | bash
 
-# Podman and CRI-O are not officially available for Ubuntu, it may be necessary to build them from source or use another base image if you need to use them.
-
-COPY --from=build --chown=kubelab-agent:kubelab-agent /go/src/github.com/natrongmbh/kubelab-agent/kubelab-agent ./
-
-EXPOSE 8090
-
-CMD ["./kubelab-agent"]
+COPY --from=backend /go/src/kubelab-agent/bin/kubelab-agent /app/kubelab-agent
+RUN ln -s /app/kubelab-agent /usr/bin/kubelab-agent
+RUN groupadd -g 1001 kubelab-agent
+RUN useradd -s /bin/bash -u 1001 -g 1001 -m kubelab-agent
+RUN mkdir -p /home/kubelab-agent
+RUN chown kubelab-agent:kubelab-agent /app -R
+WORKDIR /
+ENV WORKDIR=/app
+USER kubelab-agent
+ENTRYPOINT ["/app/kubelab-agent"]

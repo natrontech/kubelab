@@ -8,13 +8,36 @@ export const terminal = new Terminal({
     fontFamily: "monospace",
     fontSize: 14,
     theme: {
+        foreground: "#d2d2d2",
         background: "#282C34",
-        foreground: "#FFFFFF",
-        cursor: "#FFFFFF"
+        cursor: "#adadad",
+        black: "#000000",
+        red: "#d81e00",
+        green: "#5ea702",
+        yellow: "#cfae00",
+        blue: "#427ab3",
+        magenta: "#89658e",
+        cyan: "#00a7aa",
+        white: "#dbded8",
+        brightBlack: "#686a66",
+        brightRed: "#f54235",
+        brightGreen: "#99e343",
+        brightYellow: "#fdeb61",
+        brightBlue: "#84b0d8",
+        brightMagenta: "#bc94b7",
+        brightCyan: "#37e6e8",
+        brightWhite: "#f1f1f0"
     }
 });
 
-const socket = new WebSocket("ws://localhost:8080/ws");
+const socket = new WebSocket("ws://localhost:8376/xterm.js");
+
+socket.binaryType = "arraybuffer";
+
+function ab2str(buf: any) {
+    // @ts-ignore
+    return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
 
 socket.onclose = () => {
     terminal.write("\r\nConnection closed.\r\n");
@@ -31,87 +54,25 @@ terminal.focus();
 // Display the initial prompt
 terminal.write("$ ");
 
-let commandBuffer = "";
-const commandHistory: any = [];
-let historyIndex = -1;
-let autoCompleteIndex = -1;
-let autoCompleteList: any = [];
 
-terminal.onKey((e) => {
-    // prevent default keydown action
-    e.domEvent.preventDefault();
-});
 
 socket.onopen = () => {
     terminal.onData((data) => {
-        const code = data.charCodeAt(0);
+        socket.send(new TextEncoder().encode("\x00" + data))
+    });
 
-        if (code === 127) {
-            // backspace
-            terminal.write("\b \b");
-            commandBuffer = commandBuffer.slice(0, -1);
-        } else if (code === 3) {
-            // Ctrl+C
-            terminal.write("^C\r\n$ ");
-            commandBuffer = "";
-        } else if (code === 13) {
-            // enter
-            console.log(commandBuffer);
-            socket.send(commandBuffer);
-            commandHistory.push(commandBuffer);
-            commandBuffer = "";
-            historyIndex = -1;
-            autoCompleteList = [];
-            autoCompleteIndex = -1;
-        } else if (data === "\x1b[A") {
-            // up arrow
-            if (historyIndex < commandHistory.length - 1) {
-                historyIndex++;
-                terminal.write("\x1b[2K\r"); // clear line before displaying history
-                terminal.write("$ " + commandHistory[historyIndex]);
-                commandBuffer = commandHistory[historyIndex];
-            }
-        } else if (data === "\x1b[B") {
-            // down arrow
-            if (historyIndex > 0) {
-                historyIndex--;
-                terminal.write("\x1b[2K\r"); // clear line before displaying history
-                terminal.write("$ " + commandHistory[historyIndex]);
-                commandBuffer = commandHistory[historyIndex];
-            }
-        } else if (code === 4) {
-            // Ctrl+D
-            socket.close();
-        } else if (code === 9) {
-            // Tab
-            // send auto-complete request to the server but don't clear the line
-            socket.send("\t" + commandBuffer);
-        } else if (data.startsWith("less ")) {
-            socket.send("less " + data.slice(5));
-        } else {
-            terminal.write(data);
-            commandBuffer += data;
-        }
+    terminal.onTitleChange((title) => {
+        document.title = title;
     });
 };
 
+socket.onclose = () => {
+    terminal.write("\r\nConnection closed.\r\n");
+    terminal.dispose();
+};
+
 socket.onmessage = (message) => {
-    // check if the message is for auto-completion
-    if (message.data.startsWith("\t")) {
-        autoCompleteList = message.data.slice(1).split(",");
-        if (autoCompleteList.length > 0) {
-            autoCompleteIndex = 0;
-            terminal.write("\x1b[2K\r"); // clear line before displaying history
-            terminal.write("$ " + autoCompleteList[autoCompleteIndex]);
-            commandBuffer = autoCompleteList[autoCompleteIndex];
-        }
-    } else {
-        // Check if this is the output of the 'pwd' command
-        if (message.data.startsWith("/")) {
-            // Update the prompt with the current path
-            terminal.write("\r\n" + message.data + " $ ");
-        } else {
-            terminal.write("\r\n" + message.data + "\r\n$ ");
-        }
+    if (message.data instanceof ArrayBuffer) {
+        terminal.write(ab2str(message.data));
     }
 };

@@ -1,19 +1,19 @@
 <script lang="ts">
-  // @ts-nocheck
-  import { page } from "$app/stores";
   import { client, logout } from "$lib/pocketbase";
   import type { NavRoute } from "$lib/types";
   import { TerminalSquare, LayoutDashboard, Home, ScrollText } from "lucide-svelte";
-  console.log(client.authStore.baseModel?.avatar);
 
-  let avatarUrl =
-    "api/files/" +
-    client.authStore.baseModel?.collectionId +
-    "/" +
-    client.authStore.baseModel?.id +
-    "/" +
-    client.authStore.baseModel?.avatar;
-  console.log(avatarUrl);
+  let avatarUrl: string = "";
+
+  if (client.authStore) {
+    avatarUrl =
+      "api/files/" +
+      client.authStore.model?.collectionId +
+      "/" +
+      client.authStore.model?.id +
+      "/" +
+      client.authStore.model?.avatar;
+  }
 
   let routes: NavRoute[] = [
     {
@@ -109,7 +109,7 @@
         tabindex="0"
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
       >
-        <li><a>Settings</a></li>
+        <li><a href="/settings">Settings</a></li>
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
     </div>
