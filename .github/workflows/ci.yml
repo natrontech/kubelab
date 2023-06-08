@@ -31,7 +31,7 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
-        go get gopkg.in/check.v1
+        go mod vendor
 
     - name: Test
       run: |

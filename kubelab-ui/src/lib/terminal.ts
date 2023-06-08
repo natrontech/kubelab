@@ -30,11 +30,14 @@ export const terminal = new Terminal({
     }
 });
 
-const socket = new WebSocket("ws://localhost:8376/xterm.js");
+// TODO: set agentUrl for labs as properties
+export const agentUrl = "localhost:8376";
+export const socket = new WebSocket("ws://" + agentUrl + "/xterm.js");
 
 socket.binaryType = "arraybuffer";
 
 function ab2str(buf: any) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return String.fromCharCode.apply(null, new Uint8Array(buf));
 }
@@ -51,14 +54,10 @@ socket.onerror = (error) => {
 export const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
 terminal.focus();
-// Display the initial prompt
-terminal.write("$ ");
-
-
 
 socket.onopen = () => {
     terminal.onData((data) => {
-        socket.send(new TextEncoder().encode("\x00" + data))
+        socket.send(new TextEncoder().encode("\x00" + data));
     });
 
     terminal.onTitleChange((title) => {
@@ -67,8 +66,7 @@ socket.onopen = () => {
 };
 
 socket.onclose = () => {
-    terminal.write("\r\nConnection closed.\r\n");
-    terminal.dispose();
+    terminal.write("\r\nConnection closed. Try to refresh the tab.\r\n");
 };
 
 socket.onmessage = (message) => {

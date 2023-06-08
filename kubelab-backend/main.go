@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	hooks "pocketbase/hooks"
+	"pocketbase/internal/env"
+	"pocketbase/internal/helm"
+	"pocketbase/internal/k8s"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
@@ -22,6 +26,12 @@ func defaultPublicDir() string {
 	}
 
 	return filepath.Join(os.Args[0], "../pb_public")
+}
+
+func init() {
+	// set the default public dir
+	env.Init()
+	k8s.Init()
 }
 
 func main() {
@@ -56,6 +66,43 @@ func main() {
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		// serves static files from the provided public dir (if exists)
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDirFlag), true))
+
+		return nil
+	})
+
+	app.OnRecordBeforeUpdateRequest().Add(func(e *core.RecordUpdateEvent) error {
+		log.Println(e.Collection.Name)
+		// check collection name
+		if e.Collection.Name == "sessions" {
+			log.Println(e.Record.GetString("title"))
+			if e.Record.GetBool("clusterRunning") {
+				// deploy a new vcluster
+				helmclient, err := helm.CreateHelmClient(e.Record.GetString("title"), e.Record.GetString("user"))
+				if err != nil {
+					log.Println(err)
+				}
+
+				err = helm.AddHelmRepositoryToClient(helmclient, "loft-sh", "https://charts.loft.sh")
+				if err != nil {
+					log.Println(err)
+				}
+
+				_, err = helm.CreateOrUpdateHelmRelease(
+					helmclient,
+					"loft-sh/vluster",
+					"vluster",
+					helm.GetNamespaceName(e.Record.GetString("title"), e.Record.GetString("user")),
+					"0.15.1",
+					"",
+				)
+				if err != nil {
+					log.Println(err)
+				}
+
+			} else {
+				fmt.Println("cluster not running")
+			}
+		}
 
 		return nil
 	})
