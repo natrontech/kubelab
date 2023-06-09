@@ -15,8 +15,10 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/plugins/jsvm"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	v1 "k8s.io/api/core/v1"
 )
 
 func defaultPublicDir() string {
@@ -71,36 +73,138 @@ func main() {
 	})
 
 	app.OnRecordBeforeUpdateRequest().Add(func(e *core.RecordUpdateEvent) error {
-		log.Println(e.Collection.Name)
 		// check collection name
-		if e.Collection.Name == "sessions" {
-			log.Println(e.Record.GetString("title"))
+		if e.Collection.Name == "lab_sessions" {
 			if e.Record.GetBool("clusterRunning") {
+
 				// deploy a new vcluster
-				helmclient, err := helm.CreateHelmClient(e.Record.GetString("title"), e.Record.GetString("user"))
+				helmclient, err := helm.CreateHelmClient(e.Record.GetString("lab"), e.Record.GetString("user"))
 				if err != nil {
-					log.Println(err)
+					fmt.Println(err)
+					return err
 				}
 
 				err = helm.AddHelmRepositoryToClient(helmclient, "loft-sh", "https://charts.loft.sh")
 				if err != nil {
-					log.Println(err)
+					fmt.Println(err)
+					return err
 				}
 
 				_, err = helm.CreateOrUpdateHelmRelease(
 					helmclient,
-					"loft-sh/vluster",
-					"vluster",
-					helm.GetNamespaceName(e.Record.GetString("title"), e.Record.GetString("user")),
+					"loft-sh/vcluster",
+					"vcluster",
+					helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")),
 					"0.15.1",
 					"",
 				)
 				if err != nil {
-					log.Println(err)
+					fmt.Println(err)
+					return err
 				}
 
 			} else {
-				fmt.Println("cluster not running")
+				// delete the namespace
+				err := k8s.DeleteNamespace(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")))
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+			}
+		}
+
+		if e.Collection.Name == "exercise_sessions" {
+			if e.Record.GetBool("agentRunning") {
+				var err error
+				var exercise *models.Record
+				// retrieve the exercise
+				exercise, err = app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				// check if the namespace exists
+				err = k8s.CreateNamespace(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")))
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					return err
+				}
+
+				// check if vcluster pod exists 'vcluster-0'
+				_, err = k8s.GetPodByName(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "vcluster-0")
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				// get kubeconfig secret called 'vc-vcluster'
+				var secret *v1.Secret
+				secret, err = k8s.GetSecretByName(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "vc-vcluster")
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				fmt.Println(string(secret.Data["config"]))
+
+				// create a new deployment
+				// TODO: use the kubeconfig to create ~/.kube/config in the agent container
+				_, err = k8s.CreateDeployment(
+					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+					"ghcr.io/natrontech/kubelab-agent:v1.0.0-rc.1",
+					1,
+				)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				// create a new service
+				_, err = k8s.CreateService(
+					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+					"kubelab-agent",
+					8376,
+				)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				// create a new ingress
+				_, err = k8s.CreateIngress(
+					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+					"kubelab-agent",
+					"kubelab.natron.cloud",
+					"kubelab-agent",
+				)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+			} else {
+				// delete the deployment
+				err := k8s.DeleteDeployment(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				if err != nil {
+					fmt.Println(err)
+					// return err
+				}
+
+				// delete the service
+				err = k8s.DeleteService(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				if err != nil {
+					fmt.Println(err)
+					// return err
+				}
+
+				// delete the ingress
+				err = k8s.DeleteIngress(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				if err != nil {
+					fmt.Println(err)
+					// return err
+				}
 			}
 		}
 

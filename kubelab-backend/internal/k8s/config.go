@@ -35,6 +35,18 @@ func Init() {
 		if err != nil {
 			panic(err)
 		}
+
+		DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(Kubeconfig)
+		if err != nil {
+			panic(err)
+		}
+
+		Clientset, err = kubernetes.NewForConfig(Kubeconfig)
+		if err != nil {
+			panic(err)
+		}
+
+		Ctx = context.Background()
 	} else {
 		Kubeconfig, err = rest.InClusterConfig()
 		if err != nil {
