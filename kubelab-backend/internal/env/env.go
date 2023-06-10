@@ -9,6 +9,7 @@ import (
 type config struct {
 	Local        bool   `env:"LOCAL"`
 	KubelabImage string `env:"KUBELAB_IMAGE"`
+	AllowedHosts string `env:"ALLOWED_HOSTS"`
 }
 
 var Config config
@@ -24,5 +25,9 @@ func Init() {
 
 	if Config.KubelabImage == "" {
 		Config.KubelabImage = "ghcr.io/natrontech/kubelab-agent:latest"
+	}
+
+	if Config.AllowedHosts == "" {
+		Config.AllowedHosts = "kubelab.prod.natron.k8s.natron.cloud"
 	}
 }

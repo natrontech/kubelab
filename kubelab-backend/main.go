@@ -188,7 +188,7 @@ func main() {
 					string(secret.Data["config"]),
 					string(bootstrapBody),
 					string(checkBody),
-					"kubelab.prod.natron.k8s.natron.cloud",
+					env.Config.AllowedHosts,
 				)
 				if err != nil {
 					fmt.Println(err)
@@ -210,7 +210,7 @@ func main() {
 				_, err = k8s.CreateIngress(
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
 					"kubelab-agent",
-					"kubelab.prod.natron.k8s.natron.cloud",
+					env.Config.AllowedHosts,
 					"kubelab-agent",
 				)
 				if err != nil {
