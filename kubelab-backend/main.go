@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,7 +97,7 @@ func main() {
 					"loft-sh/vcluster",
 					"vcluster",
 					helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")),
-					"0.15.1",
+					"0.15.2",
 					"",
 				)
 				if err != nil {
@@ -147,14 +149,46 @@ func main() {
 					return err
 				}
 
-				fmt.Println(string(secret.Data["config"]))
+				// get exercise.GetString("bootstrap") this is a url to a bootstrap script over https github raw
+				bootstrap, err := http.Get(exercise.GetString("bootstrap"))
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				defer bootstrap.Body.Close()
+
+				// read the body
+				bootstrapBody, err := io.ReadAll(bootstrap.Body)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				check, err := http.Get(exercise.GetString("check"))
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				defer check.Body.Close()
+
+				// read the body
+				checkBody, err := io.ReadAll(check.Body)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
 
 				// create a new deployment
-				// TODO: use the kubeconfig to create ~/.kube/config in the agent container
 				_, err = k8s.CreateDeployment(
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-					"ghcr.io/natrontech/kubelab-agent:v1.0.0-rc.1",
+					env.Config.KubelabImage,
 					1,
+					string(secret.Data["config"]),
+					string(bootstrapBody),
+					string(checkBody),
+					"kubelab.prod.natron.k8s.natron.cloud",
 				)
 				if err != nil {
 					fmt.Println(err)
@@ -176,7 +210,7 @@ func main() {
 				_, err = k8s.CreateIngress(
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
 					"kubelab-agent",
-					"kubelab.natron.cloud",
+					"kubelab.prod.natron.k8s.natron.cloud",
 					"kubelab-agent",
 				)
 				if err != nil {
@@ -185,22 +219,30 @@ func main() {
 				}
 
 			} else {
+				var err error
+				var exercise *models.Record
+				// retrieve the exercise
+				exercise, err = app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
 				// delete the deployment
-				err := k8s.DeleteDeployment(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
 				if err != nil {
 					fmt.Println(err)
 					// return err
 				}
 
 				// delete the service
-				err = k8s.DeleteService(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteService(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
 				if err != nil {
 					fmt.Println(err)
 					// return err
 				}
 
 				// delete the ingress
-				err = k8s.DeleteIngress(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteIngress(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
 				if err != nil {
 					fmt.Println(err)
 					// return err

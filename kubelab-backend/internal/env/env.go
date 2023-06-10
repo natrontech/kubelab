@@ -7,7 +7,8 @@ import (
 )
 
 type config struct {
-	Local bool `env:"LOCAL"`
+	Local        bool   `env:"LOCAL"`
+	KubelabImage string `env:"KUBELAB_IMAGE"`
 }
 
 var Config config
@@ -19,5 +20,9 @@ func Init() {
 
 	if Config.Local {
 		fmt.Println("Running in local mode")
+	}
+
+	if Config.KubelabImage == "" {
+		Config.KubelabImage = "ghcr.io/natrontech/kubelab-agent:latest"
 	}
 }

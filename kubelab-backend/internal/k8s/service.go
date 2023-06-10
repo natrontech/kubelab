@@ -20,6 +20,7 @@ func CreateService(namespace string, name string, port int32) (*v1.Service, erro
 					Port: port,
 				},
 			},
+			Type: v1.ServiceTypeClusterIP,
 		},
 	}
 

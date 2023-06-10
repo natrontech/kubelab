@@ -12,8 +12,22 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
+			Annotations: map[string]string{
+				"cert-manager.io/cluster-issuer":                 "letsencrypt-prod-natron-cloud",
+				"cert-manager.io/private-key-rotation-policy":    "Always",
+				"nginx.ingress.kubernetes.io/proxy-read-timeout": "3600",
+				"nginx.ingress.kubernetes.io/proxy-send-timeout": "3600",
+				"nginx.ingress.kubernetes.io/rewrite-target":     "/$2",
+			},
 		},
 		Spec: networkingv1.IngressSpec{
+			IngressClassName: func() *string { s := "nginx"; return &s }(),
+			TLS: []networkingv1.IngressTLS{
+				{
+					Hosts:      []string{host},
+					SecretName: func() string { s := host + "-tls"; return s }(),
+				},
+			},
 			Rules: []networkingv1.IngressRule{
 				{
 					Host: host,
@@ -21,7 +35,7 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 						HTTP: &networkingv1.HTTPIngressRuleValue{
 							Paths: []networkingv1.HTTPIngressPath{
 								{
-									Path:     "/" + namespace,
+									Path:     "/" + namespace + "(/|$)(.*)",
 									PathType: func() *networkingv1.PathType { p := networkingv1.PathTypePrefix; return &p }(),
 									Backend: networkingv1.IngressBackend{
 										Service: &networkingv1.IngressServiceBackend{
