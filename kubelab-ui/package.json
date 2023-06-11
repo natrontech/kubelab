@@ -51,7 +51,7 @@
     "@sveltejs/adapter-node": "^1.2.1",
     "@sveltejs/adapter-static": "^2.0.2",
     "@webcontainer/api": "^1.1.4",
-    "lucide-svelte": "^0.220.0",
+    "lucide-svelte": "^0.242.0",
     "marked": "^5.0.4",
     "pocketbase-typegen": "^1.1.9",
     "svelte-confetti": "^1.2.2",
