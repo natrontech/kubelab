@@ -2,12 +2,16 @@
   import { client, logout } from "$lib/pocketbase";
   import type { NavRoute } from "$lib/types";
   import { TerminalSquare, LayoutDashboard, Home, ScrollText } from "lucide-svelte";
+  import ToggleConfetti from "./ToggleConfetti.svelte";
+
+  // @ts-ignore
+  import { Confetti } from "svelte-confetti";
 
   let avatarUrl: string = "";
 
   if (client.authStore) {
     avatarUrl =
-      "api/files/" +
+      "/api/files/" +
       client.authStore.model?.collectionId +
       "/" +
       client.authStore.model?.id +
@@ -38,7 +42,7 @@
 </script>
 
 <div class="navbar bg-base-100">
-  <div class="navbar-start">
+  <div class="navbar-start z-50">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost lg:hidden">
@@ -61,7 +65,7 @@
         {/each}
       </ul>
     </div>
-    <a class="btn btn-ghost normal-case text-xl hidden lg:flex">
+    <a class="btn btn-ghost normal-case text-xl hidden lg:flex" href="/">
       <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8 mr-2" /> KubeLab</a
     >
   </div>

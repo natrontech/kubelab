@@ -31,7 +31,8 @@ export const terminal = new Terminal({
 });
 
 // TODO: set agentUrl for labs as properties
-export const agentUrl = "kubelab.prod.natron.k8s.natron.cloud/kubelab-3y9rfkf5fr09x4r-721eq17619ojn75";
+export const agentUrl =
+    "kubelab.prod.natron.k8s.natron.cloud/kubelab-3y9rfkf5fr09x4r-721eq17619ojn75";
 export const socket = new WebSocket("ws://" + agentUrl + "/xterm.js");
 
 socket.binaryType = "arraybuffer";
