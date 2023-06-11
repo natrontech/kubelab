@@ -2,11 +2,11 @@ package helm
 
 import (
 	"context"
-	"pocketbase/pkg/util"
 	"strings"
 	"time"
 
 	helmclient "github.com/mittwald/go-helm-client"
+	"github.com/natrontech/kubelab/pkg/util"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 )

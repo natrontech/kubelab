@@ -9,11 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	hooks "pocketbase/hooks"
-	"pocketbase/internal/env"
-	"pocketbase/internal/helm"
-	"pocketbase/internal/k8s"
-
+	"github.com/natrontech/kubelab/hooks"
+	"github.com/natrontech/kubelab/pkg/env"
+	"github.com/natrontech/kubelab/pkg/helm"
+	"github.com/natrontech/kubelab/pkg/k8s"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"

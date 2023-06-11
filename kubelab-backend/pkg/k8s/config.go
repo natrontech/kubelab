@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"path/filepath"
-	"pocketbase/internal/env"
 
+	"github.com/natrontech/kubelab/pkg/env"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
