@@ -42,8 +42,10 @@
 
 </script>
 
+{#if lab_sessions.length > 0}
 <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 p-4">
   {#each labs as lab}
     <Lab {lab} lab_session={getLabSessions(lab.id)} exercises={getExercises(lab.id)} exercise_sessions={getExercisesSessions(lab.id)} />
   {/each}
 </div>
+{/if}

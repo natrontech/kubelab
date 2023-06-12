@@ -5,6 +5,6 @@
   export let Console: ComponentType<SvelteComponentTyped>;
 </script>
 
-<div class="grid">
+<div>
   <svelte:component this={Console} />
 </div>

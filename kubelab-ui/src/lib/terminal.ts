@@ -54,6 +54,7 @@ socket.onerror = (error) => {
 
 export const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
+fitAddon.fit();
 terminal.focus();
 
 socket.onopen = () => {

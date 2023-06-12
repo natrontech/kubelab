@@ -131,15 +131,15 @@
     <span class="badge badge-outline {lab_session.clusterRunning ? 'badge-accent' : ''} ml-2"
       >{lab_session.clusterRunning ? "Running" : "Stopped"}
       <span class="ml-1 text-gray-500 text-xs">
-        (
         {#if lab_session.clusterRunning && lab_session.startTime}
-          since
+          ( since
           {getTimeAgo(lab_session.startTime)}
+          )
         {:else if lab_session.endTime && !lab_session.clusterRunning}
+          (
           {getTimeAgo(lab_session.endTime)}
-          ago
+          ago )
         {/if}
-        )
       </span>
     </span>
     <!-- show how many exercises are done already -->
@@ -179,7 +179,9 @@
     {/if}
     {#if lab_session.clusterRunning}
       <div class="tooltip" data-tip="open console">
-        <button class="btn"><TerminalSquare /></button>
+        <a href={lab.id}>
+          <button class="btn"><TerminalSquare /></button>
+        </a>
       </div>
     {/if}
   </div>
