@@ -1,7 +1,8 @@
 <script lang="ts">
   import { layout_store } from "$lib/stores/layout_store";
+    import { terminal_size } from "$lib/stores/terminal";
   import { fitAddon, terminal } from "$lib/terminal";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
 
   let div: HTMLDivElement;
 
@@ -17,6 +18,7 @@
   };
 
   $: {
+    $terminal_size;
     $layout_store.terminal;
     setTimeout(() => {
       update_height();

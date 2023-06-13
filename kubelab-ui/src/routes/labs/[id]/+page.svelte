@@ -12,6 +12,7 @@
   import { marked } from "marked";
   import Desktop from "$lib/components/base/Desktop.svelte";
   import { metadata } from "$lib/stores/metadata";
+  import { terminal_size } from "$lib/stores/terminal";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   onMount(async () => {
@@ -36,7 +37,8 @@
 <div class="absolute top-16 bottom-0 right-0 left-0 overflow-hidden">
   <div class="absolute top-0 bottom-16 left-0 right-0">
     <Splitpanes>
-      <Pane size={55}>
+
+      <Pane bind:size={$terminal_size.height}>
         <!-- TODO: fit the whole pane -->
         <Desktop {Console} />
       </Pane>

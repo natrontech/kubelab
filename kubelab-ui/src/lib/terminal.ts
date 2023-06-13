@@ -27,7 +27,7 @@ export const terminal = new Terminal({
         brightMagenta: "#bc94b7",
         brightCyan: "#37e6e8",
         brightWhite: "#f1f1f0"
-    }
+    },
 });
 
 // TODO: set agentUrl for labs as properties
@@ -54,8 +54,17 @@ socket.onerror = (error) => {
 
 export const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
-fitAddon.fit();
 terminal.focus();
+
+terminal.onResize((size) => {
+    const terminal_size = {
+        cols: size.cols,
+        rows: size.rows,
+        y: size.rows,
+        x: size.cols,
+    }
+    socket.send(new TextEncoder().encode("\x01" + JSON.stringify(terminal_size)));
+});
 
 socket.onopen = () => {
     terminal.onData((data) => {

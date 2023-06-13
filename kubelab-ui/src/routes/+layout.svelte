@@ -8,6 +8,8 @@
   import Nav from "$lib/components/base/Nav.svelte";
   import { navigating, page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
+    import { onMount } from "svelte";
+    import { client } from "$lib/pocketbase";
 
   // export let data: any;
 
@@ -17,6 +19,7 @@
   beforeNavigate(() => {
     $metadata = {};
   });
+
 </script>
 
 <svelte:head>

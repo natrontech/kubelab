@@ -5,6 +5,6 @@
   export let Console: ComponentType<SvelteComponentTyped>;
 </script>
 
-<div>
+<div class="h-full overflow-y-auto">
   <svelte:component this={Console} />
 </div>

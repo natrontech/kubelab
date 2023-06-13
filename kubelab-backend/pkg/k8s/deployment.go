@@ -93,6 +93,7 @@ func CreateDeployment(namespace string, image string, replicas int32, kubeconfig
 									ContainerPort: 8376,
 								},
 							},
+							// --allowed-hostnames and --max-buffer-size-bytes
 							Args: []string{"--allowed-hostnames", host},
 							VolumeMounts: []v1.VolumeMount{
 								{
