@@ -6,7 +6,7 @@ import (
 )
 
 // create a ingress with a hostpath with the namespace name pointed to a service
-func CreateIngress(namespace string, name string, host string, serviceName string) (*networkingv1.Ingress, error) {
+func CreateIngress(namespace string, name string, host string, serviceName string, path string) (*networkingv1.Ingress, error) {
 
 	ingress := &networkingv1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
@@ -35,7 +35,7 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 						HTTP: &networkingv1.HTTPIngressRuleValue{
 							Paths: []networkingv1.HTTPIngressPath{
 								{
-									Path:     "/" + namespace + "(/|$)(.*)",
+									Path:     "/" + path + "(/|$)(.*)",
 									PathType: func() *networkingv1.PathType { p := networkingv1.PathTypePrefix; return &p }(),
 									Backend: networkingv1.IngressBackend{
 										Service: &networkingv1.IngressServiceBackend{

@@ -13,7 +13,7 @@ func CreateService(namespace string, name string, port int32) (*v1.Service, erro
 		},
 		Spec: v1.ServiceSpec{
 			Selector: map[string]string{
-				"kubelab.natron.io": "kubelab",
+				"kubelab.natron.io": name,
 			},
 			Ports: []v1.ServicePort{
 				{

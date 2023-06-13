@@ -40,11 +40,11 @@
       </div>
     </div>
     <form
-      class="flex justify-center self-center z-10"
+      class="flex justify-center self-center z-10 "
       method="POST"
       on:submit|preventDefault={submit}
     >
-      <div class="p-12 bg-white mx-auto rounded-2xl w-100 ">
+      <div class="p-12 bg-white mx-auto rounded-2xl w-100 border-4 border-black">
         <div class="mb-4">
           <ToggleConfetti>
             <div class="btn btn-block btn-ghost normal-case text-xl mb-10" slot="label">

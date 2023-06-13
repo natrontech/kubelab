@@ -7,7 +7,7 @@
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
-  import { Play, StopCircle, TerminalSquare } from "lucide-svelte";
+  import { Inspect, Play, StopCircle, TerminalSquare } from "lucide-svelte";
   import toast from "svelte-french-toast";
 
   export let lab: LabsResponse;
@@ -59,6 +59,7 @@
       });
   }
 
+  // TODO: add modal to confirm stop lab
   async function stopLab() {
     const data: LabSessionsRecord = {
       clusterRunning: false,
@@ -123,7 +124,7 @@
 
 <div
   tabindex="0"
-  class="collapse collapse-arrow border border-black border-4 bg-base-200 overflow-visible"
+  class="collapse collapse-arrow border-black border-4 bg-base-200 overflow-visible"
 >
   <div class="collapse-title text-xl font-medium">
     {lab.title}
@@ -178,9 +179,9 @@
       </div>
     {/if}
     {#if lab_session.clusterRunning}
-      <div class="tooltip" data-tip="open console">
+      <div class="tooltip" data-tip="exercises">
         <a href={lab.id}>
-          <button class="btn"><TerminalSquare /></button>
+          <button class="btn"><Inspect /></button>
         </a>
       </div>
     {/if}

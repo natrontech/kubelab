@@ -41,14 +41,14 @@
   ];
 </script>
 
-<div class="navbar bg-base-100 shadow-md">
+<div class="navbar bg-base-200 shadow-md">
   <div class="navbar-start z-50">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost lg:hidden">
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
-      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black">
         <li>
           <a href="/">
             <svelte:component this={Home} class="w-5 h-5" />{@html "&nbsp;"}
@@ -93,7 +93,7 @@
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <ul
         tabindex="0"
-        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black"
       >
         <li><a href="/settings">Settings</a></li>
         <li><button on:click={() => logout()}>Logout</button></li>

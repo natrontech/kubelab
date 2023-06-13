@@ -19,6 +19,7 @@ import (
 	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/plugins/jsvm"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -91,13 +92,36 @@ func main() {
 					return err
 				}
 
+				// create yaml struct
+				yamlValues := struct {
+					Sync struct {
+						PersistentVolumes struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"persistentvolumes"`
+						StorageClasses struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"storageclasses"`
+					} `yaml:"sync"`
+				}{}
+
+				// convert to string
+				yamlValues.Sync.PersistentVolumes.Enabled = true
+				yamlValues.Sync.StorageClasses.Enabled = true
+
+				// convert to yaml
+				yamlValuesBytes, err := yaml.Marshal(yamlValues)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
 				_, err = helm.CreateOrUpdateHelmRelease(
 					helmclient,
 					"loft-sh/vcluster",
 					"vcluster",
 					helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")),
 					"0.15.2",
-					"",
+					string(string(yamlValuesBytes)),
 				)
 				if err != nil {
 					fmt.Println(err)
@@ -181,6 +205,7 @@ func main() {
 
 				// create a new deployment
 				_, err = k8s.CreateDeployment(
+					"kubelab-agent-"+exercise.Id,
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
 					env.Config.KubelabImage,
 					1,
@@ -197,7 +222,7 @@ func main() {
 				// create a new service
 				_, err = k8s.CreateService(
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-					"kubelab-agent",
+					"kubelab-agent-"+exercise.Id,
 					8376,
 				)
 				if err != nil {
@@ -208,9 +233,10 @@ func main() {
 				// create a new ingress
 				_, err = k8s.CreateIngress(
 					helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-					"kubelab-agent",
+					"kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"),
 					env.Config.AllowedHosts,
-					"kubelab-agent",
+					"kubelab-agent-"+exercise.Id,
+					"kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"),
 				)
 				if err != nil {
 					fmt.Println(err)
@@ -227,21 +253,21 @@ func main() {
 					return err
 				}
 				// delete the deployment
-				err = k8s.DeleteDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
 					fmt.Println(err)
 					// return err
 				}
 
 				// delete the service
-				err = k8s.DeleteService(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteService(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
 					fmt.Println(err)
 					// return err
 				}
 
 				// delete the ingress
-				err = k8s.DeleteIngress(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent")
+				err = k8s.DeleteIngress(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"))
 				if err != nil {
 					fmt.Println(err)
 					// return err
