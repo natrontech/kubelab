@@ -25,7 +25,11 @@ export const load: PageLoad = async () => {
     }
 
     const exercises: ExercisesResponse[] = await client.collection("exercises").getFullList();
-    const exercise_sessions: ExerciseSessionsResponse[] = await client.collection("exercise_sessions").getFullList();
+    const exercise_sessions: ExerciseSessionsResponse[] = await client.collection("exercise_sessions").getFullList(200,{
+        expand: 'exercise,exercise.lab'
+    });
+
+    console.log(exercise_sessions);
     return {
         labs,
         labsSessions,

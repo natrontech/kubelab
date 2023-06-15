@@ -19,20 +19,15 @@
   $: exercise_sessions = data.filtered_exercise_sessions as ExerciseSessionsResponse[];
 
   function handleSwitchExercise(exercise_session_id: string) {
-    // TODO: implement with modal to confirm the switch
-    console.log("switch exercise");
     goto("/labs/" + lab_session_id + "/" + exercise_session_id);
   }
 
   function getExerciseSession(exercise_id: string) {
-    console.log(exercise_id);
-    console.log(exercise_sessions);
     // TODO: fix this
     // if endTime exists at exercise_session, then it is completed
     const exercise_session = exercise_sessions.find(
       (exercise_session) => exercise_session.exercise === exercise_id
     );
-
 
     return false;
   }

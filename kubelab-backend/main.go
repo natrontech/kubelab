@@ -102,11 +102,15 @@ func main() {
 							Enabled bool `yaml:"enabled"`
 						} `yaml:"storageclasses"`
 					} `yaml:"sync"`
+					Storage struct {
+						Persistence bool `yaml:"persistence"`
+					} `yaml:"storage"`
 				}{}
 
 				// convert to string
 				yamlValues.Sync.PersistentVolumes.Enabled = true
 				yamlValues.Sync.StorageClasses.Enabled = true
+				yamlValues.Storage.Persistence = false
 
 				// convert to yaml
 				yamlValuesBytes, err := yaml.Marshal(yamlValues)
@@ -216,7 +220,6 @@ func main() {
 				)
 				if err != nil {
 					fmt.Println(err)
-					return err
 				}
 
 				// create a new service
@@ -227,7 +230,6 @@ func main() {
 				)
 				if err != nil {
 					fmt.Println(err)
-					return err
 				}
 
 				// create a new ingress
@@ -240,7 +242,6 @@ func main() {
 				)
 				if err != nil {
 					fmt.Println(err)
-					return err
 				}
 
 			} else {

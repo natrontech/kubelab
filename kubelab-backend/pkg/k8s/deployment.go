@@ -150,7 +150,12 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 		},
 	}
 
-	return Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
+	deployment, err := Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return deployment, nil
 }
 
 func DeleteDeployment(namespace string, name string) error {

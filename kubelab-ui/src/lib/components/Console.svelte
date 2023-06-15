@@ -3,7 +3,7 @@
   import { client } from "$lib/pocketbase";
   import { layout_store } from "$lib/stores/layout_store";
   import { terminal_size } from "$lib/stores/terminal";
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import { Terminal } from "xterm";
   import { FitAddon } from "xterm-addon-fit";
@@ -51,19 +51,11 @@
       "-" +
       client.authStore.model?.id;
 
-    console.log("Connecting to " + agentUrl);
-
-
     socket?.close();
     terminal.reset();
     socket = new WebSocket("wss://" + agentUrl + "/xterm.js");
 
     socket.binaryType = "arraybuffer";
-
-    socket.onclose = () => {
-      terminal.write("\r\nConnection closed.\r\n");
-      terminal.dispose();
-    };
 
     socket.onerror = (error) => {
       terminal.write(`\r\nWebSocket error: ${error}\r\n`);

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { client } from "$lib/pocketbase";
   import type {
+    ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse,
     LabSessionsRecord,
@@ -70,6 +71,26 @@
     };
 
     loading = true;
+
+    // update each exercise session to stop agentRunning = false
+    exercise_sessions.forEach(async (exercise_session) => {
+      const exercise_session_data: ExerciseSessionsRecord = {
+        agentRunning: false,
+        // @ts-ignore
+        user: client.authStore.model?.id,
+        exercise: exercise_session.exercise
+      };
+      await client
+        .collection("exercise_sessions")
+        .update(exercise_session.id, exercise_session_data)
+        // @ts-ignore
+        .then((record: ExerciseSessionsResponse) => {
+          exercise_session = record;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
 
     await client
       .collection("lab_sessions")
@@ -157,33 +178,36 @@
       {getDoneExercises().length} / {exercises.length} exercises finished
     </div>
 
-    {#if lab_session.clusterRunning}
-      <div class="tooltip" data-tip="stop lab">
-        <button class="btn" on:click={() => stopLab()}>
-          {#if loading}
-            <span class="loading loading-dots loading-md" />
-          {:else}
-            <StopCircle />
-          {/if}
-        </button>
-      </div>
-    {:else}
-      <div class="tooltip" data-tip="start lab">
-        <button class="btn" on:click={() => startLab()}>
-          {#if loading}
-            <span class="loading loading-dots loading-md" />
-          {:else}
-            <Play />
-          {/if}
-        </button>
-      </div>
-    {/if}
-    {#if lab_session.clusterRunning}
-      <div class="tooltip" data-tip="exercises">
-        <a href={lab.id}>
-          <button class="btn"><Inspect /></button>
-        </a>
-      </div>
-    {/if}
+    <div class="grid grid-cols-2 gap-2 mb-2 mr-2">
+      {#if lab_session.clusterRunning}
+        <div class="tooltip" data-tip="stop lab">
+          <button class="btn " on:click={() => stopLab()}>
+            {#if loading}
+              <span class="loading loading-dots loading-md" />
+            {:else}
+              <StopCircle />
+            {/if}
+          </button>
+        </div>
+      {:else}
+        <div />
+        <div class="tooltip" data-tip="start lab">
+          <button class="btn" on:click={() => startLab()}>
+            {#if loading}
+              <span class="loading loading-dots loading-md" />
+            {:else}
+              <Play />
+            {/if}
+          </button>
+        </div>
+      {/if}
+      {#if lab_session.clusterRunning}
+        <div class="tooltip" data-tip="exercises">
+          <a href={lab.id}>
+            <button class="btn"><Inspect /></button>
+          </a>
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
