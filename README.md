@@ -35,12 +35,12 @@ KubeLab is a state-of-the-art web platform offering an immersive collection of h
 
 Built with:
 
-- [WebContainers](https://webcontainers.io)
-- [CodeMirror](https://codemirror.net/)
+- [kubelab-agent](https://github.com/natrontech/kubelab-agent)
 - [xterm.js](https://xtermjs.org/)
+- [pocketbase](https://pocketbase.io)
 
 <p align="center">
-	<img height="500px" src="assets/screenshots/login.png" />
+	<img height="400px" src="assets/screenshots/exercise.gif" />
 </p>
 
 ---
@@ -48,48 +48,16 @@ Built with:
 ## Key Features
 
 ### Web Terminal
-KubeLab Interactive provides a seamless in-browser terminal experience. You can execute commands and interact with your Kubernetes cluster in real time without the need for any additional setup or software.
+KubeLab provides a seamless in-browser terminal experience. You can execute commands and interact with your Kubernetes cluster in real time without the need for any additional setup or software.
 
 ### Cluster Per Session
 Each learning session is isolated with its own Kubernetes cluster. This ensures a secure and dedicated learning environment for each user, allowing them to interact and experiment with Kubernetes without affecting others.
 
 ## Hands-on Kubernetes Labs
-Our hands-on labs are organized into modules, each designed to enhance understanding of different Kubernetes concepts, from basics to advanced topics:
+KubeLab offers to define your own labs and exercises. Take a look at our workshops:
+- [https://github.com/natrontech/kubelab-workshops](https://github.com/natrontech/kubelab-workshops)
 
-### 1. Kubernetes Basics
-- Deploying Containers: Learn to manage containerized applications using Kubernetes.
-- Exposing Services: Understand how to expose your applications to network traffic.
-- Scaling Applications: Dive into how to scale your applications based on demand.
-- Troubleshooting: Acquire skills to identify and rectify common Kubernetes issues.
-- Database Connection: Learn to connect your applications to databases within Kubernetes.
-- Storage: Get hands-on experience managing persistent data using Kubernetes storage solutions.
-
-### 2. Advanced Concepts
-- Stateful Sets: Gain insights into managing stateful applications in Kubernetes.
-- DaemonSets: Understand the operation of DaemonSets for deploying system-level applications.
-- Jobs and CronJobs: Learn scheduling in Kubernetes with Jobs and CronJobs.
-- ConfigMaps: Manage application configurations seamlessly across your deployments.
-- Resource Quotas and Limits: Learn to set and manage compute resource quotas and limits for namespaces.
-- Init Containers: Understand the purpose and usage of Init containers in your deployments.
-- Sidecars: Discover the benefits and use cases of Sidecar containers in microservices architecture.
-
-### 3. Security
-- RBAC: Dive deep into Role-Based Access Control in Kubernetes.
-- Network Policies: Secure your applications by controlling the network traffic in your Kubernetes cluster.
-- Security Contexts: Understand and manage permissions and security settings for Pods.
-
-### 4. Deployment Strategies
-Learn different strategies to update and roll back deployments in Kubernetes, ensuring zero downtime and continuous availability.
-
-### 5. Helm
-Get acquainted with Helm, the package manager for Kubernetes, and learn to simplify your deployment process.
-
-### 6. Kustomize
-Understand how to use Kustomize for customizing your Kubernetes configurations without changing the original YAML files.
-
-With KubeLab Interactive, each lab becomes a step closer to mastering Kubernetes. Jump into the interactive world of Kubernetes with KubeLab Interactive, and experience learning like never before.
-
-**Start your Kubernetes journey with KubeLab Interactive today!**
+**Start your Kubernetes journey with KubeLab today!**
 
 ## Architecture Overview
 

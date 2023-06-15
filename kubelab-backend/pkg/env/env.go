@@ -28,6 +28,6 @@ func Init() {
 	}
 
 	if Config.AllowedHosts == "" {
-		Config.AllowedHosts = "kubelab.prod.natron.k8s.natron.cloud"
+		Config.AllowedHosts = "kubelab.swisscom.k8s.natron.cloud"
 	}
 }

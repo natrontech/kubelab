@@ -3,10 +3,11 @@
 */
 
 export enum Collections {
+	ExerciseSessions = "exercise_sessions",
 	Exercises = "exercises",
 	Hooks = "hooks",
+	LabSessions = "lab_sessions",
 	Labs = "labs",
-	Sessions = "sessions",
 	Users = "users",
 }
 
@@ -34,15 +35,23 @@ export type AuthSystemFields<T = never> = {
 
 // Record types for each collection
 
+export type ExerciseSessionsRecord = {
+	user: RecordIdString
+	startTime: IsoDateString
+	endTime?: IsoDateString
+	exercise: RecordIdString
+	agentRunning?: boolean
+}
+
 export type ExercisesRecord = {
 	title?: string
 	description?: string
+	lab: RecordIdString
 	docs?: string
 	hint?: string
 	solution?: string
 	check?: string
 	bootstrap?: string
-	agentRunning?: boolean
 }
 
 export enum HooksEventOptions {
@@ -65,21 +74,18 @@ export type HooksRecord = {
 	disabled?: boolean
 }
 
+export type LabSessionsRecord = {
+	user: RecordIdString
+	startTime: IsoDateString
+	endTime?: IsoDateString
+	lab: RecordIdString
+	clusterRunning?: boolean
+}
+
 export type LabsRecord = {
 	title?: string
 	description?: string
-	exercises: RecordIdString[]
 	docs?: string
-}
-
-export type SessionsRecord = {
-	user?: RecordIdString
-	title?: string
-	startTime?: IsoDateString
-	endTime?: IsoDateString
-	lab: RecordIdString
-	score?: number
-	clusterRunning?: boolean
 }
 
 export type UsersRecord = {
@@ -90,26 +96,29 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type ExercisesResponse = Required<ExercisesRecord> & BaseSystemFields
+export type ExerciseSessionsResponse<Texpand = unknown> = Required<ExerciseSessionsRecord> & BaseSystemFields<Texpand>
+export type ExercisesResponse<Texpand = unknown> = Required<ExercisesRecord> & BaseSystemFields<Texpand>
 export type HooksResponse = Required<HooksRecord> & BaseSystemFields
-export type LabsResponse<Texpand = unknown> = Required<LabsRecord> & BaseSystemFields<Texpand>
-export type SessionsResponse<Texpand = unknown> = Required<SessionsRecord> & BaseSystemFields<Texpand>
+export type LabSessionsResponse<Texpand = unknown> = Required<LabSessionsRecord> & BaseSystemFields<Texpand>
+export type LabsResponse = Required<LabsRecord> & BaseSystemFields
 export type UsersResponse = Required<UsersRecord> & AuthSystemFields
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
+	exercise_sessions: ExerciseSessionsRecord
 	exercises: ExercisesRecord
 	hooks: HooksRecord
+	lab_sessions: LabSessionsRecord
 	labs: LabsRecord
-	sessions: SessionsRecord
 	users: UsersRecord
 }
 
 export type CollectionResponses = {
+	exercise_sessions: ExerciseSessionsResponse
 	exercises: ExercisesResponse
 	hooks: HooksResponse
+	lab_sessions: LabSessionsResponse
 	labs: LabsResponse
-	sessions: SessionsResponse
 	users: UsersResponse
 }

@@ -6,7 +6,7 @@
   import { site } from "$lib/config";
   import { beforeNavigate } from "$app/navigation";
   import Nav from "$lib/components/base/Nav.svelte";
-  import { navigating, page } from "$app/stores";
+  import { page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
 
   // export let data: any;
@@ -25,10 +25,12 @@
 </svelte:head>
 
 <div>
-  <Toaster />
+  <Toaster
+    position="top-center"
+  />
   <!-- only display nav when not on /login -->
   {#if $page.route.id !== "/login"}
     <Nav />
   {/if}
-  <slot />
+    <slot />
 </div>
