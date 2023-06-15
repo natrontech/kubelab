@@ -4,3 +4,35 @@ a {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+}
+
+li {
+    margin-bottom: 0.25em;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #ddd;
+    padding: 0.5em;
+}
+
+code {
+    background-color: #bababa;
+    border-radius: 5px;
+    color: #000;
+    padding: 0.25em;
+    /* block */
+    display: inline-block;
+}
+

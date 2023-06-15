@@ -29,7 +29,6 @@ export const load: PageLoad = async () => {
         expand: 'exercise,exercise.lab'
     });
 
-    console.log(exercise_sessions);
     return {
         labs,
         labsSessions,

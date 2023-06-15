@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/natrontech/kubelab/hooks"
 	"github.com/natrontech/kubelab/pkg/env"
@@ -132,6 +133,8 @@ func main() {
 					return err
 				}
 
+				time.Sleep(20 * time.Second)
+
 			} else {
 				// delete the namespace
 				err := k8s.DeleteNamespace(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")))
@@ -139,6 +142,8 @@ func main() {
 					fmt.Println(err)
 					return err
 				}
+
+				time.Sleep(20 * time.Second)
 			}
 		}
 
@@ -240,9 +245,15 @@ func main() {
 					"kubelab-agent-"+exercise.Id,
 					"kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"),
 				)
+
+				// check if deployment is ready
+				err = k8s.WaitForDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
 					fmt.Println(err)
 				}
+
+				// sleep for 5 seconds
+				time.Sleep(5 * time.Second)
 
 			} else {
 				var err error

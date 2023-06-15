@@ -51,7 +51,10 @@
       "-" +
       client.authStore.model?.id;
 
-    socket?.close();
+    // Close the socket only if it is opened
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.close();
+    }
     terminal.reset();
     socket = new WebSocket("wss://" + agentUrl + "/xterm.js");
 
@@ -62,13 +65,16 @@
     };
 
     socket.onopen = () => {
-      terminal.onData((data) => {
-        socket.send(new TextEncoder().encode("\x00" + data));
-      });
+      // Check that the socket is opened before interacting with it
+      if (socket.readyState === WebSocket.OPEN) {
+        terminal.onData((data) => {
+          socket.send(new TextEncoder().encode("\x00" + data));
+        });
 
-      terminal.onTitleChange((title) => {
-        document.title = title;
-      });
+        terminal.onTitleChange((title) => {
+          document.title = title;
+        });
+      }
     };
 
     socket.onclose = () => {
@@ -99,7 +105,10 @@
       y: size.rows,
       x: size.cols
     };
-    socket.send(new TextEncoder().encode("\x01" + JSON.stringify(terminal_size)));
+    // Check that the socket is opened before interacting with it
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(new TextEncoder().encode("\x01" + JSON.stringify(terminal_size)));
+    }
   });
 
   let div: HTMLDivElement;

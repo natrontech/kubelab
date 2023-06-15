@@ -32,6 +32,7 @@ export const load: PageLoad = async ({ params }: any) => {
     return {
         exercise,
         exercises,
-        filtered_exercise_sessions
+        filtered_exercise_sessions,
+        exercise_sessions
     };
 };

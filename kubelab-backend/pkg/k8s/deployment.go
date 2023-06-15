@@ -3,6 +3,7 @@ package k8s
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -94,8 +95,8 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 									ContainerPort: 8376,
 								},
 							},
-							// --allowed-hostnames and --max-buffer-size-bytes
-							Args: []string{"--allowed-hostnames", host},
+							// --allowed-hostnames
+							Args: []string{"--allowed-hostnames", "*," + host},
 							VolumeMounts: []v1.VolumeMount{
 								{
 									Name:      "kubeconfig-writable",
@@ -169,4 +170,20 @@ func DeleteDeployment(namespace string, name string) error {
 	}
 
 	return Clientset.AppsV1().Deployments(namespace).Delete(Ctx, name, metav1.DeleteOptions{})
+}
+
+func WaitForDeployment(namespace string, name string) error {
+	for {
+		deployment, err := Clientset.AppsV1().Deployments(namespace).Get(Ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		// check if all containers are ready
+		if deployment.Status.ReadyReplicas == *deployment.Spec.Replicas {
+			return nil
+		}
+
+		time.Sleep(1 * time.Second)
+	}
 }
