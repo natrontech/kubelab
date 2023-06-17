@@ -1,11 +1,15 @@
 <script lang="ts">
   import { metadata } from "$lib/stores/metadata";
-  import { TerminalSquare } from "lucide-svelte";
+  import { ArrowLeft, TerminalSquare } from "lucide-svelte";
   import { exercises, getExerciseSessionByExercise } from "$lib/stores/data";
+    import { goto } from "$app/navigation";
 
   $metadata.title = "Exercises";
 </script>
-
+<button class="btn top-6 absolute" on:click={() => goto("/labs/")}>
+  <ArrowLeft class="inline-block w-4 h-4 mr-2" />
+  Labs
+</button>
 <h1 class="text-center text-4xl font-bold my-4">Exercises</h1>
 <div class="grid grid-cols-3 gap-4">
   {#each $exercises as exercise, i}
