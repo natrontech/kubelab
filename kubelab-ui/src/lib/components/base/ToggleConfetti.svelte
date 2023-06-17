@@ -1,5 +1,5 @@
 <script>
-  import { tick } from "svelte";
+  import { onMount, tick } from "svelte";
 
   export let toggleOnce = false;
   export let relative = true;
@@ -16,6 +16,15 @@
     await tick();
     active = true;
   }
+
+  onMount(() => {
+    if (toggleOnce) {
+      return;
+    }
+
+    click();
+  });
+
 </script>
 
 <span on:click={click} class:relative>

@@ -2,10 +2,6 @@
   import { client, logout } from "$lib/pocketbase";
   import type { NavRoute } from "$lib/types";
   import { TerminalSquare, LayoutDashboard, Home, ScrollText } from "lucide-svelte";
-  import ToggleConfetti from "./ToggleConfetti.svelte";
-
-  // @ts-ignore
-  import { Confetti } from "svelte-confetti";
 
   let avatarUrl: string = "";
 

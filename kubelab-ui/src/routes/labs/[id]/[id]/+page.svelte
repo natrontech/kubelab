@@ -72,7 +72,6 @@
     clearInterval(clear);
   });
 
-
   $metadata.title = "Exercise";
 
   async function handleStartExercise() {
@@ -126,8 +125,8 @@
   }
 </script>
 
-<Splitpanes horizontal class="p-2 bg-neutral">
-  <Pane>
+<Splitpanes horizontal class="p-2 mt-2 pb-2 bg-neutral">
+  <Pane class="">
     <Splitpanes>
       <Pane size={65}>
         <div class="p-2">
@@ -142,7 +141,10 @@
             <SvelteMarkdown source={hint} />
             <div class="flex justify-center">
               <button
-                class="btn mt-4 {showSolution === window.location.pathname.split("/")[3] && $exercise_session.agentRunning ? 'btn-neutral' : 'btn-disabled'}"
+                class="btn mt-4 {showSolution === window.location.pathname.split('/')[3] &&
+                $exercise_session.agentRunning
+                  ? 'btn-neutral'
+                  : 'btn-disabled'}"
                 on:click={() => my_modal_1.showModal()}
               >
                 <Info size={16} />

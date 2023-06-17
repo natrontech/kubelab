@@ -16,7 +16,7 @@
     fontSize: 14,
     theme: {
       foreground: "#d2d2d2",
-      background: "#282C34",
+      background: "#2B3441",
       cursor: "#adadad",
       black: "#000000",
       red: "#d81e00",
@@ -34,7 +34,8 @@
       brightMagenta: "#bc94b7",
       brightCyan: "#37e6e8",
       brightWhite: "#f1f1f0"
-    }
+    },
+    scrollOnUserInput: true
   });
 
   let socket: WebSocket;
@@ -146,8 +147,16 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
+    border: 4px solid #fff;
   }
   div :global(.xterm) {
     height: 100%;
   }
+
+  /* style scrollbar */
+  div :global(.xterm-viewport) {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+  }
+
 </style>

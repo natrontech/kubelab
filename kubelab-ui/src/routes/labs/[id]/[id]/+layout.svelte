@@ -13,6 +13,10 @@
     filterExercisesByLab
   } from "$lib/stores/data.js";
 
+  // @ts-ignore
+  import { Confetti } from "svelte-confetti";
+  import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
+
   $metadata.title = "Exercises";
 
   export let data;
@@ -133,69 +137,84 @@
   }
 </script>
 
-<div class="">
-  <div class="absolute top-0 h-16 left-0 right-0 bg-neutral">
-    <div class="mt-2 flex justify-between px-2">
-      <!-- add back button -->
-      <button class="btn btn-neutral" on:click={() => goto("/labs/" + data.pathname.split("/")[2])}>
-        <ArrowLeft class="inline-block w-4 h-4 mr-2" />
-        Back
-      </button>
+<div class="absolute top-0 h-20 left-0 right-0 bg-neutral">
+  <div class="mt-5 flex justify-between px-2">
+    <!-- add back button -->
+    <button class="btn " on:click={() => goto("/labs/" + data.pathname.split("/")[2])}>
+      <ArrowLeft class="inline-block w-4 h-4 mr-2" />
+      Exercises
+    </button>
+    <ToggleConfetti>
       <button
+        slot="label"
         class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-success'}"
         on:click={() => handleCheckExercise()}
       >
         <Check class="inline-block mr-2" />
         {$exercise_session.endTime ? "Check (already done)" : "Check"}
       </button>
-    </div>
-  </div>
-  <div class="absolute top-16 bottom-16 left-0 right-0">
-    <slot />
-  </div>
-  <div class="absolute h-16 bottom-0 left-0 right-0 bg-neutral">
-    <div class="mt-2 flex justify-between px-2">
-      <div>
-        <button
-          class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-error'}"
-          on:click={() => handleStopExercise()}
-        >
-          <StopCircle class="inline-block mr-2" />
-          Stop
-        </button>
-
-        <button
-          class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
-          on:click={() => handleRestartExercise()}
-        >
-          {#if restartLoading}
-            <RotateCw class="inline-block mr-2 animate-spin" />
-            Restart
-          {:else}
-            <RotateCw class="inline-block mr-2" />
-            Restart
-          {/if}
-        </button>
+      <div
+        style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
+      >
+        {#if $exercise_session.endTime}
+        <Confetti
+          x={[-5, 5]}
+          y={[0, 0.1]}
+          delay={[0, 2000]}
+          duration="3000"
+          amount="100"
+          fallDistance="100vh"
+        />
+        {/if}
       </div>
-      <div class="">
-        <ul class="steps mt-1">
-          {#key ($exercise.id, $exercise_session.id)}
-            {#key ($exercise_session.endTime, $exercise_session.agentRunning)}
-              {#each $exercises as currentExercise, i}
-                <button
-                  on:click={() => handleSwitchExercise(currentExercise.id)}
-                  data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
-                  class="step
+    </ToggleConfetti>
+  </div>
+</div>
+<div class="absolute top-16 bottom-16 left-0 right-0 z-0">
+  <slot />
+</div>
+<div class="absolute h-16 bottom-0 left-0 right-0 bg-neutral">
+  <div class="mt-2 flex justify-between px-2">
+    <div>
+      <button
+        class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-error'}"
+        on:click={() => handleStopExercise()}
+      >
+        <StopCircle class="inline-block mr-2" />
+        Stop
+      </button>
+
+      <button
+        class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
+        on:click={() => handleRestartExercise()}
+      >
+        {#if restartLoading}
+          <RotateCw class="inline-block mr-2 animate-spin" />
+          Restart
+        {:else}
+          <RotateCw class="inline-block mr-2" />
+          Restart
+        {/if}
+      </button>
+    </div>
+    <div class="">
+      <ul class="steps mt-1">
+        {#key ($exercise.id, $exercise_session.id)}
+          {#key ($exercise_session.endTime, $exercise_session.agentRunning)}
+            {#each $exercises as currentExercise, i}
+              <button
+                on:click={() => handleSwitchExercise(currentExercise.id)}
+                data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
+                class="step
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
-                >
-                  <li />
-                </button>
-              {/each}
-            {/key}
+              >
+                <li />
+              </button>
+            {/each}
           {/key}
-        </ul>
-      </div>
+        {/key}
+      </ul>
     </div>
   </div>
 </div>
