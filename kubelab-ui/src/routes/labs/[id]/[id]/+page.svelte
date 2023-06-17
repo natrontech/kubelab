@@ -12,7 +12,13 @@
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
   import { Info, Play } from "lucide-svelte";
-  import { exercise, exercise_session, exercise_sessions, filterExercisesByLab } from "$lib/stores/data";
+  import {
+    checkIfExerciseIsDone,
+    exercise,
+    exercise_session,
+    exercise_sessions,
+    filterExercisesByLab
+  } from "$lib/stores/data";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   let loading = false;
@@ -165,16 +171,30 @@
       {/key}
     {:else}
       <!-- button to start the agent -->
-      <div class="flex justify-center items-center h-full">
+      <div
+        class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+          ? 'bg-green-200'
+          : ''}"
+      >
         <div class="text-center">
-          <h1 class="text-4xl font-bold">Exercise not started</h1>
-          <p class="text-xl">Click the button below to start the exercise</p>
-          <button class="btn btn-neutral mt-4" on:click={() => handleStartExercise()}>
+          <h1 class="text-4xl font-bold">
+            {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+          </h1>
+          <p class="text-xl">
+            {checkIfExerciseIsDone($exercise.id)
+              ? "Click the button below to restart the exercise. You must finish it again!"
+              : "Click the button below to start the exercise"}
+          </p>
+          <button
+            class="btn {checkIfExerciseIsDone($exercise.id) ? 'btn-warning' : 'btn-neutral'} mt-4"
+            on:click={() => handleStartExercise()}
+          >
             {#if loading}
               <span class="loading loading-dots loading-md" /> Start Terminal
             {:else}
               <Play /> Start Terminal
             {/if}
+            {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
           </button>
         </div>
       </div>

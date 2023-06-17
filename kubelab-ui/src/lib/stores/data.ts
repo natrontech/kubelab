@@ -47,6 +47,14 @@ export function getExerciseSessionByExercise(exerciseId: string) {
     );
 }
 
+export function checkIfExerciseIsDone(exercise_id: string) {
+    const temp_exercise_session = getExerciseSessionByExercise(exercise_id);
+    if (temp_exercise_session) {
+        return temp_exercise_session.endTime;
+    }
+    return false;
+}
+
 export async function setExerciseByExerciseSession(exerciseSessionId: string) {
     if (exercises === undefined) {
         return;

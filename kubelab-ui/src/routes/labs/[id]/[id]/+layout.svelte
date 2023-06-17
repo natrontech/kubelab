@@ -5,6 +5,7 @@
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
   import {
+    checkIfExerciseIsDone,
     exercise,
     exercise_session,
     exercise_sessions,
@@ -128,15 +129,6 @@
         console.error(error);
         toast.error("Exercise failed to stop");
       });
-  }
-
-  function checkIfExerciseIsDone(exercise_id: string) {
-    console.log("checkIfExerciseIsDone");
-    let temp_exercise_session = getExerciseSessionByExercise(exercise_id);
-    if (temp_exercise_session) {
-      return temp_exercise_session.endTime;
-    }
-    return false;
   }
 
   function isCurrentExercise(exercise_id: string) {
