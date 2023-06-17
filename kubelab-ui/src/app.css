@@ -12,6 +12,11 @@ h1 {
     margin-bottom: 0.5em;
 }
 
+a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
 li {
     margin-bottom: 0.25em;
 }

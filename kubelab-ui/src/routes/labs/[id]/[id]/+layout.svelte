@@ -1,25 +1,24 @@
 <script lang="ts">
-  import type {
-    ExerciseSessionsResponse,
-    ExercisesResponse
-  } from "$lib/pocketbase/generated-types";
-  import { marked } from "marked";
   import { metadata } from "$lib/stores/metadata";
   import { goto } from "$app/navigation";
-  import { ArrowLeft, Check, MapPin, RotateCcw, RotateCw, StopCircle } from "lucide-svelte";
+  import { ArrowLeft, Check, RotateCw, StopCircle } from "lucide-svelte";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
-  import { page } from "$app/stores";
+  import {
+    exercise,
+    exercise_session,
+    exercise_sessions,
+    exercises,
+    filterExerciseSessionsByLab,
+    filterExercisesByLab,
+    getExerciseSessionByExercise,
+    updateDataStores
+  } from "$lib/stores/data.js";
 
   $metadata.title = "Exercises";
 
   export let data;
   let restartLoading = false;
-
-  $: exercise = data.exercise as ExercisesResponse;
-  $: exercises = data.exercises as ExercisesResponse[];
-  $: exercise_sessions = data.filtered_exercise_sessions as ExerciseSessionsResponse[];
-  $: every_exercise_sessions = data.exercise_sessions as ExerciseSessionsResponse[];
 
   function handleSwitchExercise(exercise_session_id: string) {
     let lab_session_id = data.pathname.split("/")[2];
@@ -43,11 +42,34 @@
     await fetch("https://" + agentUrl + "/check")
       .then((response) => {
         if (response.status === 200) {
-          client.collection("exercise_sessions").update(exercise_sessions[0].id, {
-            endTime: new Date().toISOString(),
-            agentRunning: false
-          });
-          toast.success("Exercise completed");
+          client
+            .collection("exercise_sessions")
+            .update($exercise_session.id, {
+              endTime: new Date().toISOString(),
+              agentRunning: false
+            })
+            .then((record: any) => {
+              let duration =
+                new Date(record.endTime).getTime() - new Date(record.startTime).getTime();
+              // show in m and s
+              let diffString = Math.floor(duration / 1000 / 60) + "m ";
+              diffString += Math.floor((duration / 1000) % 60) + "s";
+              toast.success("Exercise completed in " + diffString);
+              exercise_session.set(record);
+
+              let labId = window.location.pathname.split("/")[2];
+
+              exercise_sessions.update((exercise_sessions) => {
+                return exercise_sessions.map((exercise_session) => {
+                  if (exercise_session.id === record.id) {
+                    return record;
+                  }
+                  return exercise_session;
+                });
+              });
+
+              filterExercisesByLab(labId)
+            });
         } else {
           toast.error("Exercise not completed");
         }
@@ -95,12 +117,12 @@
   async function handleStopExercise() {
     await client
       .collection("exercise_sessions")
-      .update(exercise_sessions[0].id, {
+      .update($exercise_session.id, {
         agentRunning: false
       })
       .then((record: any) => {
         toast.success("Exercise stopped");
-        exercise_sessions[0] = record;
+        exercise_session.set(record);
       })
       .catch((error) => {
         console.error(error);
@@ -108,71 +130,83 @@
       });
   }
 
-  function getExerciseSession(exercise_id: string) {
-    let exercise_session = every_exercise_sessions.find((exercise_session) => {
-      return exercise_session.exercise === exercise_id;
-    });
-
-    if (exercise_session) {
-      return exercise_session.endTime;
+  function checkIfExerciseIsDone(exercise_id: string) {
+    console.log("checkIfExerciseIsDone");
+    let temp_exercise_session = getExerciseSessionByExercise(exercise_id);
+    if (temp_exercise_session) {
+      return temp_exercise_session.endTime;
     }
-
     return false;
   }
 
   function isCurrentExercise(exercise_id: string) {
-    return exercise.id === exercise_id;
+    return $exercise.id === exercise_id;
   }
 </script>
 
 <div class="">
-  <div class="absolute top-0 h-16 left-0 right-0">
-    <div class="mt-4 flex justify-between px-2">
+  <div class="absolute top-0 h-16 left-0 right-0 bg-neutral">
+    <div class="mt-2 flex justify-between px-2">
       <!-- add back button -->
       <button class="btn btn-neutral" on:click={() => goto("/labs/" + data.pathname.split("/")[2])}>
         <ArrowLeft class="inline-block w-4 h-4 mr-2" />
         Back
       </button>
-
-      <div class="">
-        <ul class="steps mt-1">
-          {#each exercises as exercise, i}
-            <button
-              on:click={() => handleSwitchExercise(exercise.id)}
-              data-content={isCurrentExercise(exercise.id) ? "●" : getExerciseSession(exercise.id) ? "✓" : i + 1}
-              class="step
-          {getExerciseSession(exercise.id) ? 'step-success' : ''}
-          "
-            >
-              <li />
-            </button>
-          {/each}
-        </ul>
-      </div>
+      <button
+        class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-success'}"
+        on:click={() => handleCheckExercise()}
+      >
+        <Check class="inline-block mr-2" />
+        {$exercise_session.endTime ? "Check (already done)" : "Check"}
+      </button>
     </div>
   </div>
   <div class="absolute top-16 bottom-16 left-0 right-0">
     <slot />
   </div>
-  <div class="absolute h-16 bottom-0 left-0 right-0">
+  <div class="absolute h-16 bottom-0 left-0 right-0 bg-neutral">
     <div class="mt-2 flex justify-between px-2">
-      <button class="btn btn-error" on:click={() => handleStopExercise()}>
-        <StopCircle class="inline-block mr-2" />
-        Stop
-      </button>
-      <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
-        {#if restartLoading}
-          <RotateCw class="inline-block mr-2 animate-spin" />
-          Restart
-        {:else}
-          <RotateCw class="inline-block mr-2" />
-          Restart
-        {/if}
-      </button>
-      <button class="btn btn-success" on:click={() => handleCheckExercise()}>
-        <Check class="inline-block mr-2" />
-        Check
-      </button>
+      <div>
+        <button
+          class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-error'}"
+          on:click={() => handleStopExercise()}
+        >
+          <StopCircle class="inline-block mr-2" />
+          Stop
+        </button>
+
+        <button
+          class="btn {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
+          on:click={() => handleRestartExercise()}
+        >
+          {#if restartLoading}
+            <RotateCw class="inline-block mr-2 animate-spin" />
+            Restart
+          {:else}
+            <RotateCw class="inline-block mr-2" />
+            Restart
+          {/if}
+        </button>
+      </div>
+      <div class="">
+        <ul class="steps mt-1">
+          {#key ($exercise.id, $exercise_session.id)}
+            {#key ($exercise_session.endTime, $exercise_session.agentRunning)}
+              {#each $exercises as currentExercise, i}
+                <button
+                  on:click={() => handleSwitchExercise(currentExercise.id)}
+                  data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
+                  class="step
+          {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
+          "
+                >
+                  <li />
+                </button>
+              {/each}
+            {/key}
+          {/key}
+        </ul>
+      </div>
     </div>
   </div>
 </div>

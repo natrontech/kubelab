@@ -26,7 +26,7 @@
 
 <div>
   <Toaster
-    position="top-center"
+    position="bottom-center"
   />
   <!-- only display nav when not on /login -->
   {#if $page.route.id !== "/login"}

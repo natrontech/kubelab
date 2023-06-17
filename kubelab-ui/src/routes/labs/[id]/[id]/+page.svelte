@@ -8,42 +8,34 @@
   import { terminal_size } from "$lib/stores/terminal";
   import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/stores";
-  import type {
-    ExerciseSessionsRecord,
-    ExerciseSessionsResponse,
-    ExercisesResponse
-  } from "$lib/pocketbase/generated-types.js";
+  import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
   import { Info, Play } from "lucide-svelte";
+  import { exercise, exercise_session, exercise_sessions, filterExercisesByLab } from "$lib/stores/data";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
-  export let data;
   let loading = false;
   let showSolution = false;
-
-  $: exercise = data.exercise as ExercisesResponse;
-  $: exercise_sessions = data.filtered_exercise_sessions as ExerciseSessionsResponse[];
-  $: exercise_session = data.filtered_exercise_sessions[0] as ExerciseSessionsResponse;
 
   let docs: string;
   let hint: string;
   let solution: string;
 
   async function getMarkdown() {
-    await fetch(exercise.docs)
+    await fetch($exercise.docs)
       .then((response) => response.text())
       .then((text) => {
         docs = text;
       });
 
-    await fetch(exercise.hint)
+    await fetch($exercise.hint)
       .then((response) => response.text())
       .then((text) => {
         hint = text;
       });
 
-    await fetch(exercise.solution)
+    await fetch($exercise.solution)
       .then((response) => response.text())
       .then((text) => {
         solution = text;
@@ -59,7 +51,7 @@
     }
     clearInterval(clear);
     clear = setInterval(() => {
-      if (isRecentlyStarted(exercise_sessions[0].startTime)) {
+      if (isRecentlyStarted($exercise_session.startTime)) {
         showSolution = true;
       }
     }, 5000);
@@ -80,8 +72,9 @@
     const data: ExerciseSessionsRecord = {
       // @ts-ignore
       user: client.authStore.model?.id,
-      exercise: exercise.id,
+      exercise: $exercise.id,
       startTime: new Date().toISOString(),
+      endTime: "",
       agentRunning: true
     };
 
@@ -89,34 +82,24 @@
 
     await client
       .collection("exercise_sessions")
-      .update(exercise_sessions[0].id, data)
+      .update($exercise_session.id, data)
       // @ts-ignore
       .then((record: LabSessionsResponse) => {
-        let lab_session_id = window.location.pathname.split("/")[2];
-        let exercise_id = window.location.pathname.split("/")[3];
-        let agentUrl =
-          "kubelab.swisscom.k8s.natron.cloud/kubelab-" +
-          lab_session_id +
-          "-" +
-          exercise_id +
-          "-" +
-          client.authStore.model?.id;
+        toast.success("Exercise started");
+        exercise_session.set(record);
 
-        fetch("https://" + agentUrl + "/bootstrap", {
-          method: "POST"
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              toast.success("Exercise started");
-              exercise_sessions[0] = record;
-            } else {
-              toast.error("Exercise not started");
+        let labId = window.location.pathname.split("/")[2];
+
+        exercise_sessions.update((exercise_sessions) => {
+          return exercise_sessions.map((exercise_session) => {
+            if (exercise_session.id === record.id) {
+              return record;
             }
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error("Exercise not started");
+            return exercise_session;
           });
+        });
+
+        filterExercisesByLab(labId);
       })
       .catch((error) => {
         console.error(error);
@@ -136,7 +119,7 @@
   }
 </script>
 
-<Splitpanes horizontal class="p-2">
+<Splitpanes horizontal class="p-2 bg-neutral">
   <Pane>
     <Splitpanes>
       <Pane size={65}>
@@ -153,7 +136,7 @@
             <div class="flex justify-center">
               <button
                 class="btn mt-4 {showSolution ? 'btn-neutral' : 'btn-disabled'}"
-                onclick="my_modal_1.showModal()"
+                on:click={() => my_modal_1.showModal()}
               >
                 <Info size={16} />
                 Show Solution</button
@@ -176,7 +159,7 @@
     </Splitpanes>
   </Pane>
   <Pane bind:size={$terminal_size.height}>
-    {#if exercise_sessions[0].agentRunning}
+    {#if $exercise_session.agentRunning}
       {#key $page.params}
         <Desktop {Console} />
       {/key}
