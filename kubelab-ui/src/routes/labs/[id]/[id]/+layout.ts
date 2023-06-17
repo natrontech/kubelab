@@ -1,7 +1,5 @@
 import {
     UpdateFilterEnum,
-    filterExerciseSessionsByLab,
-    filterExercisesByLab,
     setExerciseByExerciseSession,
     setExerciseSessionByExercise,
     updateDataStores

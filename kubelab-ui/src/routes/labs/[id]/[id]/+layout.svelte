@@ -10,10 +10,7 @@
     exercise_session,
     exercise_sessions,
     exercises,
-    filterExerciseSessionsByLab,
-    filterExercisesByLab,
-    getExerciseSessionByExercise,
-    updateDataStores
+    filterExercisesByLab
   } from "$lib/stores/data.js";
 
   $metadata.title = "Exercises";
@@ -69,7 +66,7 @@
                 });
               });
 
-              filterExercisesByLab(labId)
+              filterExercisesByLab(labId);
             });
         } else {
           toast.error("Exercise not completed");

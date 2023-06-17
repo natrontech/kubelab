@@ -21,8 +21,8 @@
   } from "$lib/stores/data";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
-  let loading = false;
-  let showSolution = false;
+  let loading = "";
+  let showSolution = "";
 
   let docs: string;
   let hint: string;
@@ -58,9 +58,9 @@
     clearInterval(clear);
     clear = setInterval(() => {
       if (isRecentlyStarted($exercise_session.startTime)) {
-        showSolution = true;
+        showSolution = window.location.pathname.split("/")[3];
       }
-    }, 5000);
+    }, 1000);
   }
 
   onMount(async () => {
@@ -71,6 +71,7 @@
     Console = PlaceholderComponent;
     clearInterval(clear);
   });
+
 
   $metadata.title = "Exercise";
 
@@ -84,7 +85,7 @@
       agentRunning: true
     };
 
-    loading = true;
+    loading = window.location.pathname.split("/")[3];
 
     await client
       .collection("exercise_sessions")
@@ -112,7 +113,7 @@
         toast.error("Exercise failed to start. Lab is probably still starting.");
       })
       .finally(() => {
-        loading = false;
+        loading = "";
       });
   }
 
@@ -141,7 +142,7 @@
             <SvelteMarkdown source={hint} />
             <div class="flex justify-center">
               <button
-                class="btn mt-4 {showSolution ? 'btn-neutral' : 'btn-disabled'}"
+                class="btn mt-4 {showSolution === window.location.pathname.split("/")[3] && $exercise_session.agentRunning ? 'btn-neutral' : 'btn-disabled'}"
                 on:click={() => my_modal_1.showModal()}
               >
                 <Info size={16} />
@@ -167,37 +168,41 @@
   <Pane bind:size={$terminal_size.height}>
     {#if $exercise_session.agentRunning}
       {#key $page.params}
-        <Desktop {Console} />
+        {#if $exercise_session.exercise === $exercise.id}
+          <Desktop {Console} />
+        {/if}
       {/key}
     {:else}
       <!-- button to start the agent -->
-      <div
-        class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
-          ? 'bg-green-200'
-          : ''}"
-      >
-        <div class="text-center">
-          <h1 class="text-4xl font-bold">
-            {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-          </h1>
-          <p class="text-xl">
-            {checkIfExerciseIsDone($exercise.id)
-              ? "Click the button below to restart the exercise. You must finish it again!"
-              : "Click the button below to start the exercise"}
-          </p>
-          <button
-            class="btn {checkIfExerciseIsDone($exercise.id) ? 'btn-warning' : 'btn-neutral'} mt-4"
-            on:click={() => handleStartExercise()}
-          >
-            {#if loading}
-              <span class="loading loading-dots loading-md" /> Start Terminal
-            {:else}
-              <Play /> Start Terminal
-            {/if}
-            {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
-          </button>
+      {#key $page.params}
+        <div
+          class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+            ? 'bg-green-200'
+            : ''}"
+        >
+          <div class="text-center">
+            <h1 class="text-4xl font-bold">
+              {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+            </h1>
+            <p class="text-xl">
+              {checkIfExerciseIsDone($exercise.id)
+                ? "Click the button below to restart the exercise. You must finish it again!"
+                : "Click the button below to start the exercise"}
+            </p>
+            <button
+              class="btn {checkIfExerciseIsDone($exercise.id) ? 'btn-warning' : 'btn-neutral'} mt-4"
+              on:click={() => handleStartExercise()}
+            >
+              {#if loading === window.location.pathname.split("/")[3]}
+                <span class="loading loading-dots loading-md" /> Start Terminal
+              {:else}
+                <Play /> Start Terminal
+              {/if}
+              {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
+            </button>
+          </div>
         </div>
-      </div>
+      {/key}
     {/if}
   </Pane>
 </Splitpanes>
