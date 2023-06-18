@@ -124,20 +124,23 @@
       .update(this_lab_session.id, data)
       // @ts-ignore
       .then((record: LabSessionsResponse) => {
-        setTimeout(() => {
-          toast.success("Lab stopped");
-          this_lab_session = record;
-        }, 3000);
+        toast.success("Lab stopped");
+        this_lab_session = record;
+        lab_sessions.update((lab_sessions) => {
+          return lab_sessions.map((lab_session) => {
+            if (lab_session.id === record.id) {
+              return record;
+            }
+            return lab_session;
+          });
+        });
       })
       .catch((error) => {
         console.error(error);
         toast.error("Lab failed to stop");
       })
       .finally(() => {
-        // wait 3 seconds before loading false
-        setTimeout(() => {
-          $loadingLabs = $loadingLabs.filter((id) => id !== this_lab_session.id);
-        }, 3000);
+        $loadingLabs = $loadingLabs.filter((id) => id !== this_lab_session.id);
       });
   }
 
@@ -216,7 +219,7 @@
       {:else}
         <div />
         <div class="tooltip" data-tip="start lab">
-          {#key $exercise_sessions}
+          {#key $lab_sessions}
             <button
               class="btn
             {$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 0
