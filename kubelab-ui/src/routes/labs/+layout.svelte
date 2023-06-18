@@ -1,3 +1,3 @@
-<div class="absolute top-16 bottom-0 right-0 left-0 overflow-hidden p-2">
+<div class="absolute top-20 bottom-0 right-0 left-0 overflow-y-scroll p-2">
   <slot />
 </div>
