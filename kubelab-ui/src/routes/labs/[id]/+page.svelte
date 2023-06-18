@@ -7,7 +7,6 @@
     getExerciseSessionByExercise,
     lab
   } from "$lib/stores/data";
-  import { goto } from "$app/navigation";
   import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
   import { client } from "$lib/pocketbase";
   import toast from "svelte-french-toast";

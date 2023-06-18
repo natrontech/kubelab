@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubelab-service
+  namespace: kubelab
+spec:
+  selector:
+    app: kubelab
+  ports:
+    - protocol: TCP
+      port: 8090

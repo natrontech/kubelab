@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -83,13 +82,13 @@ func main() {
 				// deploy a new vcluster
 				helmclient, err := helm.CreateHelmClient(e.Record.GetString("lab"), e.Record.GetString("user"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
 				err = helm.AddHelmRepositoryToClient(helmclient, "loft-sh", "https://charts.loft.sh")
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -128,7 +127,7 @@ func main() {
 				// convert to yaml
 				yamlValuesBytes, err := yaml.Marshal(yamlValues)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -141,13 +140,13 @@ func main() {
 					string(string(yamlValuesBytes)),
 				)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
 				err = k8s.CreateResourceQuota(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), env.Config.ResourceName, env.Config.PodsLimit, env.Config.StorageLimit)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -157,7 +156,7 @@ func main() {
 				// delete the namespace
 				err := k8s.DeleteNamespace(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -172,14 +171,14 @@ func main() {
 				// retrieve the exercise
 				exercise, err = app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
 				// check if the namespace exists
 				err = k8s.CreateNamespace(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				} else {
 					return err
 				}
@@ -187,7 +186,7 @@ func main() {
 				// check if vcluster pod exists 'vcluster-0'
 				_, err = k8s.GetPodByName(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "vcluster-0")
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -195,14 +194,14 @@ func main() {
 				var secret *v1.Secret
 				secret, err = k8s.GetSecretByName(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "vc-vcluster")
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
 				// get exercise.GetString("bootstrap") this is a url to a bootstrap script over https github raw
 				bootstrap, err := http.Get(exercise.GetString("bootstrap"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -211,13 +210,13 @@ func main() {
 				// read the body
 				bootstrapBody, err := io.ReadAll(bootstrap.Body)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
 				check, err := http.Get(exercise.GetString("check"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -226,7 +225,7 @@ func main() {
 				// read the body
 				checkBody, err := io.ReadAll(check.Body)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 
@@ -242,7 +241,7 @@ func main() {
 					env.Config.AllowedHosts,
 				)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				}
 
 				// create a new service
@@ -252,7 +251,7 @@ func main() {
 					8376,
 				)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				}
 
 				// create a new ingress
@@ -267,7 +266,7 @@ func main() {
 				// check if deployment is ready
 				err = k8s.WaitForDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				}
 
 				// sleep for 5 seconds
@@ -279,27 +278,27 @@ func main() {
 				// retrieve the exercise
 				exercise, err = app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					return err
 				}
 				// delete the deployment
 				err = k8s.DeleteDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					// return err
 				}
 
 				// delete the service
 				err = k8s.DeleteService(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					// return err
 				}
 
 				// delete the ingress
 				err = k8s.DeleteIngress(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"))
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					// return err
 				}
 			}

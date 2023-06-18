@@ -1,7 +1,7 @@
 package env
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/caarlos0/env/v8"
 )
@@ -19,11 +19,11 @@ var Config config
 
 func Init() {
 	if err := env.Parse(&Config); err != nil {
-		fmt.Printf("%+v\n", err)
+		log.Printf("%+v\n", err)
 	}
 
 	if Config.Local {
-		fmt.Println("Running in local mode")
+		log.Println("Running in local mode")
 	}
 
 	if Config.KubelabImage == "" {

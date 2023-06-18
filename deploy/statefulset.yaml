@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kubelab-statefulset
+  namespace: kubelab
+spec:
+  serviceName: "kubelab-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubelab
+  template:
+    metadata:
+      labels:
+        app: kubelab
+    spec:
+      serviceAccountName: kubelab-admin
+      containers:
+      - name: kubelab
+        image: ghcr.io/natrontech/kubelab:latest
+        # image: kubelab:local
+        ports:
+        - containerPort: 8090
+        volumeMounts:
+        - name: pb-data
+          mountPath: /app/kubelab/pb_data
+  volumeClaimTemplates:
+  - metadata:
+      name: pb-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: hcloud-volumes

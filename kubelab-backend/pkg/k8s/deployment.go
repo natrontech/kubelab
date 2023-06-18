@@ -1,7 +1,7 @@
 package k8s
 
 import (
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -24,7 +24,7 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 		},
 	}
 	if _, err := Clientset.CoreV1().ConfigMaps(namespace).Create(Ctx, configMap, metav1.CreateOptions{}); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	// create config maps for scripts
@@ -39,7 +39,7 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 	}
 
 	if _, err := Clientset.CoreV1().ConfigMaps(namespace).Create(Ctx, scriptsConfigMap, metav1.CreateOptions{}); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	deployment := &appsv1.Deployment{
@@ -153,7 +153,7 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 
 	deployment, err := Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	return deployment, nil
@@ -162,11 +162,11 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 func DeleteDeployment(namespace string, name string) error {
 	// Delete the configmap first
 	if err := Clientset.CoreV1().ConfigMaps(namespace).Delete(Ctx, "kubeconfig", metav1.DeleteOptions{}); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	if err := Clientset.CoreV1().ConfigMaps(namespace).Delete(Ctx, "scripts-"+name, metav1.DeleteOptions{}); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	return Clientset.AppsV1().Deployments(namespace).Delete(Ctx, name, metav1.DeleteOptions{})

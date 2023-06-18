@@ -3,7 +3,6 @@
   import Prism from "prismjs";
     import toast from "svelte-french-toast";
   export let text: string;
-  export let lang: string;
 
   let language = "javascript";
 

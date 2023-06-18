@@ -19,14 +19,6 @@
 </button>
 
 <style>
-  .code {
-    white-space: pre-wrap;
-    overflow-x: auto;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 0.5rem;
-  }
-
   .btn {
     /* disable caps lock */
     text-transform: none;
