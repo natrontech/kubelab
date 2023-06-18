@@ -2,10 +2,6 @@
   import { client, logout } from "$lib/pocketbase";
   import type { NavRoute } from "$lib/types";
   import { TerminalSquare, LayoutDashboard, Home, ScrollText } from "lucide-svelte";
-  import ToggleConfetti from "./ToggleConfetti.svelte";
-
-  // @ts-ignore
-  import { Confetti } from "svelte-confetti";
 
   let avatarUrl: string = "";
 
@@ -95,7 +91,6 @@
         tabindex="0"
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black"
       >
-        <li><a href="/settings">Settings</a></li>
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
     </div>

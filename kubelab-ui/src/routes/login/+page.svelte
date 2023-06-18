@@ -13,13 +13,15 @@
     password: ""
   };
   let user = { ...DEFAULTS };
+  let loading = false;
 
   async function submit() {
+    loading = true;
     await alertOnFailure(async function () {
       await login(user.email, user.password);
-      goto("/");
-      user = { ...DEFAULTS };
       toast.success("Logged in successfully!");
+      goto("/");
+      loading = false;
     });
   }
 </script>
@@ -82,7 +84,13 @@
             </div>
           </div>
           <div>
-            <button type="submit" class="btn btn-block"> Sign in </button>
+            <button type="submit" class="btn btn-neutral btn-block">
+              {#if loading}
+                <span class="loading loading-dots loading-md" /> Loading
+              {:else}
+                Sign in
+              {/if}
+            </button>
           </div>
         </div>
         <div class="pt-5 text-center text-gray-400 text-xs">

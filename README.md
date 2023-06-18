@@ -40,7 +40,7 @@ Built with:
 - [pocketbase](https://pocketbase.io)
 
 <p align="center">
-	<img height="400px" src="assets/screenshots/exercise.gif" />
+	<img height="400px" src="assets/screenshots/terminal.png" />
 </p>
 
 ---

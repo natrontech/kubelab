@@ -1,26 +1,15 @@
 <script lang="ts">
   import Chart from "$lib/components/dashboard/Chart.svelte";
-  import type {
-    ExerciseSessionsResponse,
-    ExercisesResponse,
-    LabSessionsResponse,
-    LabsResponse
-  } from "$lib/pocketbase/generated-types.js";
-  import { FlaskConical, TerminalSquare } from "lucide-svelte";
-
-  export let data;
-  $: labs = data.labs as LabsResponse[];
-  $: lab_sessions = data.labsSessions as LabSessionsResponse[];
-  $: exercises = data.exercises as ExercisesResponse[];
-  $: exercise_sessions = data.exercise_sessions as ExerciseSessionsResponse[];
+  import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data.js";
+  import { TerminalSquare } from "lucide-svelte";
 
   function getDoneExercisesNumber() {
-    let done_exercises = exercise_sessions.filter((exercise_session) => exercise_session.endTime);
+    let done_exercises = $exercise_sessions.filter((exercise_session) => exercise_session.endTime);
     return done_exercises.length;
   }
 
   function getAverageTimeToResolve() {
-    let done_exercises = exercise_sessions.filter((exercise_session) => exercise_session.endTime);
+    let done_exercises = $exercise_sessions.filter((exercise_session) => exercise_session.endTime);
     let total_time = 0;
     done_exercises.forEach((exercise_session) => {
       // convert starTime and endTime to Date objects
@@ -50,14 +39,16 @@
   <div
     class="stats shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-4 border-black"
   >
-    <div class="stat">
-      <div class="stat-figure text-blue-500">
-        <TerminalSquare class="w-8 h-8" />
+    <a href="/labs">
+      <div class="stat">
+        <div class="stat-figure text-blue-500">
+          <TerminalSquare class="w-8 h-8" />
+        </div>
+        <div class="stat-title">Total Labs</div>
+        <div class="stat-value text-blue-500">{$labs.length}</div>
+        <div class="stat-desc">With <strong>{$exercises.length}</strong> exercises</div>
       </div>
-      <div class="stat-title">Total Labs</div>
-      <div class="stat-value text-blue-500">{labs.length}</div>
-      <div class="stat-desc">Git related labs</div>
-    </div>
+    </a>
 
     <div class="stat">
       <div class="stat-figure text-accent">
@@ -75,24 +66,24 @@
         >
       </div>
       <div class="stat-title">Total Exercises</div>
-      <div class="stat-value text-accent">{exercises.length}</div>
-      <div class="stat-desc">21% more than last month</div>
+      <div class="stat-value text-accent">{$exercises.length}</div>
+      <div class="stat-desc">Within <strong>{$labs.length}</strong> labs</div>
     </div>
 
     <div class="stat">
       <div class="stat-figure text-secondary">
         <progress
           class="progress w-56"
-          value={Math.round((getDoneExercisesNumber() / exercises.length) * 100)}
+          value={Math.round((getDoneExercisesNumber() / $exercises.length) * 100)}
           max="100"
         />
       </div>
       <div class="stat-value">
-        {Math.round((getDoneExercisesNumber() / exercises.length) * 100)}%
+        {Math.round((getDoneExercisesNumber() / $exercises.length) * 100)}%
       </div>
       <div class="stat-title">Exercises done</div>
       <div class="stat-desc text-blue-500">
-        {exercises.length - getDoneExercisesNumber()} exercise(s) remaining
+        {$exercises.length - getDoneExercisesNumber()} exercise(s) remaining
       </div>
     </div>
   </div>

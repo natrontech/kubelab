@@ -37,7 +37,7 @@ export type AuthSystemFields<T = never> = {
 
 export type ExerciseSessionsRecord = {
 	user: RecordIdString
-	startTime: IsoDateString
+	startTime?: IsoDateString
 	endTime?: IsoDateString
 	exercise: RecordIdString
 	agentRunning?: boolean
@@ -76,7 +76,7 @@ export type HooksRecord = {
 
 export type LabSessionsRecord = {
 	user: RecordIdString
-	startTime: IsoDateString
+	startTime?: IsoDateString
 	endTime?: IsoDateString
 	lab: RecordIdString
 	clusterRunning?: boolean

@@ -102,6 +102,15 @@ func main() {
 						StorageClasses struct {
 							Enabled bool `yaml:"enabled"`
 						} `yaml:"storageclasses"`
+						Ingresses struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"ingresses"`
+						VolumeSnapshots struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"volumesnapshots"`
+						PodDisruptionBudgets struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"poddisruptionbudgets"`
 					} `yaml:"sync"`
 					Storage struct {
 						Persistence bool `yaml:"persistence"`
@@ -111,6 +120,9 @@ func main() {
 				// convert to string
 				yamlValues.Sync.PersistentVolumes.Enabled = true
 				yamlValues.Sync.StorageClasses.Enabled = true
+				yamlValues.Sync.Ingresses.Enabled = true
+				yamlValues.Sync.VolumeSnapshots.Enabled = true
+				yamlValues.Sync.PodDisruptionBudgets.Enabled = true
 				yamlValues.Storage.Persistence = false
 
 				// convert to yaml
@@ -133,7 +145,13 @@ func main() {
 					return err
 				}
 
-				time.Sleep(20 * time.Second)
+				err = k8s.CreateResourceQuota(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), env.Config.ResourceName, env.Config.PodsLimit, env.Config.StorageLimit)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
+				time.Sleep(15 * time.Second)
 
 			} else {
 				// delete the namespace
@@ -143,7 +161,7 @@ func main() {
 					return err
 				}
 
-				time.Sleep(20 * time.Second)
+				time.Sleep(15 * time.Second)
 			}
 		}
 
