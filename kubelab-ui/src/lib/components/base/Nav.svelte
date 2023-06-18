@@ -28,12 +28,6 @@
       href: "/labs",
       icon: TerminalSquare
     },
-    {
-      id: "3",
-      name: "Docs",
-      href: "/docs",
-      icon: ScrollText
-    }
   ];
 </script>
 
