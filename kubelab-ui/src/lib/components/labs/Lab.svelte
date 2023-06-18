@@ -8,6 +8,7 @@
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
+    import { lab_sessions, updateDataStores } from "$lib/stores/data";
   import { Inspect, Play, StopCircle, TerminalSquare } from "lucide-svelte";
   import toast from "svelte-french-toast";
 
@@ -33,6 +34,14 @@
   }
 
   async function startLab() {
+
+    // if there is more than one lab_session clusterRunning = true, fail
+    if ($lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 0) {
+      toast.error("There is already a lab running");
+      updateDataStores();
+      return;
+    }
+
     const data: LabSessionsRecord = {
       clusterRunning: true,
       // @ts-ignore
@@ -180,7 +189,7 @@
     <div class="grid grid-cols-2 gap-2 mb-2 mr-2">
       {#if lab_session.clusterRunning}
         <div class="tooltip" data-tip="stop lab">
-          <button class="btn " on:click={() => stopLab()}>
+          <button class="btn btn-error" on:click={() => stopLab()}>
             {#if loading}
               <span class="loading loading-dots loading-md" />
             {:else}
@@ -191,7 +200,7 @@
       {:else}
         <div />
         <div class="tooltip" data-tip="start lab">
-          <button class="btn" on:click={() => startLab()}>
+          <button class="btn btn-success" on:click={() => startLab()}>
             {#if loading}
               <span class="loading loading-dots loading-md" />
             {:else}
@@ -203,7 +212,7 @@
       {#if lab_session.clusterRunning}
         <div class="tooltip" data-tip="exercises">
           <a href={lab.id}>
-            <button class="btn"><Inspect /></button>
+            <button class="btn btn-neutral"><Inspect /></button>
           </a>
         </div>
       {/if}

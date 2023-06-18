@@ -2,6 +2,7 @@
   import "../app.postcss";
   import "../app.css";
   import "../styles/xterm.css";
+  import "../styles/prism.css";
   import { metadata } from "$lib/stores/metadata";
   import { site } from "$lib/config";
   import { beforeNavigate } from "$app/navigation";

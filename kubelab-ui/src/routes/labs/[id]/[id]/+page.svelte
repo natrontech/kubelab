@@ -2,7 +2,6 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import PlaceholderComponent from "$lib/components/base/PlaceholderComponent.svelte";
   import { onMount, type ComponentType, type SvelteComponentTyped, onDestroy } from "svelte";
-  import { marked } from "marked";
   import Desktop from "$lib/components/base/Desktop.svelte";
   import { metadata } from "$lib/stores/metadata";
   import { terminal_size } from "$lib/stores/terminal";
@@ -19,9 +18,12 @@
     exercise_sessions,
     filterExercisesByLab
   } from "$lib/stores/data";
+  import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
+  import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   let loading = "";
+  let loadingMD = "";
   let showSolution = "";
 
   let docs: string;
@@ -29,23 +31,38 @@
   let solution: string;
 
   async function getMarkdown() {
-    await fetch($exercise.docs)
-      .then((response) => response.text())
-      .then((text) => {
-        docs = text;
-      });
+    loadingMD = window.location.pathname.split("/")[3];
 
-    await fetch($exercise.hint)
-      .then((response) => response.text())
-      .then((text) => {
-        hint = text;
-      });
+    new Promise((resolve, reject) => {
+      fetch($exercise.docs)
+        .then((response) => response.text())
+        .then((text) => {
+          docs = text;
+        })
+        .catch((error) => {
+          reject(error);
+        });
 
-    await fetch($exercise.solution)
-      .then((response) => response.text())
-      .then((text) => {
-        solution = text;
-      });
+      fetch($exercise.hint)
+        .then((response) => response.text())
+        .then((text) => {
+          hint = text;
+        })
+        .catch((error) => {
+          reject(error);
+        });
+
+      fetch($exercise.solution)
+        .then((response) => response.text())
+        .then((text) => {
+          solution = text;
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    }).finally(() => {
+      loadingMD = "";
+    });
   }
 
   let clear: any;
@@ -126,20 +143,33 @@
 </script>
 
 <Splitpanes horizontal class="p-2 mt-2 pb-2 bg-neutral">
-  <Pane class="">
+  <Pane>
     <Splitpanes>
-      <Pane size={65}>
-        <div class="p-2">
+      <Pane maxSize={75} size={65}>
+        <div class="p-2 leading-8 h-full overflow-y-scroll">
           {#key $page.params}
-            <SvelteMarkdown source={docs} />
+            <SvelteMarkdown
+              source={docs}
+              renderers={{
+                codespan: CodeSpanComponent,
+                code: CodeComponent,
+              }}
+            />
           {/key}
         </div>
       </Pane>
       <Pane>
-        <div class="p-2">
+        <div class="p-2 leading-8 h-full overflow-y-scroll">
           {#key $page.params}
-            <SvelteMarkdown source={hint} />
+            <SvelteMarkdown
+              source={hint}
+              renderers={{
+                codespan: CodeSpanComponent,
+                code: CodeComponent
+              }}
+            />
             <div class="flex justify-center">
+              <!-- svelte-ignore missing-declaration -->
               <button
                 class="btn mt-4 {showSolution === window.location.pathname.split('/')[3] &&
                 $exercise_session.agentRunning
@@ -148,13 +178,19 @@
                 on:click={() => my_modal_1.showModal()}
               >
                 <Info size={16} />
-                Show Solution</button
-              >
+                Show Solution
+              </button>
               <dialog id="my_modal_1" class="modal">
                 <form method="dialog" class="modal-box">
                   <h3 class="font-bold text-lg">Solution</h3>
 
-                  <SvelteMarkdown source={solution} />
+                  <SvelteMarkdown
+                    source={solution}
+                    renderers={{
+                      codespan: CodeSpanComponent,
+                      code: CodeComponent
+                    }}
+                  />
                   <div class="modal-action">
                     <!-- if there is a button in form, it will close the modal -->
                     <button class="btn">Close</button>
@@ -208,3 +244,9 @@
     {/if}
   </Pane>
 </Splitpanes>
+
+<style>
+  * {
+    word-break: keep-all;
+  }
+</style>
