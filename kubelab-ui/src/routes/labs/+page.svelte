@@ -43,13 +43,22 @@
 
 {#if $lab_sessions.length > 0}
   <h1 class="text-center text-4xl font-bold my-4">Labs</h1>
+  {#key $lab_sessions}
+    <p class="text-center text-xl my-4">
+      <!-- display number of running labs x/1 -->
+      Running labs:
+      <span class="font-bold"
+        >{$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}</span
+      > / 1
+    </p>
+  {/key}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-    {#each $labs as lab}
+    {#each $labs as this_lab}
       <Lab
-        {lab}
-        lab_session={getLabSessions(lab.id)}
-        exercises={getExercises(lab.id)}
-        exercise_sessions={getExercisesSessions(lab.id)}
+        {this_lab}
+        this_lab_session={getLabSessions(this_lab.id)}
+        this_exercises={getExercises(this_lab.id)}
+        this_exercise_sessions={getExercisesSessions(this_lab.id)}
       />
     {/each}
   </div>

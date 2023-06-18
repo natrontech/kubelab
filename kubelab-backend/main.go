@@ -151,7 +151,7 @@ func main() {
 					return err
 				}
 
-				time.Sleep(20 * time.Second)
+				time.Sleep(15 * time.Second)
 
 			} else {
 				// delete the namespace
@@ -161,7 +161,7 @@ func main() {
 					return err
 				}
 
-				time.Sleep(20 * time.Second)
+				time.Sleep(15 * time.Second)
 			}
 		}
 

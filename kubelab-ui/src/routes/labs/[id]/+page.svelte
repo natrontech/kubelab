@@ -11,9 +11,9 @@
   import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
   import { client } from "$lib/pocketbase";
   import toast from "svelte-french-toast";
+  import { loadingExercises } from "$lib/stores/loading";
 
   $metadata.title = "Exercises";
-  let loading: string[] = [];
 
   function isExerciseRunning(exercise_id: string) {
     return getExerciseSessionByExercise(exercise_id)?.agentRunning;
@@ -29,7 +29,7 @@
       agentRunning: true
     };
 
-    loading = loading.concat(exercise_id);
+    $loadingExercises = $loadingExercises.concat(exercise_id);
 
     // const labId = window.location.pathname.split("/")[2];
 
@@ -51,13 +51,12 @@
               return exercise_session;
             });
           });
-
         })
         .catch((error) => {
           toast.error(error.message);
         })
         .finally(() => {
-          loading = loading.filter((id) => id !== exercise_id);
+          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
         });
     }
   }
@@ -100,7 +99,7 @@
                 class="btn {isExerciseRunning(exercise.id) ? 'btn-disabled' : 'btn-neutral'}"
                 on:click={() => startExercise(exercise.id)}
               >
-                {#if loading.includes(exercise.id)}
+                {#if $loadingExercises.includes(exercise.id)}
                   <span class="loading loading-dots loading-md" />
                 {:else}
                   <Play />
