@@ -144,8 +144,7 @@
 </script>
 
 <div
-  tabindex="0"
-  class="collapse collapse-arrow border-black border-4 bg-base-200 overflow-visible"
+  class="collapse border-black border-4 bg-base-200 overflow-visible"
 >
   <div class="collapse-title text-xl font-medium">
     {lab.title}

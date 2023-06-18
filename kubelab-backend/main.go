@@ -133,6 +133,12 @@ func main() {
 					return err
 				}
 
+				err = k8s.CreateResourceQuota(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")), env.Config.ResourceName, env.Config.PodsLimit, env.Config.StorageLimit)
+				if err != nil {
+					fmt.Println(err)
+					return err
+				}
+
 				time.Sleep(20 * time.Second)
 
 			} else {
