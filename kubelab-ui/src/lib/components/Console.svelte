@@ -153,10 +153,4 @@
     height: 100%;
   }
 
-  /* style scrollbar */
-  div :global(.xterm-viewport) {
-    overflow-y: hidden !important;
-    overflow-x: hidden !important;
-  }
-
 </style>

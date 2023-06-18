@@ -26,7 +26,7 @@ def post_request(url, data):
     try:
         headers = {'Content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
-        print(response.text)
+        return response
     except requests.exceptions.RequestException as e:
         print(e)
 
@@ -51,7 +51,34 @@ def main():
             'description': lab.description,
             'docs': prefix + lab.docs
         }
-        post_request(labs_upload_url, data)
+        response = post_request(labs_upload_url, data)
+        if response.status_code == 200:
+            print("Lab {} uploaded successfully".format(lab.title))
+            # convert response.content bytes to json
+            labId = json.loads(response.text)['id']
+            print("Lab {} id: {}".format(lab.title, labId))
+            for exercise in exercises:
+                if exercise.lab == lab.title:
+                    data = {
+                        'title': exercise.title,
+                        'description': exercise.description,
+                        'docs': prefix + exercise.docs,
+                        'hint': prefix + exercise.hint,
+                        'solution': prefix + exercise.solution,
+                        'check': prefix + exercise.check,
+                        'bootstrap': prefix + exercise.bootstrap,
+                        'lab': labId
+                    }
+                    response = post_request(exercises_upload_url, data)
+                    if response.status_code == 200:
+                        print("Exercise {} uploaded successfully".format(exercise.title))
+                    else:
+                        print("Exercise {} upload failed".format(exercise.title))
+
+
+        else:
+            print("Lab {} upload failed".format(lab.title))
+
 
 
 def get_labs_from_dir(path):
@@ -88,16 +115,24 @@ def get_exercises_from_dir(path, level=1, parent=None):
                     Exercise(
                         title=name,
                         description=name,
-                        docs=prename+"/docs.md",
-                        hint=prename+"/hint.md",
-                        solution=prename+"/solution.md",
-                        check=prename+"/check.sh",
-                        bootstrap=prename+"/bootstrap.sh",
-                        lab=parent
+                        docs=parent+"/"+prename+"/docs.md",
+                        hint=parent+"/"+prename+"/hint.md",
+                        solution=parent+"/"+prename+"/solution.md",
+                        check=parent+"/"+prename+"/check.sh",
+                        bootstrap=parent+"/"+prename+"/bootstrap.sh",
+                        lab=parse_name(parent)
                     )
                 )
             exercises.extend(get_exercises_from_dir(full_path, level + 1, parent=name))
     return exercises
+
+def parse_name(name):
+    name = name.split("_")
+    number = name[0]
+    name = name[1:]
+    name = " ".join(name)
+    name = number+" "+name.title()
+    return name
 
 
 if __name__ == '__main__':
