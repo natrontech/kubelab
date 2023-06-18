@@ -41,7 +41,7 @@
   }
 </script>
 
-{#if $lab_sessions.length > 0}
+{#if $lab_sessions.length > 1}
   <h1 class="text-center text-4xl font-bold my-4">Labs</h1>
   {#key $lab_sessions}
     <p class="text-center text-xl my-4">
@@ -49,7 +49,7 @@
       Running labs:
       <span class="font-bold"
         >{$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}</span
-      > / 1
+      > / 2
     </p>
   {/key}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">

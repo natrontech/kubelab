@@ -34,8 +34,8 @@
 
   async function startLab() {
     // if there is more than one lab_session clusterRunning = true, fail
-    if ($lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 0) {
-      toast.error("There is already a lab running");
+    if ($lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 1) {
+      toast.error("There are already two lab running");
       return;
     }
 
@@ -222,7 +222,7 @@
           {#key $lab_sessions}
             <button
               class="btn
-            {$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 0
+            {$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 1
                 ? 'btn-disabled'
                 : 'btn-success'}"
               on:click={() => startLab()}
