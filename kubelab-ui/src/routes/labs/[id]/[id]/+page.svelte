@@ -20,6 +20,7 @@
   } from "$lib/stores/data";
   import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
+  import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   let loading = "";
@@ -138,21 +139,27 @@
     let start = new Date(startTime);
     let diff = Math.abs(now.getTime() - start.getTime());
     let minutes = Math.floor(diff / 1000 / 60);
-    return minutes > 1;
+    return minutes > 5;
+  }
+
+  function openModal() {
+    // @ts-ignore
+    window.my_modal_1.showModal();
   }
 </script>
 
 <Splitpanes horizontal class="p-2 mt-2 pb-2 bg-neutral">
-  <Pane>
+  <Pane class="rounded-md my-2">
     <Splitpanes>
       <Pane maxSize={75} size={65}>
-        <div class="p-2 leading-8 h-full overflow-y-scroll">
+        <div class="p-2 leading-8 h-full overflow-y-scroll bg-white">
           {#key $page.params}
             <SvelteMarkdown
               source={docs}
               renderers={{
                 codespan: CodeSpanComponent,
                 code: CodeComponent,
+                link: LinkComponent
               }}
             />
           {/key}
@@ -165,7 +172,8 @@
               source={hint}
               renderers={{
                 codespan: CodeSpanComponent,
-                code: CodeComponent
+                code: CodeComponent,
+                link: LinkComponent
               }}
             />
             <div class="flex justify-center">
@@ -175,7 +183,7 @@
                 $exercise_session.agentRunning
                   ? 'btn-neutral'
                   : 'btn-disabled'}"
-                on:click={() => my_modal_1.showModal()}
+                on:click={() => openModal()}
               >
                 <Info size={16} />
                 Show Solution
@@ -188,7 +196,8 @@
                     source={solution}
                     renderers={{
                       codespan: CodeSpanComponent,
-                      code: CodeComponent
+                      code: CodeComponent,
+                      link: LinkComponent
                     }}
                   />
                   <div class="modal-action">

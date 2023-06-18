@@ -91,7 +91,6 @@
         tabindex="0"
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black"
       >
-        <li><a href="/settings">Settings</a></li>
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
     </div>

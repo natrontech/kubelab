@@ -62,10 +62,10 @@
   }
 </script>
 
-<button class="btn top-5 absolute" on:click={() => goto("/labs/")}>
+<a class="btn top-5 absolute" href="/labs/">
   <ArrowLeft class="inline-block w-4 h-4 mr-2" />
   Labs
-</button>
+</a>
 <h1 class="text-center text-4xl font-bold my-4">Exercises</h1>
 <div class="grid grid-cols-3 gap-4">
   {#key $exercise_sessions}

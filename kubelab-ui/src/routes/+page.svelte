@@ -39,14 +39,16 @@
   <div
     class="stats shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-4 border-black"
   >
-    <div class="stat">
-      <div class="stat-figure text-blue-500">
-        <TerminalSquare class="w-8 h-8" />
+    <a href="/labs">
+      <div class="stat">
+        <div class="stat-figure text-blue-500">
+          <TerminalSquare class="w-8 h-8" />
+        </div>
+        <div class="stat-title">Total Labs</div>
+        <div class="stat-value text-blue-500">{$labs.length}</div>
+        <div class="stat-desc">With <strong>{$exercises.length}</strong> exercises</div>
       </div>
-      <div class="stat-title">Total Labs</div>
-      <div class="stat-value text-blue-500">{$labs.length}</div>
-      <div class="stat-desc">Git related labs</div>
-    </div>
+    </a>
 
     <div class="stat">
       <div class="stat-figure text-accent">
@@ -65,7 +67,7 @@
       </div>
       <div class="stat-title">Total Exercises</div>
       <div class="stat-value text-accent">{$exercises.length}</div>
-      <div class="stat-desc">21% more than last month</div>
+      <div class="stat-desc">Within <strong>{$labs.length}</strong> labs</div>
     </div>
 
     <div class="stat">

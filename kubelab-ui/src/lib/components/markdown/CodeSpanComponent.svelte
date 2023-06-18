@@ -11,7 +11,7 @@
 </script>
 
 <button
-  class="inline bg-gray-500 text-xs transition-all duration-150 ease-in-out cursor-pointer rounded-md p-2 hover:bg-white text-white hover:text-gray-500"
+  class="btn btn-sm btn-neutral"
   on:click={copyCode}
 >
   <code>{raw.replace(/`/g, "")}</code>
@@ -26,4 +26,10 @@
     background-color: #f5f5f5;
     border-radius: 0.5rem;
   }
+
+  .btn {
+    /* disable caps lock */
+    text-transform: none;
+  }
+
 </style>
