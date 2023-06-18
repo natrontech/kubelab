@@ -8,15 +8,36 @@
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
-  import { exercise_sessions, lab_sessions } from "$lib/stores/data";
+  import { exercise, exercise_sessions, lab_sessions } from "$lib/stores/data";
   import { loadingLabs } from "$lib/stores/loading";
   import { Inspect, Play, StopCircle } from "lucide-svelte";
   import toast from "svelte-french-toast";
+  import SvelteMarkdown from "svelte-markdown";
+  import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
+  import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
+  import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
+    import { onMount } from "svelte";
 
   export let this_lab: LabsResponse;
   export let this_lab_session: LabSessionsResponse;
   export let this_exercises: ExercisesResponse[];
   export let this_exercise_sessions: ExerciseSessionsResponse[];
+
+  let docs: string;
+
+  async function getMarkdown() {
+    fetch(this_lab.docs)
+      .then((response) => response.text())
+      .then((text) => {
+        docs = text;
+      }).catch((error) => {
+        console.error(error);
+      });
+  }
+
+  onMount(() => {
+    getMarkdown();
+  });
 
   function getDoneExercises() {
     let done_exercises: ExercisesResponse[] = [];
@@ -173,7 +194,7 @@
   }
 </script>
 
-<div class="collapse border-black border-4 bg-base-200 overflow-visible">
+<div tabindex="0" class="collapse border-black border-4 bg-base-200 overflow-visible collapse-arrow">
   <div class="collapse-title text-xl font-medium">
     {this_lab.title}
     <!-- show some stats -->
@@ -194,7 +215,14 @@
     <!-- show how many exercises are done already -->
   </div>
   <div class="collapse-content">
-    <p>{this_lab.description}</p>
+    <SvelteMarkdown
+      source={docs}
+      renderers={{
+        codespan: CodeSpanComponent,
+        code: CodeComponent,
+        link: LinkComponent
+      }}
+    />
   </div>
   <div class="justify-end content-end flex">
     <div
