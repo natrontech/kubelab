@@ -104,12 +104,6 @@ func main() {
 						Ingresses struct {
 							Enabled bool `yaml:"enabled"`
 						} `yaml:"ingresses"`
-						VolumeSnapshots struct {
-							Enabled bool `yaml:"enabled"`
-						} `yaml:"volumesnapshots"`
-						PodDisruptionBudgets struct {
-							Enabled bool `yaml:"enabled"`
-						} `yaml:"poddisruptionbudgets"`
 					} `yaml:"sync"`
 					Storage struct {
 						Persistence bool `yaml:"persistence"`
@@ -120,8 +114,6 @@ func main() {
 				yamlValues.Sync.PersistentVolumes.Enabled = true
 				yamlValues.Sync.StorageClasses.Enabled = true
 				yamlValues.Sync.Ingresses.Enabled = true
-				yamlValues.Sync.VolumeSnapshots.Enabled = true
-				yamlValues.Sync.PodDisruptionBudgets.Enabled = true
 				yamlValues.Storage.Persistence = false
 
 				// convert to yaml
