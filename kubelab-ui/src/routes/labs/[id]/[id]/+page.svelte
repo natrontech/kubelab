@@ -185,7 +185,7 @@
               <dialog id="my_modal_2" class="modal">
                 <form method="dialog" class="modal-box">
                   <h3 class="font-bold text-lg">Hint</h3>
-
+                  <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                   <SvelteMarkdown
                     source={hint}
                     renderers={{
@@ -194,10 +194,6 @@
                       link: LinkComponent
                     }}
                   />
-                  <div class="modal-action">
-                    <!-- if there is a button in form, it will close the modal -->
-                    <button class="btn">Close</button>
-                  </div>
                 </form>
               </dialog>
             </div>

@@ -6,10 +6,10 @@
 </script>
 
 <a {href} {title} target="_blank">
-  <button class="btn btn-sm btn-info ">
+  <div class="btn btn-sm btn-info">
     <slot />
     <ExternalLink class="inline ml-2" size={16} />
-  </button>
+  </div>
 </a>
 
 <style>
