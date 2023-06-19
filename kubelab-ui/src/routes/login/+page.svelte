@@ -32,7 +32,7 @@
   class="bg-no-repeat bg-cover bg-center relative"
   style="background-image: url(/images/bg.svg);"
 >
-  <div class="absolute inset-0 z-0" />
+  <div class="absolute sm:inset-0 z-0" />
   <div class="min-h-screen sm:flex sm:flex-row mx-0 justify-center">
     <div class="flex-col flex  self-center p-10 sm:max-w-5xl xl:max-w-2xl  z-10">
       <div class="self-start hidden lg:flex flex-col  text-white">
