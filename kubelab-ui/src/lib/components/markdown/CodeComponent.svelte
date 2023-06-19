@@ -15,7 +15,7 @@
 <div class="code bg-base-200 p-2 my-2 rounded-md relative">
   {@html Prism.highlight(text, Prism.languages[language], language)}
   <button
-    class="btn btn-neutral absolute top-0 right-0"
+    class="absolute top-2 right-2"
     on:click={copyCode}
   >
     <Copy class="" size={16} />

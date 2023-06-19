@@ -200,8 +200,8 @@
             <div class="flex justify-center">
               <!-- svelte-ignore missing-declaration -->
               <button
-                class="btn mt-4 {showSolution === window.location.pathname.split('/')[3] &&
-                $exercise_session.agentRunning
+                class="btn mt-4 {(showSolution === window.location.pathname.split('/')[3] &&
+                $exercise_session.agentRunning) || $exercise_session.endTime
                   ? 'btn-neutral'
                   : 'btn-disabled'}"
                 on:click={() => openModal()}
