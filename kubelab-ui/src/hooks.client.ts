@@ -1,4 +1,4 @@
-import { currentUser, client } from "$lib/pocketbase";
+import { client } from "$lib/pocketbase";
 
 import type { Handle } from "@sveltejs/kit";
 
@@ -16,8 +16,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     return response;
 };
 
-client.authStore.loadFromCookie(document.cookie);
-client.authStore.onChange(() => {
-    currentUser.set(client.authStore.model);
-    document.cookie = client.authStore.exportToCookie({ httpOnly: false });
-});
+// client.authStore.loadFromCookie(document.cookie);
+// client.authStore.onChange(() => {
+//     currentUser.set(client.authStore.model);
+//     document.cookie = client.authStore.exportToCookie({ httpOnly: false });
+// });
