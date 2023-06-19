@@ -10,7 +10,7 @@
   import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
-  import { Info, Play } from "lucide-svelte";
+  import { Info, Play, Search } from "lucide-svelte";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -146,6 +146,11 @@
     // @ts-ignore
     window.my_modal_1.showModal();
   }
+
+  function openModal2() {
+    // @ts-ignore
+    window.my_modal_2.showModal();
+  }
 </script>
 
 <Splitpanes horizontal class="p-2 mt-2 pb-2 bg-neutral">
@@ -168,14 +173,34 @@
       <Pane>
         <div class="p-2 leading-8 h-full overflow-y-scroll">
           {#key $page.params}
-            <SvelteMarkdown
-              source={hint}
-              renderers={{
-                codespan: CodeSpanComponent,
-                code: CodeComponent,
-                link: LinkComponent
-              }}
-            />
+            <div class="flex justify-center">
+              <!-- svelte-ignore missing-declaration -->
+              <button
+                class="btn mt-4 btn-neutral"
+                on:click={() => openModal2()}
+              >
+                <Search class="mr-2" size={16} />
+                Show Hint
+              </button>
+              <dialog id="my_modal_2" class="modal">
+                <form method="dialog" class="modal-box">
+                  <h3 class="font-bold text-lg">Hint</h3>
+
+                  <SvelteMarkdown
+                    source={hint}
+                    renderers={{
+                      codespan: CodeSpanComponent,
+                      code: CodeComponent,
+                      link: LinkComponent
+                    }}
+                  />
+                  <div class="modal-action">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button class="btn">Close</button>
+                  </div>
+                </form>
+              </dialog>
+            </div>
             <div class="flex justify-center">
               <!-- svelte-ignore missing-declaration -->
               <button
