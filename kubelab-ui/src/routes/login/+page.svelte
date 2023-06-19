@@ -21,6 +21,7 @@
       await login(user.email, user.password);
       toast.success("Logged in successfully!");
       goto("/");
+    }).finally(() => {
       loading = false;
     });
   }
