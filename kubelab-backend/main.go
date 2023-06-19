@@ -104,6 +104,9 @@ func main() {
 						Ingresses struct {
 							Enabled bool `yaml:"enabled"`
 						} `yaml:"ingresses"`
+						HostStorageClasses struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"hoststorageclasses"`
 					} `yaml:"sync"`
 					Storage struct {
 						Persistence bool `yaml:"persistence"`
@@ -112,8 +115,9 @@ func main() {
 
 				// convert to string
 				yamlValues.Sync.PersistentVolumes.Enabled = true
-				yamlValues.Sync.StorageClasses.Enabled = true
+				yamlValues.Sync.StorageClasses.Enabled = false
 				yamlValues.Sync.Ingresses.Enabled = true
+				yamlValues.Sync.HostStorageClasses.Enabled = true
 				yamlValues.Storage.Persistence = false
 
 				// convert to yaml
@@ -149,7 +153,6 @@ func main() {
 				err := k8s.DeleteNamespace(helm.GetNamespaceName(e.Record.GetString("lab"), e.Record.GetString("user")))
 				if err != nil {
 					log.Println(err)
-					return err
 				}
 
 				time.Sleep(15 * time.Second)
