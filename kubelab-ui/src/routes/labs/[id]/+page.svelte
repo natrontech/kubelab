@@ -91,7 +91,6 @@
             {getExerciseSessionByExercise(exercise.id)?.endTime ? "Completed" : "Not Completed"}
           </p>
           <h2 class="card-title mt-2">{exercise.title}</h2>
-          <p>{exercise.description}</p>
           <div class="flex gap-2 justify-end">
             <div class="tooltip" data-tip="start exercise">
               <button
