@@ -209,7 +209,6 @@
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
               >
-                <li />
               </button>
             {/each}
           {/key}

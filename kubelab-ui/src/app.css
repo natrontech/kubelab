@@ -12,7 +12,37 @@ h1 {
     margin-bottom: 0.5em;
 }
 
-li {
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 0.5em;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 0.5em;
+}
+
+ul {
+    list-style: disc;
+    margin-bottom: 0.5em;
+    margin-left: 1.25em;
+}
+
+ul li {
+    margin-bottom: 0.25em;
+}
+
+ol {
+    list-style: decimal;
+    margin-bottom: 0.5em;
+    margin-left: 1.25em;
+}
+
+ol li {
     margin-bottom: 0.25em;
 }
 

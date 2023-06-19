@@ -146,8 +146,6 @@
   div {
     height: 100%;
     width: 100%;
-    overflow: hidden;
-    border: 4px solid #fff;
   }
   div :global(.xterm) {
     height: 100%;
