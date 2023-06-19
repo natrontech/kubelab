@@ -1,7 +1,7 @@
 <script lang="ts">
   import { client, logout } from "$lib/pocketbase";
   import type { NavRoute } from "$lib/types";
-  import { TerminalSquare, LayoutDashboard, Home, ScrollText } from "lucide-svelte";
+  import { TerminalSquare, LayoutDashboard, Home, ScrollText, Github, Presentation } from "lucide-svelte";
 
   let avatarUrl: string = "";
 
@@ -28,6 +28,18 @@
       href: "/labs",
       icon: TerminalSquare
     },
+    {
+      id: "3",
+      name: "Material",
+      href: "/material",
+      icon: Presentation
+    },
+    {
+      id: "4",
+      name: "About",
+      href: "https://github.com/natrontech/kubelab",
+      icon: Github
+    }
   ];
 </script>
 
