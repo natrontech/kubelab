@@ -190,10 +190,10 @@
       >
         {#if restartLoading}
           <RotateCw class="inline-block mr-2 animate-spin" />
-          Restart
+          Reset Exercise
         {:else}
           <RotateCw class="inline-block mr-2" />
-          Restart
+          Reset Exercise
         {/if}
       </button>
     </div>
