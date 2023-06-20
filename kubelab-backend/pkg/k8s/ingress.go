@@ -13,10 +13,11 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 			Name:      name,
 			Namespace: namespace,
 			Annotations: map[string]string{
-				"nginx.ingress.kubernetes.io/proxy-read-timeout":    "3600",
-				"nginx.ingress.kubernetes.io/proxy-connect-timeout": "3600",
-				"nginx.ingress.kubernetes.io/proxy-send-timeout":    "3600",
-				"nginx.ingress.kubernetes.io/rewrite-target":        "/$2",
+				"nginx.ingress.kubernetes.io/proxy-read-timeout":          "3600",
+				"nginx.ingress.kubernetes.io/proxy-connect-timeout":       "3600",
+				"nginx.ingress.kubernetes.io/proxy-send-timeout":          "3600",
+				"nginx.ingress.kubernetes.io/proxy-next-upstream-timeout": "3600",
+				"nginx.ingress.kubernetes.io/rewrite-target":              "/$2",
 			},
 		},
 		Spec: networkingv1.IngressSpec{
