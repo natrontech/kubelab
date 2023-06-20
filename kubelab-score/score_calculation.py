@@ -1,15 +1,15 @@
-
-
+import csv
 import json
 import os
 import requests
 
 
 class User:
-    def __init__(self, id, name, email):
+    def __init__(self, id, name, email, username):
         self.id = id
         self.name = name
         self.email = email
+        self.username = username
 
 
 class ExerciseSession:
@@ -20,10 +20,10 @@ class ExerciseSession:
         self.endTime = endTime
 
 
-def get_request(url, data):
+def get_request(url):
     try:
         headers = {'Content-type': 'application/json'}
-        response = requests.get(url, data=json.dumps(data), headers=headers)
+        response = requests.get(url, headers=headers)
         return response
     except requests.exceptions.RequestException as e:
         print(e)
@@ -38,37 +38,43 @@ def main():
         exercises_sessions_url)
     users = get_users_from_users_url(users_url)
 
-    # print exercise sessions
-    for exercise_session in exercise_sessions:
-        print("Exercise session id: {}, userId: {}, startTime: {}, endTime: {}".format(
-            exercise_session.id, exercise_session.userId, exercise_session.startTime, exercise_session.endTime))
+    # parse the data into a csv file
+    with open(csv_path, mode='w') as file:
+        writer = csv.writer(file)
+        writer.writerow(["userId", "username", "email",
+                        "exercise_session_id", "start_time", "end_time"])
 
-    # print users
-    for user in users:
-        print("User id: {}, name: {}, email: {}".format(
-            user.id, user.name, user.email))
+        for user in users:
+            for exercise_session in exercise_sessions:
+                if user.id == exercise_session.userId:
+                    writer.writerow([user.id, user.username, user.email, exercise_session.id,
+                                     exercise_session.startTime, exercise_session.endTime])
 
 
 def get_users_from_users_url(users_url):
     users = []
-    response = get_request(users_url, None)
+    response = get_request(users_url)
     if response.status_code == 200:
-        users_json = json.loads(response.text)
+        users_json = json.loads(response.text)['items']
         print(users_json)
         for user_json in users_json:
-            user = User(user_json['id'], user_json['name'], user_json['email'])
+            email = user_json.get('email')
+            username = user_json.get('username')
+            user = User(user_json['id'], user_json['name'], email, username)
             users.append(user)
     return users
 
 
+
 def get_exercise_sessions_from_exercise_sessions_url(exercises_sessions_url):
     exercise_sessions = []
-    response = get_request(exercises_sessions_url, None)
+    response = get_request(exercises_sessions_url)
     if response.status_code == 200:
-        exercise_sessions_json = json.loads(response.text)
+        exercise_sessions_json = json.loads(response.text)['items']
+        print(exercise_sessions_json)
         for exercise_session_json in exercise_sessions_json:
             exercise_session = ExerciseSession(
-                exercise_session_json['id'], exercise_session_json['userId'], exercise_session_json['startTime'], exercise_session_json['endTime'])
+                exercise_session_json['id'], exercise_session_json['user'], exercise_session_json['startTime'], exercise_session_json['endTime'])
             exercise_sessions.append(exercise_session)
     return exercise_sessions
 
