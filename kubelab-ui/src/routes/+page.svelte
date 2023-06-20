@@ -37,7 +37,7 @@
 >
   <h1 class="text-center text-4xl font-bold mt-4 mb-8 text-white">Dashboard</h1>
   <div
-    class="stats shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-4 border-black"
+    class="stats shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-4 border-neutral"
   >
     <a href="/labs">
       <div class="stat">
@@ -89,7 +89,7 @@
   </div>
 
   <div
-    class="stats mt-4 shadow border-4 border-black hover:shadow-md transition-all duration-150 ease-in-out"
+    class="stats mt-4 shadow border-4 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
   >
     <div class="stat">
       <div class="stat-title">Your <strong>average</strong> time to resolution</div>

@@ -13,10 +13,19 @@ module.exports = {
     require("@tailwindcss/forms"),
     require("@tailwindcss/typography"),
     require("@tailwindcss/line-clamp"),
-    require('tailwind-scrollbar'),
+    require("tailwind-scrollbar"),
     require("daisyui")
   ],
   daisyui: {
-    logs: false
-  }
+    logs: false,
+    themes: [
+      {
+        light: {
+          ...require("daisyui/src/theming/themes")["[data-theme=light]"],
+          "primary": "#193BF5",
+          "primary-focus": "#1431CB",
+        },
+      },
+    ],
+  },
 };

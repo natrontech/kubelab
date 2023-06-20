@@ -84,7 +84,7 @@
         <div
           class="card w-full {getExerciseSessionByExercise(exercise.id)?.endTime
             ? 'bg-green-200'
-            : 'bg-base-200'} border-4 border-black"
+            : 'bg-base-200'} border-4 border-neutral"
         >
           <div class="card-body">
             <p class="badge badge-neutral absolute top-2 right-2">#{i + 1}</p>

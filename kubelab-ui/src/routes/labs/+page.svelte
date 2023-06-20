@@ -10,8 +10,6 @@
 
   $metadata.title = "Labs";
 
-  console.log("lab_sessions", $lab_sessions);
-
   function getLabSessions(lab_id: string): LabSessionsResponse {
     let lab_session = $lab_sessions.find((lab_session) => lab_session.lab === lab_id);
     // only return the lab session if it exists

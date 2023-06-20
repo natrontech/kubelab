@@ -33,7 +33,7 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 							Paths: []networkingv1.HTTPIngressPath{
 								{
 									Path:     "/" + path + "(/|$)(.*)",
-									PathType: func() *networkingv1.PathType { p := networkingv1.PathTypePrefix; return &p }(),
+									PathType: func() *networkingv1.PathType { p := networkingv1.PathTypeImplementationSpecific; return &p }(),
 									Backend: networkingv1.IngressBackend{
 										Service: &networkingv1.IngressServiceBackend{
 											Name: serviceName,

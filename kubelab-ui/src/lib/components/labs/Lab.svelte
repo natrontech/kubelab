@@ -194,7 +194,7 @@
   }
 </script>
 
-<div tabindex="0" class="collapse border-black border-4 bg-base-200 overflow-visible collapse-arrow">
+<div tabindex="0" class="collapse border-neutral border-4 bg-base-200 overflow-visible collapse-arrow">
   <div class="collapse-title text-xl font-medium">
     {this_lab.title}
     <!-- show some stats -->

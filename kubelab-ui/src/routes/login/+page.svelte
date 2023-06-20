@@ -47,7 +47,7 @@
       method="POST"
       on:submit|preventDefault={submit}
     >
-      <div class="p-12 bg-white mx-auto rounded-2xl w-100 border-4 border-black">
+      <div class="p-12 bg-white mx-auto rounded-2xl w-100 border-4 border-neutral">
         <div class="mb-4">
           <ToggleConfetti>
             <div class="btn btn-block btn-ghost normal-case text-xl mb-10" slot="label">

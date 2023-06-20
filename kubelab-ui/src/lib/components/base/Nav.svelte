@@ -50,7 +50,7 @@
       <label tabindex="0" class="btn btn-ghost lg:hidden">
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
-      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black">
+      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral">
         <li>
           <a href="/">
             <svelte:component this={Home} class="w-5 h-5" />{@html "&nbsp;"}
@@ -95,7 +95,7 @@
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <ul
         tabindex="0"
-        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-black"
+        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral"
       >
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
