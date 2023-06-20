@@ -43,7 +43,7 @@ func Init() {
 	}
 
 	if Config.StorageLimit == "" {
-		Config.StorageLimit = "10Gi"
+		Config.StorageLimit = "50Gi"
 	}
 
 }
