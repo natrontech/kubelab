@@ -1,15 +1,15 @@
 import { writable } from "svelte/store";
 
 const defaultValue = false;
-const initialTableViewValue =
-    localStorage.getItem("tableView") === null
+const initialHorizontalViewValue =
+    localStorage.getItem("horizontalView") === null
         ? defaultValue
-        : localStorage.getItem("tableView") === "true";
+        : localStorage.getItem("horizontalView") === "true";
 
-const tableView = writable<boolean>(initialTableViewValue);
+const horizontalView = writable<boolean>(initialHorizontalViewValue);
 
-tableView.subscribe((value) => {
-    localStorage.setItem("tableView", value.toString());
+horizontalView.subscribe((value) => {
+    localStorage.setItem("horizontalView", value.toString());
 });
 
-export default tableView;
+export default horizontalView;

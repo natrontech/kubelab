@@ -21,6 +21,7 @@
   import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
   import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
+    import horizontalView from "$lib/stores/tableView";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   let loading = "";
@@ -151,13 +152,76 @@
     // @ts-ignore
     window.my_modal_2.showModal();
   }
+
+
+
+  import { RadioGroup, RadioItem } from "@skeletonlabs/skeleton";
+  import { LayoutGrid, LayoutList } from "lucide-svelte";
 </script>
 
-<Splitpanes horizontal class="p-2 mt-2 pb-2 bg-neutral">
+
+<div class="flex justify-between items-center mb-6">
+<RadioGroup active="variant-filled-primary" hover="hover:variant-soft-primary">
+  <RadioItem
+    bind:group={$horizontalView}
+    on:click={() => horizontalView.set(false)}
+    name="justify"
+    value={false}><LayoutList /></RadioItem
+  >
+  <RadioItem
+    bind:group={$horizontalView}
+    on:click={() => horizontalView.set(true)}
+    name="justify"
+    value={true}><LayoutGrid /></RadioItem
+  >
+</RadioGroup>
+</div>
+
+<Splitpanes class="p-2 mt-2 pb-2 bg-neutral">
+  <Pane bind:size={$terminal_size.height}>
+    {#if $exercise_session.agentRunning}
+      {#key $page.params}
+        {#if $exercise_session.exercise === $exercise.id}
+          <Desktop {Console} />
+        {/if}
+      {/key}
+    {:else}
+      <!-- button to start the agent -->
+      {#key $page.params}
+        <div
+          class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+            ? 'bg-green-200'
+            : ''}"
+        >
+          <div class="text-center">
+            <h1 class="text-4xl font-bold">
+              {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+            </h1>
+            <p class="text-xl">
+              {checkIfExerciseIsDone($exercise.id)
+                ? "Click the button below to restart the exercise. You must finish it again!"
+                : "Click the button below to start the exercise"}
+            </p>
+            <button
+              class="btn {checkIfExerciseIsDone($exercise.id) ? 'btn-warning' : 'btn-neutral'} mt-4"
+              on:click={() => handleStartExercise()}
+            >
+              {#if loading === window.location.pathname.split("/")[3]}
+                <span class="loading loading-dots loading-md" /> Start Terminal
+              {:else}
+                <Play /> Start Terminal
+              {/if}
+              {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
+            </button>
+          </div>
+        </div>
+      {/key}
+    {/if}
+  </Pane>
   <Pane class="rounded-md my-2">
-    <Splitpanes>
+    <Splitpanes horizontal>
       <Pane maxSize={75} size={65}>
-        <div class="p-2 leading-8 h-full overflow-y-scroll bg-white">
+        <div class="p-2 leading-8 h-full overflow-y-scroll  bg-white">
           {#key $page.params}
             <SvelteMarkdown
               source={docs}
@@ -232,46 +296,6 @@
         </div>
       </Pane>
     </Splitpanes>
-  </Pane>
-  <Pane bind:size={$terminal_size.height}>
-    {#if $exercise_session.agentRunning}
-      {#key $page.params}
-        {#if $exercise_session.exercise === $exercise.id}
-          <Desktop {Console} />
-        {/if}
-      {/key}
-    {:else}
-      <!-- button to start the agent -->
-      {#key $page.params}
-        <div
-          class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
-            ? 'bg-green-200'
-            : ''}"
-        >
-          <div class="text-center">
-            <h1 class="text-4xl font-bold">
-              {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-            </h1>
-            <p class="text-xl">
-              {checkIfExerciseIsDone($exercise.id)
-                ? "Click the button below to restart the exercise. You must finish it again!"
-                : "Click the button below to start the exercise"}
-            </p>
-            <button
-              class="btn {checkIfExerciseIsDone($exercise.id) ? 'btn-warning' : 'btn-neutral'} mt-4"
-              on:click={() => handleStartExercise()}
-            >
-              {#if loading === window.location.pathname.split("/")[3]}
-                <span class="loading loading-dots loading-md" /> Start Terminal
-              {:else}
-                <Play /> Start Terminal
-              {/if}
-              {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
-            </button>
-          </div>
-        </div>
-      {/key}
-    {/if}
   </Pane>
 </Splitpanes>
 
