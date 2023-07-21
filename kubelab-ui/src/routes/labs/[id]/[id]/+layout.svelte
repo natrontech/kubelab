@@ -1,7 +1,14 @@
 <script lang="ts">
   import { metadata } from "$lib/stores/metadata";
   import { goto } from "$app/navigation";
-  import { ArrowLeft, Check, RotateCw, StopCircle } from "lucide-svelte";
+  import {
+    ArrowLeft,
+    Check,
+    RotateCw,
+    StopCircle,
+    StretchHorizontal,
+    StretchVertical
+  } from "lucide-svelte";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
   import {
@@ -16,6 +23,7 @@
   // @ts-ignore
   import { Confetti } from "svelte-confetti";
   import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
+  import horizontalView from "$lib/stores/tableView.js";
 
   $metadata.title = "Exercises";
 
@@ -137,13 +145,31 @@
   }
 </script>
 
-<div class="absolute top-0 h-20 left-0 right-0 bg-neutral">
+<div class="absolute top-0 h-20 left-0 right-0 ">
   <div class="mt-5 flex justify-between px-2">
     <!-- add back button -->
-    <button class="btn " on:click={() => goto("/labs/" + data.pathname.split("/")[2])}>
+    <button class="btn btn-neutral" on:click={() => goto("/labs/" + data.pathname.split("/")[2])}>
       <ArrowLeft class="inline-block w-4 h-4 mr-2" />
       Exercises
     </button>
+    <div class="join grid grid-cols-2">
+      <button
+        on:click={() => {
+          horizontalView.set(true);
+        }}
+        class="join-item btn {$horizontalView ? 'btn-neutral' : 'btn-outline'} "
+      >
+        <StretchHorizontal />
+      </button>
+      <button
+        on:click={() => {
+          horizontalView.set(false);
+        }}
+        class="join-item btn {$horizontalView ? 'btn-outline' : 'btn-neutral'}"
+      >
+        <StretchVertical />
+      </button>
+    </div>
     <ToggleConfetti>
       <button
         slot="label"
@@ -157,14 +183,14 @@
         style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
       >
         {#if $exercise_session.endTime}
-        <Confetti
-          x={[-5, 5]}
-          y={[0, 0.1]}
-          delay={[0, 2000]}
-          duration="3000"
-          amount="100"
-          fallDistance="100vh"
-        />
+          <Confetti
+            x={[-5, 5]}
+            y={[0, 0.1]}
+            delay={[0, 2000]}
+            duration="3000"
+            amount="100"
+            fallDistance="100vh"
+          />
         {/if}
       </div>
     </ToggleConfetti>
@@ -173,7 +199,7 @@
 <div class="absolute top-16 bottom-16 left-0 right-0 z-0">
   <slot />
 </div>
-<div class="absolute h-16 bottom-0 left-0 right-0 bg-neutral">
+<div class="absolute h-16 bottom-0 left-0 right-0">
   <div class="mt-2 flex justify-between px-2">
     <div>
       <button
@@ -208,8 +234,7 @@
                 class="step
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
-              >
-              </button>
+              />
             {/each}
           {/key}
         {/key}
