@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import { client } from "$lib/pocketbase";
   import { layout_store } from "$lib/stores/layout_store";
   import { terminal_size } from "$lib/stores/terminal";
@@ -13,6 +14,28 @@
     cursorBlink: true,
     fontFamily: "monospace",
     fontSize: 14,
+    // theme: {
+    //   foreground: "#d2d2d2",
+    //   background: "#2B3441",
+    //   cursor: "#adadad",
+    //   black: "#000000",
+    //   red: "#d81e00",
+    //   green: "#5ea702",
+    //   yellow: "#cfae00",
+    //   blue: "#427ab3",
+    //   magenta: "#89658e",
+    //   cyan: "#00a7aa",
+    //   white: "#dbded8",
+    //   brightBlack: "#686a66",
+    //   brightRed: "#f54235",
+    //   brightGreen: "#99e343",
+    //   brightYellow: "#fdeb61",
+    //   brightBlue: "#84b0d8",
+    //   brightMagenta: "#bc94b7",
+    //   brightCyan: "#37e6e8",
+    //   brightWhite: "#f1f1f0"
+    // },
+
     theme: {
       foreground: "#2B3441",
       background: "#ffffff",
@@ -34,7 +57,6 @@
       brightCyan: "#37e6e8",
       brightWhite: "#2B3441"
     },
-
     scrollOnUserInput: true
   });
 
@@ -150,4 +172,5 @@
   div :global(.xterm) {
     height: 100%;
   }
+
 </style>
