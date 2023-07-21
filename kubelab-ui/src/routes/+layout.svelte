@@ -9,6 +9,7 @@
   import Nav from "$lib/components/base/Nav.svelte";
   import { page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
+    import darkTheme from "$lib/stores/theme";
 
   // export let data: any;
 
@@ -18,6 +19,15 @@
   beforeNavigate(() => {
     $metadata = {};
   });
+
+  // add  class="dark" data-theme="dark" to <html> if dark mode is enabled
+  $: if ($darkTheme) {
+    document.documentElement.classList.add("dark");
+    document.documentElement.setAttribute("data-theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.setAttribute("data-theme", "light");
+  }
 </script>
 
 <svelte:head>
@@ -25,13 +35,12 @@
   <meta name="description" content={description} />
 </svelte:head>
 
+
 <div>
-  <Toaster
-    position="bottom-center"
-  />
+  <Toaster position="bottom-center" />
   <!-- only display nav when not on /login -->
   {#if $page.route.id !== "/login"}
     <Nav />
   {/if}
-    <slot />
+  <slot />
 </div>

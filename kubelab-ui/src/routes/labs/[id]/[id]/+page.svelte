@@ -156,10 +156,10 @@
 
 {#if $horizontalView}
   <Splitpanes horizontal class="p-2 mt-2 pb-2">
-    <Pane class="rounded-md my-2">
+    <Pane class="my-2">
       <Splitpanes>
         <Pane maxSize={75} size={65}>
-          <div class="p-2 leading-8 h-full overflow-y-scroll  bg-white">
+          <div class="p-2 leading-8 h-full overflow-y-scroll dark:bg-neutral">
             {#key $page.params}
               <SvelteMarkdown
                 source={docs}
@@ -173,7 +173,7 @@
           </div>
         </Pane>
         <Pane>
-          <div class="p-2 leading-8 h-full overflow-y-scroll">
+          <div class="p-2 leading-8 h-full overflow-y-scroll dark:bg-neutral">
             {#key $page.params}
               <div class="flex justify-center">
                 <!-- svelte-ignore missing-declaration -->
@@ -245,7 +245,7 @@
         <!-- button to start the agent -->
         {#key $page.params}
           <div
-            class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+            class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone($exercise.id)
               ? 'bg-green-200'
               : ''}"
           >

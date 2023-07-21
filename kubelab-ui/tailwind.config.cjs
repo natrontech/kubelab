@@ -22,8 +22,14 @@ module.exports = {
       {
         light: {
           ...require("daisyui/src/theming/themes")["[data-theme=light]"],
-          "primary": "#193BF5",
-          "primary-focus": "#1431CB",
+          "primary": "#1D242A",
+          "primary-focus": "#1D242A",
+        },
+        dark: {
+          ...require("daisyui/src/theming/themes")["[data-theme=dark]"],
+          "primary": "#fff",
+          "secondary": "#252E36",
+          "primary-focus": "#fff",
         },
       },
     ],

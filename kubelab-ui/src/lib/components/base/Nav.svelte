@@ -1,7 +1,16 @@
 <script lang="ts">
   import { client, logout } from "$lib/pocketbase";
+  import darkTheme from "$lib/stores/theme";
   import type { NavRoute } from "$lib/types";
-  import { TerminalSquare, LayoutDashboard, Home, ScrollText, Github, Presentation } from "lucide-svelte";
+  import {
+    TerminalSquare,
+    LayoutDashboard,
+    Home,
+    Github,
+    Presentation,
+    Sun,
+    Moon
+  } from "lucide-svelte";
 
   let avatarUrl: string = "";
 
@@ -50,7 +59,9 @@
       <label tabindex="0" class="btn btn-ghost lg:hidden">
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
-      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral">
+      <ul
+        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral"
+      >
         <li>
           <a href="/">
             <svelte:component this={Home} class="w-5 h-5" />{@html "&nbsp;"}
@@ -83,7 +94,18 @@
       {/each}
     </ul>
   </div>
+
   <div class="navbar-end">
+
+    <button class="btn m-2 bg-transparent border-none"
+      on:click={() => darkTheme.set(!$darkTheme)}
+    >
+      {#if $darkTheme === true}
+        <Sun />
+      {:else}
+        <Moon />
+      {/if}
+    </button>
     <div class="dropdown dropdown-end z-50">
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <!-- svelte-ignore a11y-label-has-associated-control -->

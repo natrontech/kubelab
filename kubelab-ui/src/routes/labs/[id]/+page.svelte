@@ -72,7 +72,7 @@
   }
 </script>
 
-<a class="btn top-5 absolute" href="/labs/" on:click={() => show = false}>
+<a class="btn btn-neutral top-5 absolute" href="/labs/" on:click={() => show = false}>
   <ArrowLeft class="inline-block w-4 h-4 mr-2" />
   Labs
 </a>

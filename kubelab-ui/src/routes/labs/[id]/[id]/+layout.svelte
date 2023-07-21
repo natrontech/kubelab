@@ -157,7 +157,7 @@
         on:click={() => {
           horizontalView.set(true);
         }}
-        class="join-item btn {$horizontalView ? 'btn-neutral' : 'btn-outline'} "
+        class="join-item btn {$horizontalView ? ' btn-neutral dark:btn-primary dark:text-neutral ' : 'btn-outline'} "
       >
         <StretchHorizontal />
       </button>
@@ -165,7 +165,7 @@
         on:click={() => {
           horizontalView.set(false);
         }}
-        class="join-item btn {$horizontalView ? 'btn-outline' : 'btn-neutral'}"
+        class="join-item btn {$horizontalView ? 'btn-outline' : ' btn-neutral dark:btn-primary dark:text-neutral '}"
       >
         <StretchVertical />
       </button>
