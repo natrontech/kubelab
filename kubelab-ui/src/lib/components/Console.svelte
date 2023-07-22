@@ -3,6 +3,7 @@
   import { client } from "$lib/pocketbase";
   import { layout_store } from "$lib/stores/layout_store";
   import { terminal_size } from "$lib/stores/terminal";
+  import darkTheme from "$lib/stores/theme";
   import { onDestroy, onMount } from "svelte";
 
   import { Terminal } from "xterm";
@@ -14,49 +15,50 @@
     cursorBlink: true,
     fontFamily: "monospace",
     fontSize: 14,
-    // theme: {
-    //   foreground: "#d2d2d2",
-    //   background: "#2B3441",
-    //   cursor: "#adadad",
-    //   black: "#000000",
-    //   red: "#d81e00",
-    //   green: "#5ea702",
-    //   yellow: "#cfae00",
-    //   blue: "#427ab3",
-    //   magenta: "#89658e",
-    //   cyan: "#00a7aa",
-    //   white: "#dbded8",
-    //   brightBlack: "#686a66",
-    //   brightRed: "#f54235",
-    //   brightGreen: "#99e343",
-    //   brightYellow: "#fdeb61",
-    //   brightBlue: "#84b0d8",
-    //   brightMagenta: "#bc94b7",
-    //   brightCyan: "#37e6e8",
-    //   brightWhite: "#f1f1f0"
-    // },
 
-    theme: {
-      foreground: "#2B3441",
-      background: "#ffffff",
-      cursor: "#2B3441",
-      black: "#2B3441",
-      red: "#d81e00",
-      green: "#5ea702",
-      yellow: "#cfae00",
-      blue: "#427ab3",
-      magenta: "#89658e",
-      cyan: "#00a7aa",
-      white: "#000000",
-      brightBlack: "#686a66",
-      brightRed: "#f54235",
-      brightGreen: "#99e343",
-      brightYellow: "#fdeb61",
-      brightBlue: "#84b0d8",
-      brightMagenta: "#bc94b7",
-      brightCyan: "#37e6e8",
-      brightWhite: "#2B3441"
-    },
+    theme: $darkTheme
+      ? {
+          foreground: "#d2d2d2",
+          background: "#2B3441",
+          cursor: "#adadad",
+          black: "#000000",
+          red: "#d81e00",
+          green: "#5ea702",
+          yellow: "#cfae00",
+          blue: "#427ab3",
+          magenta: "#89658e",
+          cyan: "#00a7aa",
+          white: "#dbded8",
+          brightBlack: "#686a66",
+          brightRed: "#f54235",
+          brightGreen: "#99e343",
+          brightYellow: "#fdeb61",
+          brightBlue: "#84b0d8",
+          brightMagenta: "#bc94b7",
+          brightCyan: "#37e6e8",
+          brightWhite: "#f1f1f0"
+        }
+      : {
+          foreground: "#2B3441",
+          background: "#F2F2F2",
+          cursor: "#2B3441",
+          black: "#2B3441",
+          red: "#d81e00",
+          green: "#5ea702",
+          yellow: "#cfae00",
+          blue: "#427ab3",
+          magenta: "#89658e",
+          cyan: "#00a7aa",
+          white: "#000000",
+          brightBlack: "#686a66",
+          brightRed: "#f54235",
+          brightGreen: "#99e343",
+          brightYellow: "#fdeb61",
+          brightBlue: "#84b0d8",
+          brightMagenta: "#bc94b7",
+          brightCyan: "#37e6e8",
+          brightWhite: "#2B3441"
+        },
     scrollOnUserInput: true
   });
 
@@ -172,5 +174,4 @@
   div :global(.xterm) {
     height: 100%;
   }
-
 </style>
