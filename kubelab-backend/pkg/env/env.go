@@ -8,7 +8,7 @@ import (
 
 type config struct {
 	Local        bool   `env:"LOCAL"`
-	KubelabImage string `env:"KUBELAB_IMAGE"`
+	KubelabImage string `env:"KUBELAB_AGENT_IMAGE"`
 	AllowedHosts string `env:"ALLOWED_HOSTS"`
 	ResourceName string `env:"RESOURCE_NAME"`
 	PodsLimit    string `env:"PODS_LIMIT"`
@@ -31,7 +31,7 @@ func Init() {
 	}
 
 	if Config.AllowedHosts == "" {
-		Config.AllowedHosts = "kubelab.swisscom.k8s.natron.cloud"
+		Config.AllowedHosts = "*"
 	}
 
 	if Config.ResourceName == "" {

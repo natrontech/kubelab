@@ -52,7 +52,7 @@
   ];
 </script>
 
-<div class="navbar shadow-md">
+<div class="navbar shadow-md h-2">
   <div class="navbar-start z-50">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
