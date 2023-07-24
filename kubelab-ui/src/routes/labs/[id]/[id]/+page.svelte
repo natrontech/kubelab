@@ -324,7 +324,7 @@
     <Pane>
       <Splitpanes horizontal>
         <Pane maxSize={75} size={65}>
-          <div class="p-2 leading-8 h-full overflow-y-scroll bg-white">
+          <div class="p-2 leading-8 h-full overflow-y-scroll dark:bg-neutral">
             {#key $page.params}
               <SvelteMarkdown
                 source={docs}
@@ -338,7 +338,7 @@
           </div>
         </Pane>
         <Pane>
-          <div class="p-2 leading-8 h-full overflow-y-scroll">
+          <div class="p-2 leading-8 h-full overflow-y-scroll dark:bg-neutral">
             {#key $page.params}
               <div class="flex justify-center">
                 <!-- svelte-ignore missing-declaration -->
