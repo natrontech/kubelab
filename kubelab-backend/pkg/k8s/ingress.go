@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"github.com/natrontech/kubelab/pkg/env"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,7 +28,7 @@ func CreateIngress(namespace string, name string, host string, serviceName strin
 			},
 		},
 		Spec: networkingv1.IngressSpec{
-			IngressClassName: func() *string { s := "nginx"; return &s }(),
+			IngressClassName: func() *string { s := env.Config.IngressClass; return &s }(),
 			TLS: []networkingv1.IngressTLS{
 				{
 					Hosts: []string{host},

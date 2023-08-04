@@ -11,6 +11,7 @@ type config struct {
 	KubelabImage string `env:"KUBELAB_AGENT_IMAGE"`
 	AllowedHosts string `env:"ALLOWED_HOSTS"`
 	ResourceName string `env:"RESOURCE_NAME"`
+	IngressClass string `env:"AGENT_INGRESS_CLASS"`
 	PodsLimit    string `env:"PODS_LIMIT"`
 	StorageLimit string `env:"STORAGE_LIMIT"`
 }
@@ -36,6 +37,10 @@ func Init() {
 
 	if Config.ResourceName == "" {
 		Config.ResourceName = "kubelab"
+	}
+
+	if Config.IngressClass == "" {
+		Config.IngressClass = "nginx"
 	}
 
 	if Config.PodsLimit == "" {
