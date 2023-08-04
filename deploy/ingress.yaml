@@ -4,11 +4,13 @@ metadata:
   name: kubelab-ingress
   namespace: kubelab
   annotations:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod-natron-cloud
+    cert-manager.io/private-key-rotation-policy: Always
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx-external
   rules:
-  - host: kubelab.swisscom.k8s.natron.cloud
+  - host: kubelab.natr-demo.k8s.natron.cloud
     http:
       paths:
       - pathType: Prefix
@@ -18,3 +20,7 @@ spec:
             name: kubelab-service
             port:
               number: 8090
+  # tls:
+  # - hosts:
+  #   - kubelab.natr-demo.k8s.natron.cloud
+  #   secretName: kubelab-tls

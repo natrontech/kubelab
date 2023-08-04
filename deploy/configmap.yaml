@@ -4,6 +4,7 @@ metadata:
   name: kubelab-config
 data:
   KUBELAB_AGENT_IMAGE: ghcr.io/natrontech/kubelab-agent:latest
-  ALLOWED_HOSTS: kubelab.swisscom.k8s.natron.cloud
+  ALLOWED_HOSTS: kubelab.natr-demo.k8s.natron.cloud
   PODS_LIMIT: "70"
   STORAGE_LIMIT: "50Gi"
+  AGENT_INGRESS_CLASS: nginx-external

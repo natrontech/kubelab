@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import { client } from "$lib/pocketbase";
   import { layout_store } from "$lib/stores/layout_store";
   import { terminal_size } from "$lib/stores/terminal";
@@ -68,8 +67,11 @@
   const initializeWebSocket = () => {
     const lab_session_id = window.location.pathname.split("/")[2];
     const exercise_id = window.location.pathname.split("/")[3];
+    const agentHost = window.location.host;
+
     agentUrl =
-      "kubelab.swisscom.k8s.natron.cloud/kubelab-" +
+      agentHost +
+      "/kubelab-" +
       lab_session_id +
       "-" +
       exercise_id +
