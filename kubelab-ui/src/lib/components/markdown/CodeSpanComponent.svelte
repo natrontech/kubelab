@@ -11,7 +11,7 @@
 </script>
 
 <button
-  class="btn btn-sm btn-neutral"
+  class="btn btn-sm btn-neutral dark:btn-primary dark:text-neutral"
   on:click={copyCode}
 >
   <code>{raw.replace(/`/g, "")}</code>

@@ -111,14 +111,55 @@ func main() {
 					Storage struct {
 						Persistence bool `yaml:"persistence"`
 					} `yaml:"storage"`
+					Isolation struct {
+						Enabled             bool   `yaml:"enabled"`
+						PodSecurityStandard string `yaml:"podSecurityStandard"`
+						NodeProxyPermission struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"nodeProxyPermission"`
+						ResourceQuota struct {
+							Enabled bool `yaml:"enabled"`
+						} `yaml:"resourceQuota"`
+						LimitRange struct {
+							Enabled        bool              `yaml:"enabled"`
+							Default        map[string]string `yaml:"default"`
+							DefaultRequest map[string]string `yaml:"defaultRequest"`
+						} `yaml:"limitRange"`
+						NetworkPolicy struct {
+							Enabled             bool `yaml:"enabled"`
+							OutgoingConnections struct {
+								IPBlock struct {
+									CIDR   string   `yaml:"cidr"`
+									Except []string `yaml:"except"`
+								} `yaml:"ipBlock"`
+							} `yaml:"outgoingConnections"`
+						} `yaml:"networkPolicy"`
+					} `yaml:"isolation"`
 				}{}
 
-				// convert to string
+				// set values
 				yamlValues.Sync.PersistentVolumes.Enabled = true
 				yamlValues.Sync.StorageClasses.Enabled = false
 				yamlValues.Sync.Ingresses.Enabled = true
 				yamlValues.Sync.HostStorageClasses.Enabled = true
 				yamlValues.Storage.Persistence = false
+				yamlValues.Isolation.Enabled = true
+				yamlValues.Isolation.PodSecurityStandard = "baseline"
+				yamlValues.Isolation.NodeProxyPermission.Enabled = false
+				yamlValues.Isolation.ResourceQuota.Enabled = false
+				yamlValues.Isolation.LimitRange.Enabled = true
+				yamlValues.Isolation.LimitRange.Default = map[string]string{
+					"ephemeral-storage": "8Gi",
+					"memory":            "512Mi",
+					"cpu":               "1",
+				}
+				yamlValues.Isolation.LimitRange.DefaultRequest = map[string]string{
+					"ephemeral-storage": "3Gi",
+					"memory":            "128Mi",
+					"cpu":               "100m",
+				}
+				yamlValues.Isolation.NetworkPolicy.Enabled = true
+				yamlValues.Isolation.NetworkPolicy.OutgoingConnections.IPBlock.CIDR = "8"
 
 				// convert to yaml
 				yamlValuesBytes, err := yaml.Marshal(yamlValues)

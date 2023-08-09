@@ -41,7 +41,7 @@
     // if 500, then exercise is not completed
     let lab_session_id = data.pathname.split("/")[2];
     let exercise_id = window.location.pathname.split("/")[3];
-    let agentHost = window.location.host;
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
 
     let agentUrl =
       agentHost +
@@ -100,7 +100,7 @@
     restartLoading = true;
     let lab_session_id = data.pathname.split("/")[2];
     let exercise_id = window.location.pathname.split("/")[3];
-    let agentHost = window.location.host;
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
 
     let agentUrl =
       agentHost +

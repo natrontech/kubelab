@@ -38,17 +38,17 @@
           brightWhite: "#f1f1f0"
         }
       : {
-          foreground: "#2B3441",
-          background: "#F2F2F2",
-          cursor: "#2B3441",
-          black: "#2B3441",
+          foreground: "#d2d2d2",
+          background: "#2B3441",
+          cursor: "#adadad",
+          black: "#000000",
           red: "#d81e00",
           green: "#5ea702",
           yellow: "#cfae00",
           blue: "#427ab3",
           magenta: "#89658e",
           cyan: "#00a7aa",
-          white: "#000000",
+          white: "#dbded8",
           brightBlack: "#686a66",
           brightRed: "#f54235",
           brightGreen: "#99e343",
@@ -56,7 +56,7 @@
           brightBlue: "#84b0d8",
           brightMagenta: "#bc94b7",
           brightCyan: "#37e6e8",
-          brightWhite: "#2B3441"
+          brightWhite: "#f1f1f0"
         },
     scrollOnUserInput: true
   });
@@ -67,7 +67,9 @@
   const initializeWebSocket = () => {
     const lab_session_id = window.location.pathname.split("/")[2];
     const exercise_id = window.location.pathname.split("/")[3];
-    const agentHost = window.location.host;
+    // if dev mode the agentHost is kubelab.ch
+    const agentHost =
+      window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
 
     agentUrl =
       agentHost +
@@ -175,5 +177,11 @@
   }
   div :global(.xterm) {
     height: 100%;
+    padding: 5px;
+  }
+
+  /* disable scrollbar */
+  div :global(.xterm-viewport) {
+    overflow-y: hidden !important;
   }
 </style>
