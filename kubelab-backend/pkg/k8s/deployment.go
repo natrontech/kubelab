@@ -57,7 +57,8 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"kubelab.natron.io": name,
+						"kubelab.natron.io":           name,
+						"vcluster.loft.sh/managed-by": "vcluster",
 					},
 				},
 				Spec: v1.PodSpec{
