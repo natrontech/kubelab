@@ -159,7 +159,7 @@ func main() {
 					"cpu":               "100m",
 				}
 				yamlValues.Isolation.NetworkPolicy.Enabled = true
-				yamlValues.Isolation.NetworkPolicy.OutgoingConnections.IPBlock.CIDR = "8"
+				yamlValues.Isolation.NetworkPolicy.OutgoingConnections.IPBlock.CIDR = "8.8.8.8/32"
 
 				// convert to yaml
 				yamlValuesBytes, err := yaml.Marshal(yamlValues)
