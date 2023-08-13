@@ -9,7 +9,7 @@
   import Nav from "$lib/components/base/Nav.svelte";
   import { page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
-    import darkTheme from "$lib/stores/theme";
+  import darkTheme from "$lib/stores/theme";
 
   // export let data: any;
 
@@ -35,11 +35,10 @@
   <meta name="description" content={description} />
 </svelte:head>
 
-
 <div>
   <Toaster position="bottom-center" />
   <!-- only display nav when not on /login -->
-  {#if $page.route.id !== "/login"}
+  {#if $page.route.id !== "/login" && $page.route.id !== "/"}
     <Nav />
   {/if}
   <slot />

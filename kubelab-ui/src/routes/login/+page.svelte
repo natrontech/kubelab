@@ -20,7 +20,7 @@
     await alertOnFailure(async function () {
       await login(user.email, user.password);
       toast.success("Logged in successfully!");
-      goto("/");
+      goto("/app");
     }).finally(() => {
       loading = false;
     });

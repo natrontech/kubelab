@@ -15,25 +15,27 @@ export const load = ({ url }) => {
     if (browser) {
         if (client.authStore.model) {
             if (pathname === "/login/") {
-                throw redirect(307, "/");
-            }
-        } else {
-            if (pathname !== "/login/") {
-                client.authStore.clear();
-                throw redirect(307, "/login/");
+                throw redirect(307, "/app");
             }
         }
+        // } else {
+        //     if (pathname !== "/login/") {
+        //         client.authStore.clear();
+        //         throw redirect(307, "/login/");
+        //     }
+        // }
 
         if(client.authStore.isValid) {
             if (pathname === "/login/") {
-                throw redirect(307, "/");
-            }
-        } else {
-            if (pathname !== "/login/") {
-                client.authStore.clear();
-                throw redirect(307, "/login/");
+                throw redirect(307, "/app");
             }
         }
+        // } else {
+        //     if (pathname !== "/login/") {
+        //         client.authStore.clear();
+        //         throw redirect(307, "/login/");
+        //     }
+        // }
     }
 
     return {
