@@ -73,7 +73,7 @@
             </ul>
           </div>
           <a
-            href={plan.name === "Free" ? "/signup" : "mailto:info@natron.io"}
+            href={plan.name === "Free" ? "mailto:info@natron.io" : "mailto:info@natron.io"}
             aria-describedby="tier-freelancer"
             class="btn w-full {plan.name == 'Free' ? 'btn-outline' : 'btn-neutral'}"
             >{plan.name === "Free" ? "Get started" : "Contact us"}</a
