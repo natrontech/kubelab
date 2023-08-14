@@ -9,12 +9,13 @@
   import Nav from "$lib/components/base/Nav.svelte";
   import { page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
-    import darkTheme from "$lib/stores/theme";
+  import darkTheme from "$lib/stores/theme";
 
   // export let data: any;
 
   $: title = $metadata.title ? $metadata.title + " | " + site.name : site.name;
   $: description = $metadata.description ?? site.description;
+
   // reset metadata on navigation so that the new page inherits nothing from the old page
   beforeNavigate(() => {
     $metadata = {};
@@ -35,11 +36,10 @@
   <meta name="description" content={description} />
 </svelte:head>
 
-
 <div>
   <Toaster position="bottom-center" />
   <!-- only display nav when not on /login -->
-  {#if $page.route.id !== "/login"}
+  {#if $page.route.id !== "/login" && $page.route.id !== "/" && $page.route.id !== "/signup"}
     <Nav />
   {/if}
   <slot />

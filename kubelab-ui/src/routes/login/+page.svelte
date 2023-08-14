@@ -20,7 +20,7 @@
     await alertOnFailure(async function () {
       await login(user.email, user.password);
       toast.success("Logged in successfully!");
-      goto("/");
+      goto("/app");
     }).finally(() => {
       loading = false;
     });
@@ -34,8 +34,8 @@
 >
   <div class="absolute sm:inset-0 z-0" />
   <div class="min-h-screen sm:flex sm:flex-row mx-0 justify-center">
-    <div class="flex-col flex  self-center p-10 sm:max-w-5xl xl:max-w-2xl  z-10">
-      <div class="self-start hidden lg:flex flex-col  text-white">
+    <div class="flex-col flex self-center p-10 sm:max-w-5xl xl:max-w-2xl  z-10">
+      <div class="self-start hidden lg:flex flex-col text-white">
         <h1 class="mb-3 font-bold text-5xl">
           Hi, Welcome to <span class="font-bold text-5xl"> KubeLab</span>
         </h1>
@@ -55,12 +55,12 @@
             </div>
             <Confetti />
           </ToggleConfetti>
-          <h3 class="font-semibold text-2xl text-gray-800">Sign In</h3>
+          <h3 class="font-semibold text-2xl ">Sign In</h3>
           <p class="text-gray-500">Please sign in to your account.</p>
         </div>
         <div class="space-y-5">
           <div class="space-y-2">
-            <label class="text-sm font-medium text-gray-700 tracking-wide">Email</label>
+            <label class="text-sm font-medium tracking-wide">Email</label>
             <input
               type="text"
               placeholder="your@email.com"
@@ -70,7 +70,7 @@
             />
           </div>
           <div class="space-y-2">
-            <label class="mb-5 text-sm font-medium text-gray-700 tracking-wide"> Password </label>
+            <label class="mb-5 text-sm font-medium tracking-wide"> Password </label>
             <input
               type="password"
               placeholder="Password"

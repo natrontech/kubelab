@@ -9,7 +9,10 @@
     Github,
     Presentation,
     Sun,
-    Moon
+    Moon,
+
+    BarChart2
+
   } from "lucide-svelte";
 
   let avatarUrl: string = "";
@@ -28,8 +31,8 @@
     {
       id: "1",
       name: "Dashboard",
-      href: "/",
-      icon: LayoutDashboard
+      href: "/app",
+      icon: BarChart2
     },
     {
       id: "2",
@@ -52,22 +55,16 @@
   ];
 </script>
 
-<div class="navbar shadow-md h-2">
+<div class="navbar shadow-md h-16 pt-4">
   <div class="navbar-start z-50">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label tabindex="0" class="btn btn-ghost lg:hidden">
+      <label tabindex="0" class="btn btn-ghost lg:hidden -mt-2">
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
       <ul
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral"
       >
-        <li>
-          <a href="/">
-            <svelte:component this={Home} class="w-5 h-5" />{@html "&nbsp;"}
-            Home
-          </a>
-        </li>
         {#each routes as route}
           <li>
             <a href={route.href}>
@@ -78,7 +75,7 @@
         {/each}
       </ul>
     </div>
-    <a class="btn btn-ghost normal-case text-xl hidden lg:flex" href="/">
+    <a class="btn btn-ghost normal-case text-xl hidden lg:flex -mt-2" href="/">
       <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8 mr-2" /> KubeLab</a
     >
   </div>
@@ -95,9 +92,9 @@
     </ul>
   </div>
 
-  <div class="navbar-end">
+  <div class="navbar-end sm:-mt-2 ">
 
-    <button class="btn m-2 bg-transparent border-none"
+    <button class="btn bg-transparent border-none"
       on:click={() => darkTheme.set(!$darkTheme)}
     >
       {#if $darkTheme === true}
