@@ -14,7 +14,7 @@ export const load = ({ url }) => {
 
     if (browser) {
         if (client.authStore.model) {
-            if (pathname === "/login/") {
+            if (pathname === "/login/" || pathname === "/signup/") {
                 throw redirect(307, "/app");
             }
         }
@@ -25,8 +25,8 @@ export const load = ({ url }) => {
         //     }
         // }
 
-        if(client.authStore.isValid) {
-            if (pathname === "/login/") {
+        if (client.authStore.isValid) {
+            if (pathname === "/login/" || pathname === "/signup/") {
                 throw redirect(307, "/app");
             }
         }

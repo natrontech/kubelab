@@ -15,6 +15,7 @@
 
   $: title = $metadata.title ? $metadata.title + " | " + site.name : site.name;
   $: description = $metadata.description ?? site.description;
+
   // reset metadata on navigation so that the new page inherits nothing from the old page
   beforeNavigate(() => {
     $metadata = {};
@@ -38,7 +39,7 @@
 <div>
   <Toaster position="bottom-center" />
   <!-- only display nav when not on /login -->
-  {#if $page.route.id !== "/login" && $page.route.id !== "/"}
+  {#if $page.route.id !== "/login" && $page.route.id !== "/" && $page.route.id !== "/signup"}
     <Nav />
   {/if}
   <slot />
