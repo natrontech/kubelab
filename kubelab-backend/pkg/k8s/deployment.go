@@ -10,39 +10,36 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateDeployment(name string, namespace string, image string, replicas int32, kubeconfig string, bootstrap string, check string, host string) (*appsv1.Deployment, error) {
+func CreateDeployment(name, namespace, image string, replicas int32, kubeconfig, bootstrap, check, host string) (*appsv1.Deployment, error) {
+	kubeconfig = strings.Replace(kubeconfig, "localhost:8443", "vcluster:443", -1)
 
-	// search in string kubeconfig for 'localhost' and replace it with 'vcluster'
-	newKubeconfig := strings.Replace(kubeconfig, "localhost:8443", "vcluster:443", -1)
+	createConfigMap(namespace, "kubeconfig", map[string]string{"config": kubeconfig})
+	createConfigMap(namespace, "scripts-"+name, map[string]string{
+		"check.sh":     check,
+		"bootstrap.sh": bootstrap,
+	})
 
+	deployment := constructDeployment(name, namespace, image, replicas, host)
+	deployed, err := Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
+	if err != nil {
+		log.Println(err)
+	}
+	return deployed, nil
+}
+
+func createConfigMap(namespace, name string, data map[string]string) {
 	configMap := &v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "kubeconfig",
-		},
-		Data: map[string]string{
-			"config": newKubeconfig,
-		},
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Data:       data,
 	}
 	if _, err := Clientset.CoreV1().ConfigMaps(namespace).Create(Ctx, configMap, metav1.CreateOptions{}); err != nil {
 		log.Println(err)
 	}
+}
 
-	// create config maps for scripts
-	scriptsConfigMap := &v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "scripts-" + name,
-		},
-		Data: map[string]string{
-			"check.sh":     check,
-			"bootstrap.sh": bootstrap,
-		},
-	}
-
-	if _, err := Clientset.CoreV1().ConfigMaps(namespace).Create(Ctx, scriptsConfigMap, metav1.CreateOptions{}); err != nil {
-		log.Println(err)
-	}
-
-	deployment := &appsv1.Deployment{
+func constructDeployment(name, namespace, image string, replicas int32, host string) *appsv1.Deployment {
+	scriptVolumeName := "scripts-" + name
+	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
@@ -77,11 +74,11 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 									MountPath: "/config-writable",
 								},
 								{
-									Name:      "scripts-" + name,
+									Name:      scriptVolumeName,
 									MountPath: "/scripts",
 								},
 								{
-									Name:      "scripts-" + name + "-writable",
+									Name:      scriptVolumeName + "-writable",
 									MountPath: "/scripts-writable",
 								},
 							},
@@ -106,7 +103,7 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 									ReadOnly:  true,
 								},
 								{
-									Name:      "scripts-" + name + "-writable",
+									Name:      scriptVolumeName + "-writable",
 									MountPath: "/home/kubelab-agent/.kubelab",
 									ReadOnly:  true,
 								},
@@ -131,17 +128,17 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 							},
 						},
 						{
-							Name: "scripts-" + name,
+							Name: scriptVolumeName,
 							VolumeSource: v1.VolumeSource{
 								ConfigMap: &v1.ConfigMapVolumeSource{
 									LocalObjectReference: v1.LocalObjectReference{
-										Name: "scripts-" + name,
+										Name: scriptVolumeName,
 									},
 								},
 							},
 						},
 						{
-							Name: "scripts-" + name + "-writable",
+							Name: scriptVolumeName + "-writable",
 							VolumeSource: v1.VolumeSource{
 								EmptyDir: &v1.EmptyDirVolumeSource{},
 							},
@@ -151,40 +148,30 @@ func CreateDeployment(name string, namespace string, image string, replicas int3
 			},
 		},
 	}
-
-	deployment, err := Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
-	if err != nil {
-		log.Println(err)
-	}
-
-	return deployment, nil
 }
 
-func DeleteDeployment(namespace string, name string) error {
-	// Delete the configmap first
-	if err := Clientset.CoreV1().ConfigMaps(namespace).Delete(Ctx, "kubeconfig", metav1.DeleteOptions{}); err != nil {
-		log.Println(err)
-	}
-
-	if err := Clientset.CoreV1().ConfigMaps(namespace).Delete(Ctx, "scripts-"+name, metav1.DeleteOptions{}); err != nil {
-		log.Println(err)
-	}
+func DeleteDeployment(namespace, name string) error {
+	deleteConfigMap(namespace, "kubeconfig")
+	deleteConfigMap(namespace, "scripts-"+name)
 
 	return Clientset.AppsV1().Deployments(namespace).Delete(Ctx, name, metav1.DeleteOptions{})
 }
 
-func WaitForDeployment(namespace string, name string) error {
+func deleteConfigMap(namespace, name string) {
+	if err := Clientset.CoreV1().ConfigMaps(namespace).Delete(Ctx, name, metav1.DeleteOptions{}); err != nil {
+		log.Println(err)
+	}
+}
+
+func WaitForDeployment(namespace, name string) error {
 	for {
 		deployment, err := Clientset.AppsV1().Deployments(namespace).Get(Ctx, name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
-
-		// check if all containers are ready
 		if deployment.Status.ReadyReplicas == *deployment.Spec.Replicas {
 			return nil
 		}
-
 		time.Sleep(1 * time.Second)
 	}
 }
