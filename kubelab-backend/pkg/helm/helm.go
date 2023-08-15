@@ -11,15 +11,13 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-var (
-	Prefix = "kubelab"
-)
+const Prefix = "kubelab"
 
-func GetNamespaceName(labName string, username string) string {
+func GetNamespaceName(labName, username string) string {
 	return Prefix + "-" + util.StringParser(labName) + "-" + util.StringParser(username)
 }
 
-func CreateHelmClient(labName string, username string) (helmclient.Client, error) {
+func CreateHelmClient(labName, username string) (helmclient.Client, error) {
 	opt := &helmclient.Options{
 		Namespace: GetNamespaceName(labName, username),
 		Debug:     true,
@@ -27,29 +25,19 @@ func CreateHelmClient(labName string, username string) (helmclient.Client, error
 		DebugLog:  func(format string, v ...interface{}) {},
 	}
 
-	helmClient, err := helmclient.New(opt)
-	if err != nil {
-		return nil, err
-	}
-
-	return helmClient, nil
+	return helmclient.New(opt)
 }
 
-func AddHelmRepositoryToClient(helmClient helmclient.Client, repositoryName string, repositoryURL string) error {
+func AddHelmRepositoryToClient(helmClient helmclient.Client, repositoryName, repositoryURL string) error {
 	chartRepo := repo.Entry{
 		Name: strings.ToLower(repositoryName),
 		URL:  repositoryURL,
 	}
 
-	if err := helmClient.AddOrUpdateChartRepo(chartRepo); err != nil {
-		return err
-	}
-
-	return nil
+	return helmClient.AddOrUpdateChartRepo(chartRepo)
 }
 
-func CreateOrUpdateHelmRelease(helmClient helmclient.Client, chartName string, releaseName string, namespace string, version string, valuesYaml string) (*release.Release, error) {
-
+func CreateOrUpdateHelmRelease(helmClient helmclient.Client, chartName, releaseName, namespace, version, valuesYaml string) (rel *release.Release, err error) {
 	chartSpec := helmclient.ChartSpec{
 		ChartName:       strings.ToLower(chartName),
 		ReleaseName:     strings.ToLower(releaseName),
@@ -60,11 +48,8 @@ func CreateOrUpdateHelmRelease(helmClient helmclient.Client, chartName string, r
 		ValuesYaml:      valuesYaml,
 	}
 
-	if release, err := helmClient.InstallOrUpgradeChart(context.Background(), &chartSpec, nil); err != nil {
-		return nil, err
-	} else {
-		return release, nil
-	}
+	rel, err = helmClient.InstallOrUpgradeChart(context.Background(), &chartSpec, nil)
+	return
 }
 
 func GetHelmRelease(helmClient helmclient.Client, releaseName string) (*release.Release, error) {
