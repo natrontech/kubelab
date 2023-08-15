@@ -4,5 +4,5 @@
 /pb_data
 /tmp
 /bin
-kubelab
 ./pocketbase
+kubelab
