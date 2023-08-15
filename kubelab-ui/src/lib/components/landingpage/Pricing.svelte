@@ -60,9 +60,10 @@
                 </li>
               {/each}
             </ul>
-            <ul role="list" class="my-8 space-y-3 text-sm leading-6 text-gray-600">
+            <ul role="list" class="mt-4 mb-8 space-y-3 text-sm leading-6 text-gray-600">
               <!-- @ts-ignore -->
               {#if plan.expand.optionalFeatures}
+              <span class="text-sm font-semibold leading-6 text-gray-600">Optional features</span>
                 {#each plan.expand.optionalFeatures as feature}
                   <li class="flex gap-x-3">
                     <Plus class="h-6 w-5 flex-none text-gray-500" />
