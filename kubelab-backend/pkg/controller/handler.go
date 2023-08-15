@@ -5,11 +5,11 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 )
 
-func HandleLabSessions(e *core.RecordUpdateEvent) error {
+func HandleLabSessions(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
 	if e.Record.GetBool("clusterRunning") {
-		return deployVCluster(e)
+		return deployVCluster(e, app)
 	}
-	return deleteClusterResources(e)
+	return deleteClusterResources(e, app)
 }
 
 func HandleExerciseSessions(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {

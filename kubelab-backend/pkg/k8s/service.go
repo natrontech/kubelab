@@ -1,30 +1,45 @@
 package k8s
 
 import (
+	"github.com/natrontech/kubelab/pkg/util"
+	"github.com/pocketbase/pocketbase/models"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateService(namespace string, name string, port int32) (*v1.Service, error) {
+type ServiceParams struct {
+	Namespace  string
+	Name       string
+	Port       int32
+	UserRecord *models.Record
+}
+
+func CreateService(params ServiceParams) (*v1.Service, error) {
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
+			Name:      params.Name,
+			Namespace: params.Namespace,
+			Labels: map[string]string{
+				"kubelab.ch":             params.Name,
+				"kubelab.ch/userId":      params.UserRecord.GetString("id"),
+				"kubelab.ch/username":    params.UserRecord.GetString("username"),
+				"kubelab.ch/displayName": util.StringParser(params.UserRecord.GetString("name")),
+			},
 		},
 		Spec: v1.ServiceSpec{
 			Selector: map[string]string{
-				"kubelab.natron.io": name,
+				"kubelab.ch": params.Name,
 			},
 			Ports: []v1.ServicePort{
 				{
-					Port: port,
+					Port: params.Port,
 				},
 			},
 			Type: v1.ServiceTypeClusterIP,
 		},
 	}
 
-	return Clientset.CoreV1().Services(namespace).Create(Ctx, service, metav1.CreateOptions{})
+	return Clientset.CoreV1().Services(params.Namespace).Create(Ctx, service, metav1.CreateOptions{})
 }
 
 func DeleteService(namespace string, name string) error {

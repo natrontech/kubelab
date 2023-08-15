@@ -5,22 +5,36 @@ import (
 	"strings"
 	"time"
 
+	"github.com/natrontech/kubelab/pkg/util"
+	"github.com/pocketbase/pocketbase/models"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateDeployment(name, namespace, image string, replicas int32, kubeconfig, bootstrap, check, host string) (*appsv1.Deployment, error) {
-	kubeconfig = strings.Replace(kubeconfig, "localhost:8443", "vcluster:443", -1)
+type DeploymentParams struct {
+	Name       string
+	Namespace  string
+	Image      string
+	Replicas   int32
+	Kubeconfig string
+	Bootstrap  string
+	Check      string
+	Host       string
+	UserRecord *models.Record
+}
 
-	createConfigMap(namespace, "kubeconfig", map[string]string{"config": kubeconfig})
-	createConfigMap(namespace, "scripts-"+name, map[string]string{
-		"check.sh":     check,
-		"bootstrap.sh": bootstrap,
+func CreateDeployment(params DeploymentParams) (*appsv1.Deployment, error) {
+	params.Kubeconfig = strings.Replace(params.Kubeconfig, "localhost:8443", "vcluster:443", -1)
+
+	createConfigMap(params.Namespace, "kubeconfig", map[string]string{"config": params.Kubeconfig})
+	createConfigMap(params.Namespace, "scripts-"+params.Name, map[string]string{
+		"check.sh":     params.Check,
+		"bootstrap.sh": params.Bootstrap,
 	})
 
-	deployment := constructDeployment(name, namespace, image, replicas, host)
-	deployed, err := Clientset.AppsV1().Deployments(namespace).Create(Ctx, deployment, metav1.CreateOptions{})
+	deployment := constructDeployment(params.Name, params.Namespace, params.Image, params.Replicas, params.Host, params.UserRecord)
+	deployed, err := Clientset.AppsV1().Deployments(params.Namespace).Create(Ctx, deployment, metav1.CreateOptions{})
 	if err != nil {
 		log.Println(err)
 	}
@@ -37,7 +51,7 @@ func createConfigMap(namespace, name string, data map[string]string) {
 	}
 }
 
-func constructDeployment(name, namespace, image string, replicas int32, host string) *appsv1.Deployment {
+func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record) *appsv1.Deployment {
 	scriptVolumeName := "scripts-" + name
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -48,13 +62,19 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"kubelab.natron.io": name,
+					"kubelab.ch":             name,
+					"kubelab.ch/userId":      userRecord.GetString("id"),
+					"kubelab.ch/username":    userRecord.GetString("username"),
+					"kubelab.ch/displayName": util.StringParser(userRecord.GetString("name")),
 				},
 			},
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"kubelab.natron.io":           name,
+						"kubelab.ch":                  name,
+						"kubelab.ch/userId":           userRecord.GetString("id"),
+						"kubelab.ch/username":         userRecord.GetString("username"),
+						"kubelab.ch/displayName":      util.StringParser(userRecord.GetString("name")),
 						"vcluster.loft.sh/managed-by": "vcluster",
 					},
 				},

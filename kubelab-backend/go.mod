@@ -5,8 +5,7 @@ go 1.20
 require (
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/pocketbase/dbx v1.10.0
-	github.com/pocketbase/pocketbase v0.17.4
-	gopkg.in/yaml.v2 v2.4.0
+	github.com/pocketbase/pocketbase v0.17.5
 	helm.sh/helm/v3 v3.11.2
 	k8s.io/api v0.27.2
 	k8s.io/apimachinery v0.27.2
@@ -101,6 +100,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230807174057-1744710a1577 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.26.3 // indirect
 	k8s.io/apiserver v0.26.3 // indirect

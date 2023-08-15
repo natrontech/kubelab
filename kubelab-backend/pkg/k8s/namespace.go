@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/natrontech/kubelab/pkg/util"
+	"github.com/pocketbase/pocketbase/models"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -22,16 +24,30 @@ func GetTotalNamespaces() (string, error) {
 	return "unknown", nil
 }
 
-func CreateNamespace(namespace string) error {
+type NamespaceParams struct {
+	Name       string
+	UserRecord *models.Record
+}
+
+func CreateNamespace(params NamespaceParams) error {
 	ns := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: namespace,
+			Name: params.Name,
 			Labels: map[string]string{
-				"kubelab.natron.io/created-by": "kubelab",
+				"kubelab.ch":             params.Name,
+				"kubelab.ch/userId":      params.UserRecord.GetString("id"),
+				"kubelab.ch/username":    params.UserRecord.GetString("username"),
+				"kubelab.ch/displayName": util.StringParser(params.UserRecord.GetString("name")),
 			},
 		},
 	}
 	_, err := Clientset.CoreV1().Namespaces().Create(Ctx, ns, metav1.CreateOptions{})
+
+	// if err already exists, update
+	if err != nil && strings.Contains(err.Error(), "already exists") {
+		_, err = Clientset.CoreV1().Namespaces().Update(Ctx, ns, metav1.UpdateOptions{})
+	}
+
 	return err
 }
 

@@ -72,7 +72,7 @@ func main() {
 	app.OnRecordBeforeUpdateRequest().Add(func(e *core.RecordUpdateEvent) error {
 		switch e.Collection.Name {
 		case "lab_sessions":
-			return controller.HandleLabSessions(e)
+			return controller.HandleLabSessions(e, app)
 		case "exercise_sessions":
 			return controller.HandleExerciseSessions(e, app)
 		}

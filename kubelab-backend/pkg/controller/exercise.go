@@ -17,7 +17,17 @@ func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBas
 		return logAndReturnErr(err)
 	}
 
-	if err = k8s.CreateNamespace(namespaceName(e, exercise.GetString("lab"))); err != nil {
+	user, err := app.Dao().FindRecordById("users", e.Record.GetString("user"))
+	if err != nil {
+		return err
+	}
+
+	namespaceParams := k8s.NamespaceParams{
+		Name:       namespaceName(e, exercise.GetString("lab")),
+		UserRecord: user,
+	}
+
+	if err = k8s.CreateNamespace(namespaceParams); err != nil {
 		log.Println(err)
 	}
 
@@ -40,39 +50,51 @@ func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBas
 		return logAndReturnErr(err)
 	}
 
+	deploymentParams := k8s.DeploymentParams{
+		Name:       "kubelab-agent-" + exercise.Id,
+		Namespace:  helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+		Image:      env.Config.KubelabImage,
+		Replicas:   1,
+		Kubeconfig: string(secret.Data["config"]),
+		Bootstrap:  string(bootstrapBody),
+		Check:      string(checkBody),
+		Host:       env.Config.AllowedHosts,
+		UserRecord: user,
+	}
+
 	// create a new deployment
-	_, err = k8s.CreateDeployment(
-		"kubelab-agent-"+exercise.Id,
-		helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-		env.Config.KubelabImage,
-		1,
-		string(secret.Data["config"]),
-		string(bootstrapBody),
-		string(checkBody),
-		env.Config.AllowedHosts,
-	)
+	_, err = k8s.CreateDeployment(deploymentParams)
 	if err != nil {
 		log.Println(err)
+	}
+
+	serviceParams := k8s.ServiceParams{
+		Name:       "kubelab-agent-" + exercise.Id,
+		Namespace:  helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+		Port:       8376,
+		UserRecord: user,
 	}
 
 	// create a new service
-	_, err = k8s.CreateService(
-		helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-		"kubelab-agent-"+exercise.Id,
-		8376,
-	)
+	_, err = k8s.CreateService(serviceParams)
 	if err != nil {
 		log.Println(err)
 	}
 
+	ingressParams := k8s.IngressParams{
+		Name:        "kubelab-agent-" + exercise.Id,
+		Namespace:   helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+		ServiceName: "kubelab-agent-" + exercise.Id,
+		Host:        env.Config.AllowedHosts,
+		Path:        "kubelab-" + exercise.GetString("lab") + "-" + exercise.Id + "-" + e.Record.GetString("user"),
+		UserRecord:  user,
+	}
+
 	// create a new ingress
-	_, err = k8s.CreateIngress(
-		helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-		"kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"),
-		env.Config.AllowedHosts,
-		"kubelab-agent-"+exercise.Id,
-		"kubelab-"+exercise.GetString("lab")+"-"+exercise.Id+"-"+e.Record.GetString("user"),
-	)
+	_, err = k8s.CreateIngress(ingressParams)
+	if err != nil {
+		log.Println(err)
+	}
 
 	// check if deployment is ready
 	err = k8s.WaitForDeployment(helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")), "kubelab-agent-"+exercise.Id)
