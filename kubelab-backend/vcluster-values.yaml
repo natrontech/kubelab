@@ -17,15 +17,7 @@ isolation:
   resourceQuota:
     enabled: false
   limitRange:
-    enabled: true
-    default:
-      ephemeral-storage: 8Gi
-      memory: 512Mi
-      cpu: 1
-    defaultRequest:
-      ephemeral-storage: 3Gi
-      memory: 128Mi
-      cpu: 100m
+    enabled: false
   networkPolicy:
     enabled: true
     outgoingConnections:
