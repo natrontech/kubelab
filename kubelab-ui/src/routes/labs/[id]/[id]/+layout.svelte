@@ -3,7 +3,7 @@
   import { goto } from "$app/navigation";
   import {
     ArrowLeft,
-    Check,
+    CheckCircle,
     RotateCw,
     StopCircle,
     StretchHorizontal,
@@ -17,16 +17,19 @@
     exercise_session,
     exercise_sessions,
     exercises,
-    filterExercisesByLab,
-    lab
+    filterExercisesByLab
   } from "$lib/stores/data.js";
 
   // @ts-ignore
   import { Confetti } from "svelte-confetti";
   import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
   import horizontalView from "$lib/stores/tableView.js";
-  import { sidebarOpen, sidebar_exercise_sessions, sidebar_exercises, sidebar_lab } from "$lib/stores/sidebar.js";
-    import type { ExerciseSessionsResponse } from "$lib/pocketbase/generated-types.js";
+  import {
+    sidebarOpen,
+    sidebar_exercise_sessions,
+    sidebar_exercises,
+    sidebar_lab
+  } from "$lib/stores/sidebar.js";
 
   $metadata.title = "Exercises";
 
@@ -178,6 +181,30 @@
         <ArrowLeft class="inline-block w-4 h-4 mr-2" />
         Labs
       </button>
+      <ToggleConfetti>
+        <button
+          slot="label"
+          class="btn btn-outline {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
+          on:click={() => handleCheckExercise()}
+        >
+          <CheckCircle class="inline-block mr-2" />
+          Check
+        </button>
+        <div
+          style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
+        >
+          {#if $exercise_session.endTime}
+            <Confetti
+              x={[-5, 5]}
+              y={[0, 0.1]}
+              delay={[0, 2000]}
+              duration="3000"
+              amount="100"
+              fallDistance="100vh"
+            />
+          {/if}
+        </div>
+      </ToggleConfetti>
       <div class="join grid grid-cols-2">
         <button
           on:click={() => {
@@ -200,30 +227,6 @@
           <StretchVertical />
         </button>
       </div>
-      <ToggleConfetti>
-        <button
-          slot="label"
-          class="btn btn-outline {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-success'}"
-          on:click={() => handleCheckExercise()}
-        >
-          <Check class="inline-block mr-2" />
-          {$exercise_session.endTime ? "Check (already done)" : "Check"}
-        </button>
-        <div
-          style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
-        >
-          {#if $exercise_session.endTime}
-            <Confetti
-              x={[-5, 5]}
-              y={[0, 0.1]}
-              delay={[0, 2000]}
-              duration="3000"
-              amount="100"
-              fallDistance="100vh"
-            />
-          {/if}
-        </div>
-      </ToggleConfetti>
     </div>
   </div>
   <div class="absolute top-16 bottom-16 left-0 right-0 z-0">
@@ -232,26 +235,27 @@
   <div class="absolute h-16 bottom-0 left-0 right-0">
     <div class="mt-2 flex justify-between px-2">
       <div>
-        <button
-          class="btn btn-outline {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-error'}"
-          on:click={() => handleStopExercise()}
-        >
-          <StopCircle class="inline-block mr-2" />
-          Stop
-        </button>
+        {#if $exercise_session.agentRunning}
+          <button class="btn btn-outline btn-error" on:click={() => handleStopExercise()}>
+            <StopCircle class="inline-block mr-2" />
+            Stop
+          </button>
 
-        <button
-          class="btn btn-outline {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
-          on:click={() => handleRestartExercise()}
-        >
-          {#if restartLoading}
-            <RotateCw class="inline-block mr-2 animate-spin" />
-            Reset Exercise
-          {:else}
-            <RotateCw class="inline-block mr-2" />
-            Reset Exercise
-          {/if}
-        </button>
+          <button
+            class="btn btn-outline {!$exercise_session.agentRunning
+              ? 'btn-disabled'
+              : 'btn-warning'}"
+            on:click={() => handleRestartExercise()}
+          >
+            {#if restartLoading}
+              <RotateCw class="inline-block mr-2 animate-spin" />
+              Reset Exercise
+            {:else}
+              <RotateCw class="inline-block mr-2" />
+              Reset Exercise
+            {/if}
+          </button>
+        {/if}
       </div>
       <div class="">
         <ul class="steps mt-1">

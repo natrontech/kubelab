@@ -10,7 +10,7 @@
   import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
-  import { InfoIcon, Lightbulb, Play } from "lucide-svelte";
+  import { Check, CheckCircle, InfoIcon, Lightbulb, Play } from "lucide-svelte";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -219,7 +219,7 @@
                 <dialog id="my_modal_1" class="modal">
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Solution</h3>
-
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     <SvelteMarkdown
                       source={solution}
                       renderers={{
@@ -228,10 +228,6 @@
                         link: LinkComponent
                       }}
                     />
-                    <div class="modal-action">
-                      <!-- if there is a button in form, it will close the modal -->
-                      <button class="btn">Close</button>
-                    </div>
                   </form>
                 </dialog>
               </div>
@@ -257,27 +253,25 @@
                 : ''}"
             >
               <div class="text-center">
-                <h1 class="text-4xl font-bold">
-                  {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-                </h1>
-                <p class="text-xl">
-                  {checkIfExerciseIsDone($exercise.id)
-                    ? "Click the button below to restart the exercise. You must finish it again!"
-                    : "Click the button below to start the exercise"}
-                </p>
-                <button
-                  class="btn {checkIfExerciseIsDone($exercise.id)
-                    ? 'btn-warning'
-                    : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
-                  on:click={() => handleStartExercise()}
-                >
-                  {#if loading === window.location.pathname.split("/")[3]}
-                    <span class="loading loading-dots loading-md" /> Start Terminal
-                  {:else}
-                    <Play /> Start Terminal
-                  {/if}
-                  {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
-                </button>
+                {#if checkIfExerciseIsDone($exercise.id)}
+                  <h1 class="text-4xl font-bold">
+                    <CheckCircle class="inline-block w-12 h-12" />
+                    {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+                  </h1>
+                {:else}
+                  <button
+                    class="btn {checkIfExerciseIsDone($exercise.id)
+                      ? 'btn-warning'
+                      : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
+                    on:click={() => handleStartExercise()}
+                  >
+                    {#if loading === window.location.pathname.split("/")[3]}
+                      <span class="loading loading-dots loading-md" /> Start Terminal
+                    {:else}
+                      <Play /> Start Terminal
+                    {/if}
+                  </button>
+                {/if}
               </div>
             </div>
           {/key}
