@@ -1,15 +1,36 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { client } from "$lib/pocketbase";
   import type {
     ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse
   } from "$lib/pocketbase/generated-types";
-  import { exercise_sessions, getExerciseSessionByExercise } from "$lib/stores/data";
+  import {
+    exercise,
+    exercise_sessions,
+    exercises,
+    getExerciseSessionByExercise
+  } from "$lib/stores/data";
   import { loadingExercises } from "$lib/stores/loading";
-  import { sidebar_exercises } from "$lib/stores/sidebar";
-  import { getTimeAgo } from "$lib/utils/time";
-  import { MoreHorizontal, Pause, Play, Terminal, TerminalSquare } from "lucide-svelte";
+  import {
+    sidebarOpen,
+    sidebar_exercise_sessions,
+    sidebar_exercises,
+    sidebar_lab,
+
+    sidebar_lab_session
+
+  } from "$lib/stores/sidebar";
+  import { getDeltaTime, getTimeAgo } from "$lib/utils/time";
+  import {
+    CheckCircle,
+    MoreHorizontal,
+    Pause,
+    Play,
+    Terminal,
+    TerminalSquare
+  } from "lucide-svelte";
   import { onMount } from "svelte";
   import toast from "svelte-french-toast";
   export let this_exercise_session: ExerciseSessionsResponse;
@@ -24,6 +45,56 @@
       this_exercise = exercise;
     }
   });
+
+  async function stopExercise(exercise_id: string) {
+    const data: ExerciseSessionsRecord = {
+      // @ts-ignore
+      user: client.authStore.model?.id,
+      exercise: exercise_id,
+      startTime: new Date().toISOString(),
+      endTime: "",
+      agentRunning: false
+    };
+
+    $loadingExercises = $loadingExercises.concat(exercise_id);
+
+    // const labId = window.location.pathname.split("/")[2];
+
+    const exercise_session_id = getExerciseSessionByExercise(exercise_id)?.id;
+
+    if (exercise_session_id) {
+      await client
+        .collection("exercise_sessions")
+        .update(exercise_session_id, data)
+        // @ts-ignore
+        .then((response: any) => {
+          // goto(`/labs/${labId}/${exercise_id}`);
+          toast.success("Exercise stopped");
+          this_exercise_session = response;
+          $sidebar_exercise_sessions = $sidebar_exercise_sessions.map((exercise_session) => {
+            if (exercise_session.id === exercise_session_id) {
+              return response;
+            }
+            return exercise_session;
+          });
+
+          exercise_sessions.update((exercise_sessions) => {
+            return exercise_sessions.map((exercise_session) => {
+              if (exercise_session.id === exercise_session_id) {
+                return response;
+              }
+              return exercise_session;
+            });
+          });
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        })
+        .finally(() => {
+          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+        });
+    }
+  }
 
   async function startExercise(exercise_id: string) {
     const data: ExerciseSessionsRecord = {
@@ -48,6 +119,13 @@
         .then((response: any) => {
           // goto(`/labs/${labId}/${exercise_id}`);
           toast.success("Exercise started");
+          this_exercise_session = response;
+          $sidebar_exercise_sessions = $sidebar_exercise_sessions.map((exercise_session) => {
+            if (exercise_session.id === exercise_session_id) {
+              return response;
+            }
+            return exercise_session;
+          });
 
           exercise_sessions.update((exercise_sessions) => {
             return exercise_sessions.map((exercise_session) => {
@@ -69,16 +147,25 @@
 </script>
 
 {#if this_exercise}
-  <div class="overflow-hidden rounded-xl border border-gray-200">
-    <div class="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+  <div class="overflow-hidden rounded-xl border-2 h-auto">
+    <div class="flex items-center gap-x-4 border-b-2 p-6">
       <div
-        class="h-12 w-12 flex justify-center items-center rounded-lg bg-white object-cover ring-1 ring-gray-900/10"
+        class="h-12 w-12 flex justify-center items-center rounded-lg  object-cover ring-2 ring-primary relative"
       >
         {index + 1}
+        {#if this_exercise_session.agentRunning}
+          <span class="absolute flex h-4 w-4 -top-1 -right-1">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
+            />
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
+          </span>
+        {/if}
       </div>
-      <div class="text-sm font-medium leading-6 text-gray-900">
+      <div class="text-sm font-medium leading-6 ">
         {this_exercise.title}
       </div>
+      {#if $sidebar_lab_session.clusterRunning}
       <div class="relative ml-auto dropdown dropdown-end">
         {#if $loadingExercises.includes(this_exercise.id)}
           <span class="loading loading-dots loading-xs  block p-2.5 text-gray-500" />
@@ -89,20 +176,44 @@
           <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
             {#if this_exercise_session.agentRunning}
               <li>
-                <button>
+                <button
+                  on:click={() => {
+                    sidebarOpen.set(false);
+                    exercise.set(this_exercise);
+                    exercises.set($sidebar_exercises);
+                    new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+                      goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
+                    );
+                  }}
+                >
                   <Terminal class="w-4 h-4 mr-1 inline-block" />
                   Shell</button
                 >
               </li>
               <li>
-                <button>
+                <button class="" on:click={() => stopExercise(this_exercise.id)}>
                   <Pause class="w-4 h-4 mr-1 inline-block" />
                   Stop Exercise</button
                 >
               </li>
             {:else}
               <li>
-                <button class="bg-success" on:click={() => startExercise(this_exercise.id)}>
+                <button
+                  on:click={() => {
+                    sidebarOpen.set(false);
+                    exercise.set(this_exercise);
+                    exercises.set($sidebar_exercises);
+                    new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+                      goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
+                    );
+                  }}
+                >
+                  <Terminal class="w-4 h-4 mr-1 inline-block" />
+                  Shell</button
+                >
+              </li>
+              <li>
+                <button class="" on:click={() => startExercise(this_exercise.id)}>
                   <Play class="w-4 h-4 mr-1 inline-block" />
                   Start Exercise</button
                 >
@@ -111,6 +222,9 @@
           </ul>
         {/if}
       </div>
+      {:else}
+        <p class="text-error text-sm relative ml-auto">Lab not running</p>
+      {/if}
     </div>
     <dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
       <div class="flex justify-between gap-x-4 py-3">
@@ -129,15 +243,16 @@
         </dd>
       </div>
       <div class="flex justify-between gap-x-4 py-3">
-        <dt class="">Time</dt>
+        <dt class="">Done</dt>
         <dd class={this_exercise_session.agentRunning ? "text-success" : "text-gray-400"}>
-          <span class="ml-1 text-xs text-primary">
-            {#if this_exercise_session.agentRunning && this_exercise_session.startTime}
-              since
-              {getTimeAgo(this_exercise_session.startTime)}
-            {:else if this_exercise_session.endTime && !this_exercise_session.agentRunning}
-              {getTimeAgo(this_exercise_session.endTime)}
-              ago
+          <span class="ml-1 text-xs">
+            {#if this_exercise_session.endTime && !this_exercise_session.agentRunning}
+              <span class="text-success">
+                <CheckCircle class="w-5 h-5 inline-block" />
+                {getDeltaTime(this_exercise_session.startTime, this_exercise_session.endTime)}
+              </span>
+            {:else}
+              <span class="text-gray-400">not yet</span>
             {/if}
           </span>
         </dd>

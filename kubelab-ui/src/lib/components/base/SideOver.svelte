@@ -12,12 +12,11 @@
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
   import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
   import toast from "svelte-french-toast";
-  import { loadingLabs } from "$lib/stores/loading";
+  import { loadingExercises, loadingLabs } from "$lib/stores/loading";
   import { client } from "$lib/pocketbase";
   import {
     sidebarOpen,
     sidebar_exercise_sessions,
-    sidebar_exercises,
     sidebar_lab,
     sidebar_lab_session
   } from "$lib/stores/sidebar";
@@ -107,12 +106,21 @@
         user: client.authStore.model?.id,
         exercise: sidebar_exercise_session.exercise
       };
+      $loadingExercises = $loadingExercises.concat(sidebar_exercise_session.id);
       await client
         .collection("exercise_sessions")
         .update(sidebar_exercise_session.id, exercise_session_data)
         // @ts-ignore
         .then((record: ExerciseSessionsResponse) => {
           sidebar_exercise_session = record;
+          sidebar_exercise_sessions.update((sidebar_exercise_sessions) => {
+            return sidebar_exercise_sessions.map((sidebar_exercise_session) => {
+              if (sidebar_exercise_session.id === record.id) {
+                return record;
+              }
+              return sidebar_exercise_session;
+            });
+          });
           exercise_sessions.update((exercise_sessions) => {
             return exercise_sessions.map((exercise_session) => {
               if (exercise_session.id === record.id) {
@@ -124,6 +132,8 @@
         })
         .catch((error) => {
           console.error(error);
+        }).finally(() => {
+          $loadingExercises = $loadingExercises.filter((id) => id !== sidebar_exercise_session.id);
         });
     });
 
@@ -157,15 +167,13 @@
 </script>
 
 <aside
-  class="absolute lg:w-1/2 w-full h-full top-0 bottom-0 bg-white dark:bg-neutral border-r-2 shadow-lg z-50"
+  class="absolute lg:w-1/2 w-full h-full top-0 bottom-0 bg-white dark:bg-neutral dark:border-none border-l-2 border-t-2 shadow-md z-50"
   class:open={$sidebarOpen}
 >
   {#key $sidebar_lab_session}
     {#if $sidebarOpen}
       <div
-        in:slide
-        out:slide
-        class="{$sidebar_lab_session.clusterRunning ? '' : ''} px-4 py-6 sm:px-6 relative"
+        class="{$sidebar_lab_session.clusterRunning ? '' : ''} px-4 py-6 sm:px-6 absolute w-full z-10"
       >
         <div class="flex items-center justify-between">
           <h2 class="text-base font-semibold leading-6 text-primary" id="slide-over-title">
@@ -207,7 +215,7 @@
           {/if}
         </div>
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <div tabindex="0" class="collapse collapse-arrow bg-white dark:bg-neutral ">
+        <div tabindex="0" class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4  rounded-lg shadow-md">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="collapse-title text-md font-medium"
@@ -228,7 +236,6 @@
             />
           </div>
         </div>
-        <hr class="" />
         <div class="absolute top-5 right-6">
           <div class="tooltip tooltip-left" data-tip="close">
             <button
@@ -236,18 +243,20 @@
               on:click={() => {
                 sidebarOpen.set(false);
               }}
-              class="btn btn-outline btn-sm btn-square"
+              class="btn btn-outline border-none btn-sm btn-square"
             >
               <X />
             </button>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-6 p-2">
-        {#each $sidebar_exercise_sessions as exercise_session, idx}
-          <Exercise this_exercise_session={exercise_session} index={idx} />
-        {/each}
-      </div>
+      {#key $sidebar_exercise_sessions}
+        <div class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none ">
+          {#each $sidebar_exercise_sessions as exercise_session, idx}
+            <Exercise this_exercise_session={exercise_session} index={idx} />
+          {/each}
+        </div>
+      {/key}
     {/if}
   {/key}
 </aside>

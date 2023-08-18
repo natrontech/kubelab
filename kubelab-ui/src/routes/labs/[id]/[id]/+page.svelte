@@ -10,7 +10,7 @@
   import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
-  import { Info, InfoIcon, Lightbulb, Play, Search } from "lucide-svelte";
+  import { InfoIcon, Lightbulb, Play } from "lucide-svelte";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -154,266 +154,269 @@
   }
 </script>
 
-{#key $page.params}{/key}
+{#key $page.params}
+  {#if $horizontalView}
+    <Splitpanes horizontal class="p-2 mt-2 pb-2">
+      <Pane class="my-2">
+        <Splitpanes>
+          <Pane class="relative">
+            <div
+              class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
+            >
+              {#key $page.params}
+                <SvelteMarkdown
+                  source={docs}
+                  renderers={{
+                    codespan: CodeSpanComponent,
+                    code: CodeComponent,
+                    link: LinkComponent
+                  }}
+                />
+              {/key}
+            </div>
+            <div class="bottom-0 flex w-full justify-between absolute p-2">
+              <div>
+                <!-- svelte-ignore missing-declaration -->
+                <div class="tooltip" data-tip="Hint">
+                  <button
+                    class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
+                    on:click={() => openModal2()}
+                  >
+                    <InfoIcon size={16} />
+                  </button>
+                </div>
+                <dialog id="my_modal_2" class="modal">
+                  <form method="dialog" class="modal-box">
+                    <h3 class="font-bold text-lg">Hint</h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
+                    >
+                    <SvelteMarkdown
+                      source={hint}
+                      renderers={{
+                        codespan: CodeSpanComponent,
+                        code: CodeComponent,
+                        link: LinkComponent
+                      }}
+                    />
+                  </form>
+                </dialog>
+              </div>
+              <div>
+                <!-- svelte-ignore missing-declaration -->
+                <div class="tooltip" data-tip="Solution">
+                  <button
+                    class="btn btn-circle {(showSolution ===
+                      window.location.pathname.split('/')[3] &&
+                      $exercise_session.agentRunning) ||
+                    $exercise_session.endTime
+                      ? 'btn-neutral  dark:btn-primary dark:text-neutral'
+                      : 'btn-disabled'}"
+                    on:click={() => openModal()}
+                  >
+                    <Lightbulb size={16} />
+                  </button>
+                </div>
+                <dialog id="my_modal_1" class="modal">
+                  <form method="dialog" class="modal-box">
+                    <h3 class="font-bold text-lg">Solution</h3>
 
-{#if $horizontalView}
-  <Splitpanes horizontal class="p-2 mt-2 pb-2">
-    <Pane class="my-2">
-      <Splitpanes>
-        <Pane class="relative">
-          <div
-            class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
-          >
-            {#key $page.params}
-              <SvelteMarkdown
-                source={docs}
-                renderers={{
-                  codespan: CodeSpanComponent,
-                  code: CodeComponent,
-                  link: LinkComponent
-                }}
-              />
-            {/key}
-          </div>
-          <div class="bottom-0 flex w-full justify-between absolute p-2">
-            <div>
-              <!-- svelte-ignore missing-declaration -->
-              <div class="tooltip" data-tip="Hint">
+                    <SvelteMarkdown
+                      source={solution}
+                      renderers={{
+                        codespan: CodeSpanComponent,
+                        code: CodeComponent,
+                        link: LinkComponent
+                      }}
+                    />
+                    <div class="modal-action">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn">Close</button>
+                    </div>
+                  </form>
+                </dialog>
+              </div>
+            </div>
+          </Pane>
+        </Splitpanes>
+      </Pane>
+      <Pane bind:size={$terminal_size.height}>
+        {#if $exercise_session.agentRunning}
+          {#key $page.params}
+            {#if $exercise_session.exercise === $exercise.id}
+              <Desktop {Console} />
+            {/if}
+          {/key}
+        {:else}
+          <!-- button to start the agent -->
+          {#key $page.params}
+            <div
+              class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone(
+                $exercise.id
+              )
+                ? 'bg-green-200'
+                : ''}"
+            >
+              <div class="text-center">
+                <h1 class="text-4xl font-bold">
+                  {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+                </h1>
+                <p class="text-xl">
+                  {checkIfExerciseIsDone($exercise.id)
+                    ? "Click the button below to restart the exercise. You must finish it again!"
+                    : "Click the button below to start the exercise"}
+                </p>
                 <button
-                  class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
-                  on:click={() => openModal2()}
+                  class="btn {checkIfExerciseIsDone($exercise.id)
+                    ? 'btn-warning'
+                    : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
+                  on:click={() => handleStartExercise()}
                 >
-                  <InfoIcon size={16} />
+                  {#if loading === window.location.pathname.split("/")[3]}
+                    <span class="loading loading-dots loading-md" /> Start Terminal
+                  {:else}
+                    <Play /> Start Terminal
+                  {/if}
+                  {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
                 </button>
               </div>
-              <dialog id="my_modal_2" class="modal">
-                <form method="dialog" class="modal-box">
-                  <h3 class="font-bold text-lg">Hint</h3>
-                  <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                  <SvelteMarkdown
-                    source={hint}
-                    renderers={{
-                      codespan: CodeSpanComponent,
-                      code: CodeComponent,
-                      link: LinkComponent
-                    }}
-                  />
-                </form>
-              </dialog>
             </div>
-            <div>
-              <!-- svelte-ignore missing-declaration -->
-              <div class="tooltip" data-tip="Solution">
-              <button
-                class="btn btn-circle {(showSolution === window.location.pathname.split('/')[3] &&
-                  $exercise_session.agentRunning) ||
-                $exercise_session.endTime
-                  ? 'btn-neutral  dark:btn-primary dark:text-neutral'
-                  : 'btn-disabled'}"
-                on:click={() => openModal()}
-              >
-                <Lightbulb size={16} />
-              </button>
-              </div>
-              <dialog id="my_modal_1" class="modal">
-                <form method="dialog" class="modal-box">
-                  <h3 class="font-bold text-lg">Solution</h3>
-
-                  <SvelteMarkdown
-                    source={solution}
-                    renderers={{
-                      codespan: CodeSpanComponent,
-                      code: CodeComponent,
-                      link: LinkComponent
-                    }}
-                  />
-                  <div class="modal-action">
-                    <!-- if there is a button in form, it will close the modal -->
-                    <button class="btn">Close</button>
-                  </div>
-                </form>
-              </dialog>
-            </div>
-          </div>
-        </Pane>
-      </Splitpanes>
-    </Pane>
-    <Pane bind:size={$terminal_size.height}>
-      {#if $exercise_session.agentRunning}
-        {#key $page.params}
-          {#if $exercise_session.exercise === $exercise.id}
-            <Desktop {Console} />
-          {/if}
-        {/key}
-      {:else}
-        <!-- button to start the agent -->
-        {#key $page.params}
-          <div
-            class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone(
-              $exercise.id
-            )
-              ? 'bg-green-200'
-              : ''}"
-          >
-            <div class="text-center">
-              <h1 class="text-4xl font-bold">
-                {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-              </h1>
-              <p class="text-xl">
-                {checkIfExerciseIsDone($exercise.id)
-                  ? "Click the button below to restart the exercise. You must finish it again!"
-                  : "Click the button below to start the exercise"}
-              </p>
-              <button
-                class="btn {checkIfExerciseIsDone($exercise.id)
-                  ? 'btn-warning'
-                  : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
-                on:click={() => handleStartExercise()}
-              >
-                {#if loading === window.location.pathname.split("/")[3]}
-                  <span class="loading loading-dots loading-md" /> Start Terminal
-                {:else}
-                  <Play /> Start Terminal
-                {/if}
-                {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
-              </button>
-            </div>
-          </div>
-        {/key}
-      {/if}
-    </Pane>
-  </Splitpanes>
-{:else}
-  <Splitpanes class="p-2 mt-2">
-    <Pane bind:size={$terminal_size.height}>
-      {#if $exercise_session.agentRunning}
-        {#key $page.params}
-          {#if $exercise_session.exercise === $exercise.id}
-            <Desktop {Console} />
-          {/if}
-        {/key}
-      {:else}
-        <!-- button to start the agent -->
-        {#key $page.params}
-          <div
-            class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
-              ? 'bg-green-200'
-              : ''}"
-          >
-            <div class="text-center">
-              <h1 class="text-4xl font-bold">
-                {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-              </h1>
-              <p class="text-xl">
-                {checkIfExerciseIsDone($exercise.id)
-                  ? "Click the button below to restart the exercise. You must finish it again!"
-                  : "Click the button below to start the exercise"}
-              </p>
-              <button
-                class="btn {checkIfExerciseIsDone($exercise.id)
-                  ? 'btn-warning'
-                  : 'btn-neutral dark:btn-primary dark:text-neutral'} mt-4"
-                on:click={() => handleStartExercise()}
-              >
-                {#if loading === window.location.pathname.split("/")[3]}
-                  <span class="loading loading-dots loading-md" /> Start Terminal
-                {:else}
-                  <Play /> Start Terminal
-                {/if}
-                {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
-              </button>
-            </div>
-          </div>
-        {/key}
-      {/if}
-    </Pane>
-    <Pane>
-      <Splitpanes horizontal>
-        <Pane class="relative">
-          <div
-            class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
-          >
-            {#key $page.params}
-              <SvelteMarkdown
-                source={docs}
-                renderers={{
-                  codespan: CodeSpanComponent,
-                  code: CodeComponent,
-                  link: LinkComponent
-                }}
-              />
-            {/key}
-          </div>
-          <div class="bottom-0 flex w-full justify-between absolute p-2">
-            <div>
-              <!-- svelte-ignore missing-declaration -->
-              <div class="tooltip" data-tip="Hint">
+          {/key}
+        {/if}
+      </Pane>
+    </Splitpanes>
+  {:else}
+    <Splitpanes class="p-2 mt-2">
+      <Pane bind:size={$terminal_size.height}>
+        {#if $exercise_session.agentRunning}
+          {#key $page.params}
+            {#if $exercise_session.exercise === $exercise.id}
+              <Desktop {Console} />
+            {/if}
+          {/key}
+        {:else}
+          <!-- button to start the agent -->
+          {#key $page.params}
+            <div
+              class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+                ? 'bg-green-200'
+                : ''}"
+            >
+              <div class="text-center">
+                <h1 class="text-4xl font-bold">
+                  {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+                </h1>
+                <p class="text-xl">
+                  {checkIfExerciseIsDone($exercise.id)
+                    ? "Click the button below to restart the exercise. You must finish it again!"
+                    : "Click the button below to start the exercise"}
+                </p>
                 <button
-                  class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
-                  on:click={() => openModal2()}
+                  class="btn {checkIfExerciseIsDone($exercise.id)
+                    ? 'btn-warning'
+                    : 'btn-neutral dark:btn-primary dark:text-neutral'} mt-4"
+                  on:click={() => handleStartExercise()}
                 >
-                  <InfoIcon size={16} />
+                  {#if loading === window.location.pathname.split("/")[3]}
+                    <span class="loading loading-dots loading-md" /> Start Terminal
+                  {:else}
+                    <Play /> Start Terminal
+                  {/if}
+                  {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
                 </button>
               </div>
-              <dialog id="my_modal_2" class="modal">
-                <form method="dialog" class="modal-box">
-                  <h3 class="font-bold text-lg">Hint</h3>
-                  <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                  <SvelteMarkdown
-                    source={hint}
-                    renderers={{
-                      codespan: CodeSpanComponent,
-                      code: CodeComponent,
-                      link: LinkComponent
-                    }}
-                  />
-                </form>
-              </dialog>
             </div>
-            <div>
-              <!-- svelte-ignore missing-declaration -->
-              <div class="tooltip" data-tip="Solution">
-              <button
-                class="btn btn-circle {(showSolution === window.location.pathname.split('/')[3] &&
-                  $exercise_session.agentRunning) ||
-                $exercise_session.endTime
-                  ? 'btn-neutral  dark:btn-primary dark:text-neutral'
-                  : 'btn-disabled'}"
-                on:click={() => openModal()}
-              >
-                <Lightbulb size={16} />
-              </button>
+          {/key}
+        {/if}
+      </Pane>
+      <Pane>
+        <Splitpanes horizontal>
+          <Pane class="relative">
+            <div
+              class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
+            >
+              {#key $page.params}
+                <SvelteMarkdown
+                  source={docs}
+                  renderers={{
+                    codespan: CodeSpanComponent,
+                    code: CodeComponent,
+                    link: LinkComponent
+                  }}
+                />
+              {/key}
+            </div>
+            <div class="bottom-0 flex w-full justify-between absolute p-2">
+              <div>
+                <!-- svelte-ignore missing-declaration -->
+                <div class="tooltip" data-tip="Hint">
+                  <button
+                    class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
+                    on:click={() => openModal2()}
+                  >
+                    <InfoIcon size={16} />
+                  </button>
+                </div>
+                <dialog id="my_modal_2" class="modal">
+                  <form method="dialog" class="modal-box">
+                    <h3 class="font-bold text-lg">Hint</h3>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
+                    >
+                    <SvelteMarkdown
+                      source={hint}
+                      renderers={{
+                        codespan: CodeSpanComponent,
+                        code: CodeComponent,
+                        link: LinkComponent
+                      }}
+                    />
+                  </form>
+                </dialog>
               </div>
-              <dialog id="my_modal_1" class="modal">
-                <form method="dialog" class="modal-box">
-                  <h3 class="font-bold text-lg">Solution</h3>
+              <div>
+                <!-- svelte-ignore missing-declaration -->
+                <div class="tooltip" data-tip="Solution">
+                  <button
+                    class="btn btn-circle {(showSolution ===
+                      window.location.pathname.split('/')[3] &&
+                      $exercise_session.agentRunning) ||
+                    $exercise_session.endTime
+                      ? 'btn-neutral  dark:btn-primary dark:text-neutral'
+                      : 'btn-disabled'}"
+                    on:click={() => openModal()}
+                  >
+                    <Lightbulb size={16} />
+                  </button>
+                </div>
+                <dialog id="my_modal_1" class="modal">
+                  <form method="dialog" class="modal-box">
+                    <h3 class="font-bold text-lg">Solution</h3>
 
-                  <SvelteMarkdown
-                    source={solution}
-                    renderers={{
-                      codespan: CodeSpanComponent,
-                      code: CodeComponent,
-                      link: LinkComponent
-                    }}
-                  />
-                  <div class="modal-action">
-                    <!-- if there is a button in form, it will close the modal -->
-                    <button class="btn">Close</button>
-                  </div>
-                </form>
-              </dialog>
+                    <SvelteMarkdown
+                      source={solution}
+                      renderers={{
+                        codespan: CodeSpanComponent,
+                        code: CodeComponent,
+                        link: LinkComponent
+                      }}
+                    />
+                    <div class="modal-action">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn">Close</button>
+                    </div>
+                  </form>
+                </dialog>
+              </div>
             </div>
-          </div>
-        </Pane>
-
-      </Splitpanes>
-    </Pane>
-  </Splitpanes>
-{/if}
+          </Pane>
+        </Splitpanes>
+      </Pane>
+    </Splitpanes>
+  {/if}
+{/key}
 
 <style>
   * {
     word-break: keep-all;
-    line-height: 2
+    line-height: 2;
   }
 </style>

@@ -15,10 +15,10 @@
   import { getTimeAgo } from "$lib/utils/time";
   import { CheckCircle, Inspect, Pause, Play, XCircle } from "lucide-svelte";
 
-  export let this_lab: LabsResponse;
-  export let this_lab_session: LabSessionsResponse;
-  export let this_exercises: ExercisesResponse[];
-  export let this_exercise_sessions: ExerciseSessionsResponse[];
+  export let this_lab: LabsResponse = $sidebar_lab || {};
+  export let this_lab_session: LabSessionsResponse = $sidebar_lab_session || {};
+  export let this_exercises: ExercisesResponse[] = $sidebar_exercises || [];
+  export let this_exercise_sessions: ExerciseSessionsResponse[] = $sidebar_exercise_sessions || [];
 
   function getDoneExercises() {
     let done_exercises: ExercisesResponse[] = [];
@@ -53,6 +53,7 @@
     sidebar_exercise_sessions.set(this_exercise_sessions);
     sidebarOpen.set(true);
   }
+
 </script>
 
 <!-- <div class="border-neutral border-4 bg-base-200 collapse-arrow relative h-32">
