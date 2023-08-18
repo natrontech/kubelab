@@ -1,9 +1,10 @@
 <script lang="ts">
+    import SideOver from "$lib/components/base/SideOver.svelte";
   import Lab from "$lib/components/labs/Lab.svelte";
   import type {
     ExerciseSessionsResponse,
     ExercisesResponse,
-    LabSessionsResponse,
+    LabSessionsResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data";
   import { metadata } from "$lib/stores/metadata";
@@ -37,7 +38,10 @@
     });
     return lab_exercises_sessions;
   }
+
 </script>
+
+<SideOver />
 
 {#if $lab_sessions.length > 0}
   <h1 class="text-center text-4xl font-bold my-4">Labs</h1>
@@ -50,7 +54,8 @@
       > / 2
     </p>
   {/key}
-  <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+  <!-- <SideOver /> -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each $labs as this_lab}
       <Lab
         {this_lab}

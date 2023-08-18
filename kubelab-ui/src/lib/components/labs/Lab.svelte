@@ -1,43 +1,24 @@
 <script lang="ts">
-  import { client } from "$lib/pocketbase";
   import type {
-    ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse,
-    LabSessionsRecord,
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
-  import { exercise, exercise_sessions, lab_sessions } from "$lib/stores/data";
-  import { loadingLabs } from "$lib/stores/loading";
-  import { Inspect, Play, StopCircle } from "lucide-svelte";
-  import toast from "svelte-french-toast";
-  import SvelteMarkdown from "svelte-markdown";
-  import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
-  import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
-  import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
-    import { onMount } from "svelte";
+  import {
+    sidebarOpen,
+    sidebar_exercise_sessions,
+    sidebar_exercises,
+    sidebar_lab,
+    sidebar_lab_session
+  } from "$lib/stores/sidebar";
+  import { getTimeAgo } from "$lib/utils/time";
+  import { CheckCircle, Inspect, Pause, Play, XCircle } from "lucide-svelte";
 
   export let this_lab: LabsResponse;
   export let this_lab_session: LabSessionsResponse;
   export let this_exercises: ExercisesResponse[];
   export let this_exercise_sessions: ExerciseSessionsResponse[];
-
-  let docs: string;
-
-  async function getMarkdown() {
-    fetch(this_lab.docs)
-      .then((response) => response.text())
-      .then((text) => {
-        docs = text;
-      }).catch((error) => {
-        console.error(error);
-      });
-  }
-
-  onMount(() => {
-    getMarkdown();
-  });
 
   function getDoneExercises() {
     let done_exercises: ExercisesResponse[] = [];
@@ -53,151 +34,30 @@
     return done_exercises;
   }
 
-  async function startLab() {
-    // if there is more than one lab_session clusterRunning = true, fail
-    if ($lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 1) {
-      toast.error("There are already two lab running");
+  async function handleSideBar() {
+    if ($sidebarOpen) {
+      sidebarOpen.set(false);
+      // sleep 1s and then print lol
+      await new Promise((r) => setTimeout(r, 200)).then(() => {
+        sidebar_lab.set(this_lab);
+        sidebar_lab_session.set(this_lab_session);
+        sidebar_exercises.set(this_exercises);
+        sidebar_exercise_sessions.set(this_exercise_sessions);
+        sidebarOpen.set(true);
+      });
       return;
     }
-
-    if ($loadingLabs.length > 0) {
-      toast.error("There is already a lab starting");
-      return;
-    }
-
-    const data: LabSessionsRecord = {
-      clusterRunning: true,
-      // @ts-ignore
-      user: client.authStore.model?.id,
-      lab: this_lab.id,
-      startTime: new Date().toISOString()
-    };
-
-    $loadingLabs = $loadingLabs.concat(this_lab_session.id);
-
-    await client
-      .collection("lab_sessions")
-      .update(this_lab_session.id, data)
-      // @ts-ignore
-      .then((record: LabSessionsResponse) => {
-        toast.success("Lab started");
-        this_lab_session = record;
-        lab_sessions.update((lab_sessions) => {
-          return lab_sessions.map((lab_session) => {
-            if (lab_session.id === record.id) {
-              return record;
-            }
-            return lab_session;
-          });
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Lab failed to start");
-      })
-      .finally(() => {
-        $loadingLabs = $loadingLabs.filter((id) => id !== this_lab_session.id);
-      });
-  }
-
-  // TODO: add modal to confirm stop lab
-  async function stopLab() {
-    const data: LabSessionsRecord = {
-      clusterRunning: false,
-      // @ts-ignore
-      user: client.authStore.model?.id,
-      lab: this_lab.id,
-      endTime: new Date().toISOString()
-    };
-
-    $loadingLabs = $loadingLabs.concat(this_lab_session.id);
-
-    // update each exercise session to stop agentRunning = false
-    this_exercise_sessions.forEach(async (this_exercise_session) => {
-      const exercise_session_data: ExerciseSessionsRecord = {
-        agentRunning: false,
-        // @ts-ignore
-        user: client.authStore.model?.id,
-        exercise: this_exercise_session.exercise
-      };
-      await client
-        .collection("exercise_sessions")
-        .update(this_exercise_session.id, exercise_session_data)
-        // @ts-ignore
-        .then((record: ExerciseSessionsResponse) => {
-          this_exercise_session = record;
-          exercise_sessions.update((exercise_sessions) => {
-            return exercise_sessions.map((exercise_session) => {
-              if (exercise_session.id === record.id) {
-                return record;
-              }
-              return exercise_session;
-            });
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    });
-
-    await client
-      .collection("lab_sessions")
-      .update(this_lab_session.id, data)
-      // @ts-ignore
-      .then((record: LabSessionsResponse) => {
-        toast.success("Lab stopped");
-        this_lab_session = record;
-        lab_sessions.update((lab_sessions) => {
-          return lab_sessions.map((lab_session) => {
-            if (lab_session.id === record.id) {
-              return record;
-            }
-            return lab_session;
-          });
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Lab failed to stop");
-      })
-      .finally(() => {
-        $loadingLabs = $loadingLabs.filter((id) => id !== this_lab_session.id);
-      });
-  }
-
-  function getTimeAgo(isoString: string) {
-    const now = new Date(); // Current time
-    const pastTime = new Date(isoString); // Time from ISO string
-
-    const timeDiffMilliseconds = now.getTime() - pastTime.getTime();
-    const timeDiffSeconds = Math.floor(timeDiffMilliseconds / 1000);
-
-    // Calculate the time difference in seconds, minutes, hours, days, months, or years
-    if (timeDiffSeconds < 60) {
-      return timeDiffSeconds + " seconds";
-    } else if (timeDiffSeconds < 3600) {
-      const minutes = Math.floor(timeDiffSeconds / 60);
-      return minutes + (minutes === 1 ? " minute" : " minutes");
-    } else if (timeDiffSeconds < 86400) {
-      const hours = Math.floor(timeDiffSeconds / 3600);
-      return hours + (hours === 1 ? " hour" : " hours");
-    } else if (timeDiffSeconds < 2592000) {
-      const days = Math.floor(timeDiffSeconds / 86400);
-      return days + (days === 1 ? " day" : " days");
-    } else if (timeDiffSeconds < 31536000) {
-      const months = Math.floor(timeDiffSeconds / 2592000);
-      return months + (months === 1 ? " month" : " months");
-    } else {
-      const years = Math.floor(timeDiffSeconds / 31536000);
-      return years + (years === 1 ? " year" : " years");
-    }
+    sidebar_lab.set(this_lab);
+    sidebar_lab_session.set(this_lab_session);
+    sidebar_exercises.set(this_exercises);
+    sidebar_exercise_sessions.set(this_exercise_sessions);
+    sidebarOpen.set(true);
   }
 </script>
 
-<div tabindex="0" class="collapse border-neutral border-4 bg-base-200 overflow-visible collapse-arrow">
+<!-- <div class="border-neutral border-4 bg-base-200 collapse-arrow relative h-32">
   <div class="collapse-title text-xl font-medium">
     {this_lab.title}
-    <!-- show some stats -->
     <span class="badge badge-outline {this_lab_session.clusterRunning ? 'badge-accent' : ''} ml-2"
       >{this_lab_session.clusterRunning ? "Running" : "Stopped"}
       <span class="ml-1 text-gray-500 text-xs">
@@ -212,28 +72,24 @@
         {/if}
       </span>
     </span>
-    <!-- show how many exercises are done already -->
   </div>
-  <div class="collapse-content">
-    <SvelteMarkdown
-      source={docs}
-      renderers={{
-        codespan: CodeSpanComponent,
-        code: CodeComponent,
-        link: LinkComponent
-      }}
-    />
+  <div
+    class="absolute bottom-2 left-4 {getDoneExercises().length === this_exercises.length
+      ? 'text-success'
+      : 'text-orange-500'}"
+  >
+    {getDoneExercises().length} / {this_exercises.length} exercises finished
   </div>
   <div class="justify-end content-end flex">
-    <div
-      class="absolute bottom-2 left-4 {getDoneExercises().length === this_exercises.length
-        ? 'text-green-500'
-        : 'text-orange-500'}"
-    >
-      {getDoneExercises().length} / {this_exercises.length} exercises finished
-    </div>
-
-    <div class="grid grid-cols-2 gap-2 mb-2 mr-2">
+    <div class="grid grid-cols-1 gap-2 mb-2 mr-2">
+      <div class="">
+        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+        <div class="tooltip" data-tip="lab info">
+          <button class="btn btn-info" on:click={() => (open = !open)}>
+            <Info />
+          </button>
+        </div>
+      </div>
       {#if this_lab_session.clusterRunning}
         <div class="tooltip" data-tip="stop lab">
           <button class="btn btn-error" on:click={() => stopLab()}>
@@ -245,7 +101,6 @@
           </button>
         </div>
       {:else}
-        <div />
         <div class="tooltip" data-tip="start lab">
           {#key $lab_sessions}
             <button
@@ -273,4 +128,83 @@
       {/if}
     </div>
   </div>
-</div>
+</div> -->
+{#key this_lab_session}
+  <div class="rounded-xl border-2 relative">
+    <div class="flex items-center gap-x-4 border-b-2 p-6">
+      <!-- <div
+        class="h-12 w-12 flex items-center justify-center rounded-lg object-cover ring-2 ring-primary relative"
+      >
+        <TestTube2 class="h-5 w-5" />
+      </div> -->
+      <!-- <img src="https://tailwindui.com/img/logos/48x48/tuple.svg" alt="Tuple" class="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"> -->
+      <div class="text-sm font-medium leading-6">{this_lab.title}</div>
+      <div class="relative ml-auto">
+        <button class="btn btn-outline" on:click={() => handleSideBar()}>
+          <Inspect />
+        </button>
+
+        {#if this_lab_session.clusterRunning}
+          <span class="absolute flex h-4 w-4 -top-1 -right-1">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
+            />
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
+          </span>
+        {/if}
+      </div>
+    </div>
+    <dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
+      <div class="flex justify-between gap-x-4 py-3">
+        <dt class="">Status</dt>
+        <dd
+          class="badge badge-outline {this_lab_session.clusterRunning
+            ? 'badge-success'
+            : 'badge-neutral'}"
+        >
+          {#if this_lab_session.clusterRunning}
+            <Play class="w-4 h-4 mr-1 inline-block" />
+          {:else}
+            <Pause class="w-4 h-4 mr-1 inline-block" />
+          {/if}
+          {this_lab_session.clusterRunning ? "Running" : "Stopped"}
+        </dd>
+      </div>
+      <div class="flex justify-between gap-x-4 py-3">
+        <dt class="">Time</dt>
+        <dd class={this_lab_session.clusterRunning ? "text-success" : "text-gray-400"}>
+          <span class="ml-1 text-xs text-primary">
+            {#if this_lab_session.clusterRunning && this_lab_session.startTime}
+              since
+              {getTimeAgo(this_lab_session.startTime)}
+            {:else if this_lab_session.endTime && !this_lab_session.clusterRunning}
+              {getTimeAgo(this_lab_session.endTime)}
+              ago
+            {/if}
+          </span>
+        </dd>
+      </div>
+      <div class="flex justify-between gap-x-4 py-3">
+        <dt class="">Done Exercises</dt>
+        <dd class="flex items-start gap-x-2">
+          {#if getDoneExercises().length == this_exercises.length}
+            <div class="text-success">
+              <CheckCircle />
+            </div>
+          {:else}
+            <div class="text-red-500">
+              <XCircle />
+            </div>
+          {/if}
+          <div
+            class="font-medium
+            {getDoneExercises().length == this_exercises.length ? 'text-success' : 'text-red-500'}
+          "
+          >
+            {getDoneExercises().length} / {this_exercises.length}
+          </div>
+        </dd>
+      </div>
+    </dl>
+  </div>
+{/key}
