@@ -18,9 +18,7 @@
     sidebar_exercise_sessions,
     sidebar_exercises,
     sidebar_lab,
-
     sidebar_lab_session
-
   } from "$lib/stores/sidebar";
   import { getDeltaTime, getTimeAgo } from "$lib/utils/time";
   import {
@@ -149,79 +147,62 @@
 {#if this_exercise}
   <div class="overflow-hidden rounded-xl border-2 h-auto">
     <div class="flex items-center gap-x-4 border-b-2 p-6">
-      <div
-        class="h-12 w-12 flex justify-center items-center rounded-lg  object-cover ring-2 ring-primary relative"
-      >
-        {index + 1}
-        {#if this_exercise_session.agentRunning}
-          <span class="absolute flex h-4 w-4 -top-1 -right-1">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
-            />
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
-          </span>
-        {/if}
-      </div>
       <div class="text-sm font-medium leading-6 ">
         {this_exercise.title}
       </div>
       {#if $sidebar_lab_session.clusterRunning}
-      <div class="relative ml-auto dropdown dropdown-end">
-        {#if $loadingExercises.includes(this_exercise.id)}
-          <span class="loading loading-dots loading-xs  block p-2.5 text-gray-500" />
-        {:else}
-          <button type="button" class="-m-3 block p-2.5 text-gray-400 hover:text-gray-500">
-            <MoreHorizontal class="w-6 h-6 " strokeWidth={3} />
-          </button>
-          <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            {#if this_exercise_session.agentRunning}
-              <li>
-                <button
-                  on:click={() => {
-                    sidebarOpen.set(false);
-                    exercise.set(this_exercise);
-                    exercises.set($sidebar_exercises);
-                    new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-                      goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
-                    );
-                  }}
-                >
-                  <Terminal class="w-4 h-4 mr-1 inline-block" />
-                  Shell</button
-                >
-              </li>
-              <li>
-                <button class="" on:click={() => stopExercise(this_exercise.id)}>
-                  <Pause class="w-4 h-4 mr-1 inline-block" />
-                  Stop Exercise</button
-                >
-              </li>
+        <div class="relative ml-auto dropdown dropdown-end dropdown-bottom">
+          <button class="btn flex justify-center items-center  relative">
+            {#if $loadingExercises.includes(this_exercise.id)}
+              Actions <span class="loading loading-dots loading-xs inline-block p-2.5" />
             {:else}
-              <li>
-                <button
-                  on:click={() => {
-                    sidebarOpen.set(false);
-                    exercise.set(this_exercise);
-                    exercises.set($sidebar_exercises);
-                    new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-                      goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
-                    );
-                  }}
-                >
-                  <Terminal class="w-4 h-4 mr-1 inline-block" />
-                  Shell</button
-                >
-              </li>
-              <li>
-                <button class="" on:click={() => startExercise(this_exercise.id)}>
-                  <Play class="w-4 h-4 mr-1 inline-block" />
-                  Start Exercise</button
-                >
-              </li>
+              <button class="-m-3 block p-2.5">
+                Actions <MoreHorizontal class="w-6 h-6 inline-block" strokeWidth={3} />
+              </button>
+              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                  <button
+                    on:click={() => {
+                      sidebarOpen.set(false);
+                      exercise.set(this_exercise);
+                      exercises.set($sidebar_exercises);
+                      new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+                        goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
+                      );
+                    }}
+                    class="border-2 text-primary border-primary dark:hover:text-black hover:bg-white hover:text-primary"
+                  >
+                    <Terminal class="w-4 h-4 mr-1 inline-block" />
+                    Shell</button
+                  >
+                </li>
+                {#if this_exercise_session.agentRunning}
+                  <li>
+                    <button class="border-2 text-error border-error hover:bg-error hover:text-primary" on:click={() => stopExercise(this_exercise.id)}>
+                      <Pause class="w-4 h-4 mr-1 inline-block" />
+                      Stop Exercise</button
+                    >
+                  </li>
+                {:else}
+                  <li>
+                    <button class="border-2 text-success border-success hover:bg-success hover:text-primary" on:click={() => startExercise(this_exercise.id)}>
+                      <Play class="w-4 h-4 mr-1 inline-block" />
+                      Start Exercise</button
+                    >
+                  </li>
+                {/if}
+              </ul>
             {/if}
-          </ul>
-        {/if}
-      </div>
+            {#if this_exercise_session.agentRunning}
+              <span class="absolute flex h-4 w-4 -top-2 -right-2">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
+                />
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
+              </span>
+            {/if}
+          </button>
+        </div>
       {:else}
         <p class="text-error text-sm relative ml-auto">Lab not running</p>
       {/if}
