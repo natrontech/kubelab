@@ -1,19 +1,9 @@
 <script lang="ts">
+  import { navigating } from "$app/stores";
   import { client, logout } from "$lib/pocketbase";
   import darkTheme from "$lib/stores/theme";
   import type { NavRoute } from "$lib/types";
-  import {
-    TerminalSquare,
-    LayoutDashboard,
-    Home,
-    Github,
-    Presentation,
-    Sun,
-    Moon,
-
-    BarChart2
-
-  } from "lucide-svelte";
+  import { TerminalSquare, Github, Presentation, Sun, Moon, BarChart2 } from "lucide-svelte";
 
   let avatarUrl: string = "";
 
@@ -31,19 +21,19 @@
     {
       id: "1",
       name: "Dashboard",
-      href: "/app",
+      href: "/app/",
       icon: BarChart2
     },
     {
       id: "2",
       name: "Labs",
-      href: "/labs",
+      href: "/labs/",
       icon: TerminalSquare
     },
     {
       id: "3",
       name: "Material",
-      href: "/material",
+      href: "/material/",
       icon: Presentation
     },
     {
@@ -56,7 +46,7 @@
 </script>
 
 <div class="navbar shadow-md h-16 pt-4">
-  <div class="navbar-start z-50">
+  <div class="navbar-start z-10">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost lg:hidden -mt-2">
@@ -93,17 +83,14 @@
   </div>
 
   <div class="navbar-end sm:-mt-2 ">
-
-    <button class="btn bg-transparent border-none"
-      on:click={() => darkTheme.set(!$darkTheme)}
-    >
+    <button class="btn bg-transparent border-none" on:click={() => darkTheme.set(!$darkTheme)}>
       {#if $darkTheme === true}
         <Sun />
       {:else}
         <Moon />
       {/if}
     </button>
-    <div class="dropdown dropdown-end z-50">
+    <div class="dropdown dropdown-end z-10">
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost btn-circle avatar">
