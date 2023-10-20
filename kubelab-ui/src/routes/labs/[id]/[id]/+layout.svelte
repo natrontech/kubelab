@@ -164,6 +164,9 @@
   function isCurrentExercise(exercise_id: string) {
     return $exercise.id === exercise_id;
   }
+
+  console.log($exercises)
+
 </script>
 
 {#key $exercise}
@@ -259,31 +262,33 @@
       </div>
       <div class="">
         <ul class="steps mt-1">
-          {#key ($exercise.id, $exercise_session.id, $sidebar_exercises)}
-            {#key ($exercise_session.endTime, $exercise_session.agentRunning, $sidebar_exercises)}
-              {#if $exercises.length > 0}
-                {#each $exercises as currentExercise, i}
-                  <button
-                    on:click={() => handleSwitchExercise(currentExercise.id)}
-                    data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
-                    class="step
+          {#if ($sidebar_exercises && $sidebar_exercises.length > 0) || $exercises.length > 0}
+            {#key ($exercise.id, $exercise_session.id, $sidebar_exercises)}
+              {#key ($exercise_session.endTime, $exercise_session.agentRunning, $sidebar_exercises)}
+                {#if $exercises.length > 0}
+                  {#each $exercises as currentExercise, i}
+                    <button
+                      on:click={() => handleSwitchExercise(currentExercise.id)}
+                      data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
+                      class="step
       {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
       "
-                  />
-                {/each}
-              {:else if $sidebar_exercises}
-                {#each $sidebar_exercises as currentExercise, i}
-                  <button
-                    on:click={() => handleSwitchExercise(currentExercise.id)}
-                    data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
-                    class="step
+                    />
+                  {/each}
+                {:else if $sidebar_exercises}
+                  {#each $sidebar_exercises as currentExercise, i}
+                    <button
+                      on:click={() => handleSwitchExercise(currentExercise.id)}
+                      data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
+                      class="step
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
-                  />
-                {/each}
-              {/if}
+                    />
+                  {/each}
+                {/if}
+              {/key}
             {/key}
-          {/key}
+          {/if}
         </ul>
       </div>
     </div>

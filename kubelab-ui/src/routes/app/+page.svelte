@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { page } from "$app/stores";
+  import RunningExercises from "$lib/components/dashboard/RunningExercises.svelte";
   import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data.js";
   import { TerminalSquare } from "lucide-svelte";
+    import { onDestroy } from "svelte";
 
   function getDoneExercisesNumber() {
     let done_exercises = $exercise_sessions.filter((exercise_session) => exercise_session.endTime);
@@ -28,15 +31,23 @@
     // return a string with the average time in minutes and seconds
     return `${Math.floor(average_time / 60)}m ${Math.floor(average_time % 60)}s`;
   }
+
 </script>
 
 <div
-  class="absolute top-16 bottom-0 left-0 right-0 p-4 bg-no-repeat bg-cover bg-center"
-  style="background-image: url(/images/bg.svg);"
+  class="absolute top-16 bottom-0 left-0 right-0 p-4 bg-no-repeat bg-cover bg-center justify-center"
 >
-  <h1 class="text-center text-4xl font-bold mt-4 mb-8 text-white">Dashboard</h1>
+  <h1 class="text-center text-4xl font-bold mb-8">Dashboard</h1>
   <div
-    class="stats shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-4 border-neutral"
+    class="stats shadow border-2 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
+  >
+    <div class="stat">
+      <div class="stat-title">Your <strong>average</strong> time to resolution</div>
+      <div class="stat-value">{getAverageTimeToResolve()}</div>
+    </div>
+  </div>
+  <div
+    class="stats mt-4 shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-2 border-neutral"
   >
     <a href="/labs">
       <div class="stat">
@@ -73,7 +84,9 @@
       <div class="stat-figure text-secondary">
         <progress
           class="progress w-56"
-          value={Math.round((getDoneExercisesNumber() / $exercises.length) * 100)}
+          value={$exercises.length !== 0
+            ? Math.round((getDoneExercisesNumber() / $exercises.length) * 100)
+            : 0}
           max="100"
         />
       </div>
@@ -82,17 +95,14 @@
       </div>
       <div class="stat-title">Exercises done</div>
       <div class="stat-desc text-blue-500">
-        {$exercises.length - getDoneExercisesNumber()} exercise(s) remaining
+        {$exercises?.length - getDoneExercisesNumber()} exercise(s) remaining
       </div>
     </div>
   </div>
 
   <div
-    class="stats mt-4 shadow border-4 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
+    class="rounded-xl mt-4 shadow border-2 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
   >
-    <div class="stat">
-      <div class="stat-title">Your <strong>average</strong> time to resolution</div>
-      <div class="stat-value">{getAverageTimeToResolve()}</div>
-    </div>
+    <RunningExercises />
   </div>
 </div>

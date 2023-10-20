@@ -27,7 +27,7 @@ h3 {
 }
 
 ul {
-    list-style: disc;
+    list-style: none;
     margin-bottom: 0.5em;
     margin-left: 1.25em;
 }
