@@ -291,7 +291,7 @@
           <!-- button to start the agent -->
           {#key $page.params}
             <div
-              class="flex justify-center items-center h-full {checkIfExerciseIsDone($exercise.id)
+              class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone($exercise.id)
                 ? 'bg-green-200'
                 : ''}"
             >

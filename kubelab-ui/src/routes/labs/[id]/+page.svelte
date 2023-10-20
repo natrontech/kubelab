@@ -87,7 +87,7 @@
             : 'bg-base-200'} border-4 border-neutral"
         >
           <div class="card-body">
-            <p class="badge badge-outline badge-neutral absolute top-2 right-2">#{i + 1}</p>
+            <p class="badge badge-outline  absolute top-2 right-2">#{i + 1}</p>
             <p
               class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.agentRunning
                 ? 'badge-success'
@@ -97,7 +97,7 @@
             </p>
             <p
               class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.endTime
-                ? 'badge-neutral'
+                ? ''
                 : 'badge-error'} absolute bottom-2 left-2"
             >
               {getExerciseSessionByExercise(exercise.id)?.endTime ? "Completed" : "Not Completed"}

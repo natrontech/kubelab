@@ -170,7 +170,7 @@
                         goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
                       );
                     }}
-                    class="border-2 text-primary border-primary dark:hover:text-black hover:bg-white hover:text-primary"
+                    class="border-2 text-primary"
                   >
                     <Terminal class="w-4 h-4 mr-1 inline-block" />
                     Shell</button
@@ -213,7 +213,7 @@
         <dd
           class="badge badge-outline {this_exercise_session.agentRunning
             ? 'badge-success'
-            : 'badge-neutral'}"
+            : ''}"
         >
           {#if this_exercise_session.agentRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />

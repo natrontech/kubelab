@@ -6,7 +6,6 @@
     LabsResponse
   } from "$lib/pocketbase/generated-types";
   import {
-    sidebarOpen,
     sidebar_exercise_sessions,
     sidebar_exercises,
     sidebar_lab,
@@ -34,111 +33,27 @@
     return done_exercises;
   }
 
-  async function handleSideBar() {
-    if ($sidebarOpen) {
-      sidebarOpen.set(false);
-      // sleep 1s and then print lol
-      await new Promise((r) => setTimeout(r, 200)).then(() => {
-        sidebar_lab.set(this_lab);
-        sidebar_lab_session.set(this_lab_session);
-        sidebar_exercises.set(this_exercises);
-        sidebar_exercise_sessions.set(this_exercise_sessions);
-        sidebarOpen.set(true);
-      });
+  function handleSideBar() {
+    drawerHidden = !drawerHidden;
+    if (!drawerHidden) {
+      sidebar_lab.set(this_lab);
+      sidebar_lab_session.set(this_lab_session);
+      sidebar_exercises.set(this_exercises);
+      sidebar_exercise_sessions.set(this_exercise_sessions);
       return;
     }
     sidebar_lab.set(this_lab);
     sidebar_lab_session.set(this_lab_session);
     sidebar_exercises.set(this_exercises);
     sidebar_exercise_sessions.set(this_exercise_sessions);
-    sidebarOpen.set(true);
   }
 
+  export let drawerHidden = true;
 </script>
 
-<!-- <div class="border-neutral border-4 bg-base-200 collapse-arrow relative h-32">
-  <div class="collapse-title text-xl font-medium">
-    {this_lab.title}
-    <span class="badge badge-outline {this_lab_session.clusterRunning ? 'badge-accent' : ''} ml-2"
-      >{this_lab_session.clusterRunning ? "Running" : "Stopped"}
-      <span class="ml-1 text-gray-500 text-xs">
-        {#if this_lab_session.clusterRunning && this_lab_session.startTime}
-          ( since
-          {getTimeAgo(this_lab_session.startTime)}
-          )
-        {:else if this_lab_session.endTime && !this_lab_session.clusterRunning}
-          (
-          {getTimeAgo(this_lab_session.endTime)}
-          ago )
-        {/if}
-      </span>
-    </span>
-  </div>
-  <div
-    class="absolute bottom-2 left-4 {getDoneExercises().length === this_exercises.length
-      ? 'text-success'
-      : 'text-orange-500'}"
-  >
-    {getDoneExercises().length} / {this_exercises.length} exercises finished
-  </div>
-  <div class="justify-end content-end flex">
-    <div class="grid grid-cols-1 gap-2 mb-2 mr-2">
-      <div class="">
-        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
-        <div class="tooltip" data-tip="lab info">
-          <button class="btn btn-info" on:click={() => (open = !open)}>
-            <Info />
-          </button>
-        </div>
-      </div>
-      {#if this_lab_session.clusterRunning}
-        <div class="tooltip" data-tip="stop lab">
-          <button class="btn btn-error" on:click={() => stopLab()}>
-            {#if $loadingLabs.includes(this_lab_session.id)}
-              <span class="loading loading-dots loading-md" />
-            {:else}
-              <StopCircle />
-            {/if}
-          </button>
-        </div>
-      {:else}
-        <div class="tooltip" data-tip="start lab">
-          {#key $lab_sessions}
-            <button
-              class="btn
-            {$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 1
-                ? 'btn-disabled'
-                : 'btn-success'}"
-              on:click={() => startLab()}
-            >
-              {#if $loadingLabs.includes(this_lab_session.id)}
-                <span class="loading loading-dots loading-md" />
-              {:else}
-                <Play />
-              {/if}
-            </button>
-          {/key}
-        </div>
-      {/if}
-      {#if this_lab_session.clusterRunning}
-        <div class="tooltip" data-tip="exercises">
-          <a href={this_lab.id}>
-            <button class="btn btn-neutral"><Inspect /></button>
-          </a>
-        </div>
-      {/if}
-    </div>
-  </div>
-</div> -->
 {#key this_lab_session}
   <div class="rounded-xl border-2 relative">
     <div class="flex items-center gap-x-4 border-b-2 p-6">
-      <!-- <div
-        class="h-12 w-12 flex items-center justify-center rounded-lg object-cover ring-2 ring-primary relative"
-      >
-        <TestTube2 class="h-5 w-5" />
-      </div> -->
-      <!-- <img src="https://tailwindui.com/img/logos/48x48/tuple.svg" alt="Tuple" class="h-12 w-12 flex-none rounded-lg bg-white object-cover ring-1 ring-gray-900/10"> -->
       <div class="text-sm font-medium leading-6">{this_lab.title}</div>
       <div class="relative ml-auto">
         <button class="btn btn-outline" on:click={() => handleSideBar()}>
@@ -161,7 +76,7 @@
         <dd
           class="badge badge-outline {this_lab_session.clusterRunning
             ? 'badge-success'
-            : 'badge-neutral'}"
+            : ''}"
         >
           {#if this_lab_session.clusterRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />

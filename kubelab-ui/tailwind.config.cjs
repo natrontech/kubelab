@@ -12,9 +12,9 @@ module.exports = {
   plugins: [
     require("@tailwindcss/forms"),
     require("@tailwindcss/typography"),
-    require("@tailwindcss/line-clamp"),
     require("tailwind-scrollbar"),
-    require("daisyui")
+    require("daisyui"),
+    require('flowbite/plugin')
   ],
   daisyui: {
     logs: false,
