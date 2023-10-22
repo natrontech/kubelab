@@ -81,7 +81,10 @@
   }
 </script>
 
-<Card padding="xl" class="bg-white dark:bg-base-100">
+<Card
+  padding="xl"
+  class="bg-white dark:bg-base-100 rounded-xl mt-4 shadow border-2 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
+>
   <div class="flex justify-between items-center mb-4">
     <h5 class="text-xl font-bold leading-none ">Running Exercises</h5>
     <a href="/labs" class="text-sm font-medium "> View all </a>

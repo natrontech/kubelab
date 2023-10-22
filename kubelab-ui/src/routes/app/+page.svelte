@@ -1,9 +1,10 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import ActivityLog from "$lib/components/dashboard/ActivityLog.svelte";
   import RunningExercises from "$lib/components/dashboard/RunningExercises.svelte";
   import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data.js";
   import { TerminalSquare } from "lucide-svelte";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   function getDoneExercisesNumber() {
     let done_exercises = $exercise_sessions.filter((exercise_session) => exercise_session.endTime);
@@ -31,7 +32,6 @@
     // return a string with the average time in minutes and seconds
     return `${Math.floor(average_time / 60)}m ${Math.floor(average_time % 60)}s`;
   }
-
 </script>
 
 <div
@@ -46,6 +46,8 @@
       <div class="stat-value">{getAverageTimeToResolve()}</div>
     </div>
   </div>
+  <ActivityLog />
+
   <div
     class="stats mt-4 shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-2 border-neutral"
   >
@@ -100,9 +102,5 @@
     </div>
   </div>
 
-  <div
-    class="rounded-xl mt-4 shadow border-2 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
-  >
-    <RunningExercises />
-  </div>
+  <RunningExercises />
 </div>
