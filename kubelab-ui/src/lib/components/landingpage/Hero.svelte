@@ -1,3 +1,7 @@
+<script>
+  import darkTheme from "$lib/stores/theme";
+</script>
+
 <div class="relative pt-14">
   <div
     class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -11,19 +15,15 @@
   <div class="py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <div class="mx-auto max-w-2xl text-center">
-        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+        <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">
           The Ultimate Kubernetes Learning Platform
         </h1>
-        <p class="mt-6 text-lg leading-8 text-gray-600">
+        <p class="mt-6 text-lg leading-8">
           Embark on your Kubernetes Journey through Hands-on Practice.
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6">
-          <a
-            href="/login/"
-            class="btn btn-neutral "
-            >Get started</a
-          >
-          <a href="https://github.com/natrontech/kubelab" class="text-sm font-semibold leading-6 text-gray-900"
+          <a href="/login/" class="btn btn-neutral ">Get started</a>
+          <a href="https://github.com/natrontech/kubelab" class="text-sm font-semibold leading-6 "
             >Learn more <span aria-hidden="true">→</span></a
           >
         </div>
@@ -32,13 +32,23 @@
         <div
           class="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4"
         >
-          <img
-            src="/assets/screenshot.png"
-            alt="App screenshot"
-            width="2432"
-            height="1442"
-            class="rounded-md shadow-2xl ring-1 ring-gray-900/10"
-          />
+          {#if $darkTheme === true}
+            <img
+              src="/assets/screenshot-dark.png"
+              alt="App screenshot"
+              width="2432"
+              height="1442"
+              class="rounded-md shadow-2xl ring-1 ring-gray-900/10"
+            />
+          {:else}
+            <img
+              src="/assets/screenshot.png"
+              alt="App screenshot"
+              width="2432"
+              height="1442"
+              class="rounded-md shadow-2xl ring-1 ring-gray-900/10"
+            />
+          {/if}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@
     getExerciseSessionByExercise,
     lab
   } from "$lib/stores/data";
-  import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
+  import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
   import { client } from "$lib/pocketbase";
   import toast from "svelte-french-toast";
   import { loadingExercises } from "$lib/stores/loading";
@@ -61,6 +61,27 @@
               return exercise_session;
             });
           });
+
+          // make an entry in the exercise_session_logs collection
+
+          const exercise_session_log_data: ExerciseSessionLogsRecord = {
+            // @ts-ignore
+            user: client.authStore.model?.id,
+            exercise_session: exercise_session_id,
+            type: ExerciseSessionLogsTypeOptions.start,
+            timestamp: new Date().toISOString()
+          };
+
+          client
+            .collection("exercise_session_logs")
+            .create(exercise_session_log_data)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
         })
         .catch((error) => {
           toast.error(error.message);
@@ -72,7 +93,7 @@
   }
 </script>
 
-<a class="btn btn-neutral top-5 absolute" href="/labs/" on:click={() => show = false}>
+<a class="btn btn-neutral  top-5 absolute" href="/labs/" on:click={() => show = false}>
   <ArrowLeft class="inline-block w-4 h-4 mr-2" />
   Labs
 </a>
@@ -87,7 +108,7 @@
             : 'bg-base-200'} border-4 border-neutral"
         >
           <div class="card-body">
-            <p class="badge badge-outline badge-neutral absolute top-2 right-2">#{i + 1}</p>
+            <p class="badge badge-outline  absolute top-2 right-2">#{i + 1}</p>
             <p
               class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.agentRunning
                 ? 'badge-success'
@@ -97,7 +118,7 @@
             </p>
             <p
               class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.endTime
-                ? 'badge-neutral'
+                ? ''
                 : 'badge-error'} absolute bottom-2 left-2"
             >
               {getExerciseSessionByExercise(exercise.id)?.endTime ? "Completed" : "Not Completed"}

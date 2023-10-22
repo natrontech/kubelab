@@ -22,7 +22,7 @@
   <Hero />
   <Companies companies={companies} />
   <Features />
-  <Pricing plans={plans} />
+  <!-- <Pricing plans={plans} /> -->
   <Faq faqs={faqs} />
   <!-- <Cta /> -->
   <!-- <Footer /> -->

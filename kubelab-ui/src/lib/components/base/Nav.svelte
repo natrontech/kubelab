@@ -45,7 +45,7 @@
   ];
 </script>
 
-<div class="navbar shadow-md h-16 pt-4">
+<div class="navbar  h-16 pt-4">
   <div class="navbar-start z-10">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -65,7 +65,7 @@
         {/each}
       </ul>
     </div>
-    <a class="btn btn-ghost normal-case text-xl hidden lg:flex -mt-2" href="/">
+    <a class="btn btn-ghost normal-case text-xl hidden lg:flex -mt-2" href="/app">
       <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8 mr-2" /> KubeLab</a
     >
   </div>
@@ -90,6 +90,15 @@
         <Moon />
       {/if}
     </button>
+
+    <a href="https://natron.io" target="_blank" class="-mt-2 mx-2">
+      <span class="text-xs font-semibold leading-6 text-gray-900 dark:text-white">Powered by</span>
+      {#if $darkTheme === true}
+        <img class="h-4 w-auto" src={"/images/natron-dark.png"} alt="Switzerland" />
+      {:else}
+        <img class="h-4 w-auto" src={"/images/natron.png"} alt="Switzerland" />
+      {/if}
+    </a>
     <div class="dropdown dropdown-end z-10">
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <!-- svelte-ignore a11y-label-has-associated-control -->

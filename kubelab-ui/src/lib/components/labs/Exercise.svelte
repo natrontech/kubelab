@@ -1,10 +1,12 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { client } from "$lib/pocketbase";
-  import type {
-    ExerciseSessionsRecord,
-    ExerciseSessionsResponse,
-    ExercisesResponse
+  import {
+    ExerciseSessionLogsTypeOptions,
+    type ExerciseSessionLogsRecord,
+    type ExerciseSessionsRecord,
+    type ExerciseSessionsResponse,
+    type ExercisesResponse
   } from "$lib/pocketbase/generated-types";
   import {
     exercise,
@@ -133,6 +135,26 @@
               return exercise_session;
             });
           });
+
+          // make an entry in the exercise_session_logs collection
+
+          const exercise_session_log_data: ExerciseSessionLogsRecord = {
+            // @ts-ignore
+            user: client.authStore.model?.id,
+            exercise_session: exercise_session_id,
+            type: ExerciseSessionLogsTypeOptions.start,
+            timestamp: new Date().toISOString()
+          };
+
+          client
+            .collection("exercise_session_logs")
+            .create(exercise_session_log_data)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         })
         .catch((error) => {
           toast.error(error.message);
@@ -152,14 +174,16 @@
       </div>
       {#if $sidebar_lab_session.clusterRunning}
         <div class="relative ml-auto dropdown dropdown-end dropdown-bottom">
-          <button class="btn flex justify-center items-center  relative">
+          <button class="btn btn-neutral flex justify-center items-center  relative">
             {#if $loadingExercises.includes(this_exercise.id)}
-              Actions <span class="loading loading-dots loading-xs inline-block p-2.5" />
+              <span
+                class="capitalize"
+              >Actions</span> <span class="loading loading-dots loading-sm inline-block p-2" />
             {:else}
               <button class="-m-3 block p-2.5">
                 Actions <MoreHorizontal class="w-6 h-6 inline-block" strokeWidth={3} />
               </button>
-              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
                 <li>
                   <button
                     on:click={() => {
@@ -170,7 +194,7 @@
                         goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
                       );
                     }}
-                    class="border-2 text-primary border-primary dark:hover:text-black hover:bg-white hover:text-primary"
+                    class="border-2 text-primary"
                   >
                     <Terminal class="w-4 h-4 mr-1 inline-block" />
                     Shell</button
@@ -213,7 +237,7 @@
         <dd
           class="badge badge-outline {this_exercise_session.agentRunning
             ? 'badge-success'
-            : 'badge-neutral'}"
+            : ''}"
         >
           {#if this_exercise_session.agentRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />

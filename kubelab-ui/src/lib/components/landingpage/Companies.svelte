@@ -6,7 +6,6 @@
   function imagePath(record: CompaniesResponse) {
     return `/api/files/${record.collectionId}/${record.id}/${record.logo}`;
   }
-
 </script>
 
 <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -27,14 +26,14 @@
   </div>
   <div class="mt-16 flex justify-center">
     <p
-      class="relative rounded-full px-4 py-1.5 text-sm leading-6 text-gray-600 ring-1 ring-inset ring-gray-900/10 hover:ring-gray-900/20"
+      class="relative rounded-full px-4 py-1.5 text-sm leading-6  ring-1 ring-inset ring-gray-900/10 dark:ring-gray-100/10"
     >
       <span class="hidden md:inline"
         >Swisscom trains their employees on Kubernetes by working with us.</span
       >
       <a
         href="https://natron.io/blog/kubernetes-mastery-swisscom-kubelab-workshop"
-        class="font-semibold text-black"
+        class="font-semibold"
         ><span class="absolute inset-0" aria-hidden="true" /> Read our blog
         <span aria-hidden="true">&rarr;</span></a
       >

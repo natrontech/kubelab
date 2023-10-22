@@ -15,15 +15,14 @@
   import { loadingExercises, loadingLabs } from "$lib/stores/loading";
   import { client } from "$lib/pocketbase";
   import {
-    sidebarOpen,
     sidebar_exercise_sessions,
     sidebar_lab,
     sidebar_lab_session
   } from "$lib/stores/sidebar";
-  import { slide } from "svelte/transition";
   import Exercise from "../labs/Exercise.svelte";
 
   let docs: string;
+  export let drawerHidden = true;
 
   async function getMarkdown() {
     fetch($sidebar_lab.docs)
@@ -132,7 +131,8 @@
         })
         .catch((error) => {
           console.error(error);
-        }).finally(() => {
+        })
+        .finally(() => {
           $loadingExercises = $loadingExercises.filter((id) => id !== sidebar_exercise_session.id);
         });
     });
@@ -166,14 +166,13 @@
   }
 </script>
 
-<aside
-  class="absolute lg:w-1/2 w-full h-full top-0 bottom-0 bg-white dark:bg-neutral dark:border-none border-l-2 border-t-2 shadow-md z-50"
-  class:open={$sidebarOpen}
->
+<aside class="">
   {#key $sidebar_lab_session}
-    {#if $sidebarOpen}
+    {#if !drawerHidden}
       <div
-        class="{$sidebar_lab_session.clusterRunning ? '' : ''} px-4 py-6 sm:px-6 absolute w-full z-10"
+        class="{$sidebar_lab_session.clusterRunning
+          ? ''
+          : ''} px-4 py-6 sm:px-6 absolute w-full z-10"
       >
         <div class="flex items-center justify-between">
           <h2 class="text-base font-semibold leading-6 text-primary" id="slide-over-title">
@@ -184,7 +183,7 @@
         <div
           class="badge badge-outline {$sidebar_lab_session.clusterRunning
             ? 'badge-success'
-            : 'badge-neutral'}"
+            : ''}"
         >
           {#if $sidebar_lab_session.clusterRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />
@@ -215,7 +214,10 @@
           {/if}
         </div>
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <div tabindex="0" class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4  rounded-lg shadow-md">
+        <div
+          tabindex="0"
+          class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4  rounded-lg shadow-md"
+        >
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="collapse-title text-md font-medium"
@@ -241,7 +243,7 @@
             <button
               type="button"
               on:click={() => {
-                sidebarOpen.set(false);
+                drawerHidden = !drawerHidden;
               }}
               class="btn btn-outline border-none btn-sm btn-square"
             >
@@ -251,7 +253,9 @@
         </div>
       </div>
       {#key $sidebar_exercise_sessions}
-        <div class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none ">
+        <div
+          class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none "
+        >
           {#each $sidebar_exercise_sessions as exercise_session, idx}
             <Exercise this_exercise_session={exercise_session} index={idx} />
           {/each}
@@ -265,9 +269,5 @@
   aside {
     right: -100%;
     transition: right 0.3s ease-in-out;
-  }
-
-  .open {
-    right: 0;
   }
 </style>

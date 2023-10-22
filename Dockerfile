@@ -15,7 +15,7 @@ COPY ./kubelab-ui/package*.json ./
 RUN rm -rf ./node_modules
 RUN rm -rf ./build
 COPY ./kubelab-ui .
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 FROM alpine as runtime

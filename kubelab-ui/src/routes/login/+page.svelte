@@ -3,6 +3,7 @@
   import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
   import { login } from "$lib/pocketbase";
   import { alertOnFailure } from "$lib/pocketbase/ui";
+  import darkTheme from "$lib/stores/theme";
 
   // @ts-ignore
   import { Confetti } from "svelte-confetti";
@@ -29,8 +30,9 @@
 
 <!-- component -->
 <div
-  class="bg-no-repeat bg-cover bg-center relative"
-  style="background-image: url(/images/bg.svg);"
+  class="bg-no-repeat bg-cover bg-center relative
+  bg-gradient-to-r from-blue-500 to-purple-500 dark:from-base-100 dark:to-base-100
+  "
 >
   <div class="absolute sm:inset-0 z-0" />
   <div class="min-h-screen sm:flex sm:flex-row mx-0 justify-center">
@@ -40,6 +42,14 @@
           Hi, Welcome to <span class="font-bold text-5xl"> KubeLab</span>
         </h1>
         <p class="pr-3">Experience Kubernetes Mastery Through Practice.</p>
+        <a href="https://natron.io" target="_blank" class="mt-10">
+          <span class="text-xs font-semibold leading-6 dark:text-gray-900 text-white">Powered by</span>
+          {#if $darkTheme === false}
+            <img class="h-4 w-auto" src={"/images/natron-dark.png"} alt="Switzerland" />
+          {:else}
+            <img class="h-4 w-auto" src={"/images/natron.png"} alt="Switzerland" />
+          {/if}
+        </a>
       </div>
     </div>
     <form
@@ -47,7 +57,7 @@
       method="POST"
       on:submit|preventDefault={submit}
     >
-      <div class="p-12 bg-white mx-auto rounded-2xl w-100 border-4 border-neutral">
+      <div class="p-12 bg-white dark:bg-neutral mx-auto rounded-2xl w-100">
         <div class="mb-4">
           <ToggleConfetti>
             <div class="btn btn-block btn-ghost normal-case text-xl mb-10" slot="label">
