@@ -183,7 +183,7 @@
               <button class="-m-3 block p-2.5">
                 Actions <MoreHorizontal class="w-6 h-6 inline-block" strokeWidth={3} />
               </button>
-              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
                 <li>
                   <button
                     on:click={() => {

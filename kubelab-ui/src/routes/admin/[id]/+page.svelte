@@ -4,7 +4,8 @@
     NotificationsTypeOptions,
     type ExerciseSessionLogsResponse,
     type NotificationsResponse,
-    type ExerciseSessionsResponse
+    type ExerciseSessionsResponse,
+    type CompaniesResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_session_logs } from "$lib/stores/data";
   import {
@@ -17,7 +18,7 @@
   } from "flowbite-svelte";
   import { CheckCircle, HelpCircle, Play } from "lucide-svelte";
   import { onDestroy, onMount } from "svelte";
-    import toast from "svelte-french-toast";
+  import toast from "svelte-french-toast";
 
   interface Activity {
     exercise_title: string;
@@ -35,6 +36,38 @@
   export let data: any;
   let company_id = data.props.id || "";
   let all_exercise_sessions: ExerciseSessionsResponse[] = [];
+
+  interface Company {
+    id: string;
+    name: string;
+    logo: string;
+  }
+
+  let company: Company = {
+    id: "",
+    name: "",
+    logo: ""
+  };
+
+  async function getCompany() {
+    let company_response: CompaniesResponse = await client
+      .collection("companies")
+      .getOne(company_id, {
+        expand: "avatar"
+      });
+
+    company = {
+      id: company_response.id,
+      name: company_response.name,
+      logo:
+        "/api/files/" +
+        company_response?.collectionId +
+        "/" +
+        company_response?.id +
+        "/" +
+        company_response?.logo
+    };
+  }
 
   async function getAllExerciseSessions() {
     let exercise_sessions_response: ExerciseSessionsResponse[] = await client
@@ -223,6 +256,7 @@
     await getExerciseSessionLogs();
     await getNotifications();
     await getAllExerciseSessions();
+    await getCompany();
 
     // set an interval to get the exercise_session_logs every 5 seconds
     setInterval(async () => {
@@ -232,7 +266,7 @@
     }, 10000);
 
     // watch for new notifications and post them to the notifications array
-    client.collection("notifications").subscribe('*', function (e) {
+    client.collection("notifications").subscribe("*", function (e) {
       if (e.action === "create") {
         toast("New notification!", {
           icon: "👋",
@@ -240,8 +274,7 @@
           duration: 10000
         });
       }
-    })
-
+    });
   });
 
   onDestroy(() => {
@@ -295,13 +328,15 @@
   style=""
 >
   <div>
-    <h1 class="text-center text-4xl font-bold mb-8 text-white">Workshop Dashboard</h1>
+    <h1 class="text-center text-4xl font-bold mb-8 text-white">
+      Workshop Dashboard
+      {company.name}
+    </h1>
   </div>
   <div
-    class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-hidden left-64 right-64 grid grid-cols-2 gap-4"
+    class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-scroll scrollbar-thin left-64 right-64 grid grid-cols-2 gap-4"
   >
-
-
+  <img class="mx-auto mb-8 absolute top-0 left-4 w-36" src={company.logo} alt={company.name} />
     <div class="flow-root p-2 rounded-lg col-span-2">
       <!-- a centralized title with "User Activities" -->
       <div class="text-center mb-5">
@@ -375,7 +410,8 @@
                           {" "} for the exercise{" "}
                           <span class="font-medium text-gray-900"
                             >{notification.expand.exercise.title}</span
-                          > {" "}
+                          >
+                          {" "}
                         {/if}
                       </span>
                     </div>
