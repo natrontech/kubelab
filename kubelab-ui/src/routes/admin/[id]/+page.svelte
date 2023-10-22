@@ -334,9 +334,9 @@
     </h1>
   </div>
   <div
-    class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-scroll scrollbar-thin left-64 right-64 grid grid-cols-2 gap-4"
+    class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-scroll scrollbar-thin left-36 right-36 grid grid-cols-2 gap-4"
   >
-  <img class="mx-auto mb-8 absolute top-0 left-4 w-36" src={company.logo} alt={company.name} />
+  <img class="mx-auto mb-8 absolute top-4 left-4 w-36" src={company.logo} alt={company.name} />
     <div class="flow-root p-2 rounded-lg col-span-2">
       <!-- a centralized title with "User Activities" -->
       <div class="text-center mb-5">

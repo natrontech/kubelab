@@ -1,5 +1,6 @@
 import { client } from "$lib/pocketbase";
 import type {
+    CompaniesResponse,
     ExerciseSessionLogsResponse,
     ExerciseSessionsResponse,
     ExercisesResponse,
@@ -19,6 +20,7 @@ export const exercise_session: Writable<ExerciseSessionsResponse> =
 export const exercise_sessions: Writable<ExerciseSessionsResponse[]> =
     writable<ExerciseSessionsResponse[]>();
 export const exercise_session_logs: Writable<ExerciseSessionLogsResponse[]> = writable<ExerciseSessionLogsResponse[]>();
+export const companies: Writable<CompaniesResponse[]> = writable<CompaniesResponse[]>();
 
 export async function getLabSession(labId: string) {
     return get(labs).find((lab) => lab.id === labId);

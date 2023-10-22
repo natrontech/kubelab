@@ -3,7 +3,7 @@
   import { client, logout } from "$lib/pocketbase";
   import darkTheme from "$lib/stores/theme";
   import type { NavRoute } from "$lib/types";
-  import { TerminalSquare, Github, Presentation, Sun, Moon, BarChart2 } from "lucide-svelte";
+  import { TerminalSquare, Github, Presentation, Sun, Moon, BarChart2, Building2 } from "lucide-svelte";
 
   let avatarUrl: string = "";
 
@@ -43,6 +43,44 @@
       icon: Github
     }
   ];
+
+  if (client.authStore.model?.role != "admin") {
+    routes = [
+      {
+        id: "1",
+        name: "Dashboard",
+        href: "/app/",
+        icon: BarChart2
+      },
+      {
+        id: "2",
+        name: "Labs",
+        href: "/labs/",
+        icon: TerminalSquare
+      },
+      {
+        id: "3",
+        name: "Material",
+        href: "/material/",
+        icon: Presentation
+      },
+      {
+        id: "4",
+        name: "About",
+        href: "https://github.com/natrontech/kubelab",
+        icon: Github
+      }
+    ];
+  } else {
+    routes = [
+      {
+        id: "1",
+        name: "Companies",
+        href: "/app/",
+        icon: Building2
+      }
+    ];
+  }
 </script>
 
 <div class="navbar  h-16 pt-4">
@@ -53,7 +91,7 @@
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
       <ul
-        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral"
+        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 "
       >
         {#each routes as route}
           <li>
@@ -110,7 +148,7 @@
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <ul
         tabindex="0"
-        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 border-4 border-neutral"
+        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 "
       >
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
