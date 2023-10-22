@@ -3,6 +3,7 @@
   import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
   import { login } from "$lib/pocketbase";
   import { alertOnFailure } from "$lib/pocketbase/ui";
+  import darkTheme from "$lib/stores/theme";
 
   // @ts-ignore
   import { Confetti } from "svelte-confetti";
@@ -41,6 +42,14 @@
           Hi, Welcome to <span class="font-bold text-5xl"> KubeLab</span>
         </h1>
         <p class="pr-3">Experience Kubernetes Mastery Through Practice.</p>
+        <a href="https://natron.io" target="_blank" class="mt-10">
+          <span class="text-xs font-semibold leading-6 dark:text-gray-900 text-white">Powered by</span>
+          {#if $darkTheme === false}
+            <img class="h-4 w-auto" src={"/images/natron-dark.png"} alt="Switzerland" />
+          {:else}
+            <img class="h-4 w-auto" src={"/images/natron.png"} alt="Switzerland" />
+          {/if}
+        </a>
       </div>
     </div>
     <form

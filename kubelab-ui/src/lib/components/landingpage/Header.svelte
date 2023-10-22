@@ -1,6 +1,6 @@
 <script lang="ts">
   import darkTheme from "$lib/stores/theme";
-    import { Moon, Sun } from "lucide-svelte";
+  import { Moon, Sun } from "lucide-svelte";
 </script>
 
 <header class="absolute inset-x-0 top-0 z-50">
@@ -15,8 +15,7 @@
     <div class="flex items-center gap-x-6">
       <!-- powered by label -->
       <a href="https://natron.io" target="_blank">
-        <span class="text-sm font-semibold leading-6">Powered by</span
-        >
+        <span class="text-sm font-semibold leading-6">Powered by</span>
         {#if $darkTheme === true}
           <img class="h-8 w-auto" src={"/images/natron-dark.png"} alt="Switzerland" />
         {:else}
