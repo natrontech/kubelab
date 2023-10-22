@@ -4,6 +4,7 @@
 
 export enum Collections {
 	Companies = "companies",
+	ExerciseSessionLogs = "exercise_session_logs",
 	ExerciseSessions = "exercise_sessions",
 	Exercises = "exercises",
 	Faqs = "faqs",
@@ -11,6 +12,7 @@ export enum Collections {
 	Hooks = "hooks",
 	LabSessions = "lab_sessions",
 	Labs = "labs",
+	Notifications = "notifications",
 	Plans = "plans",
 	Users = "users",
 }
@@ -42,6 +44,17 @@ export type AuthSystemFields<T = never> = {
 export type CompaniesRecord = {
 	name: string
 	logo: string
+}
+
+export enum ExerciseSessionLogsTypeOptions {
+	"start" = "start",
+	"end" = "end",
+}
+export type ExerciseSessionLogsRecord = {
+	user: RecordIdString
+	exercise_session: RecordIdString
+	timestamp: IsoDateString
+	type: ExerciseSessionLogsTypeOptions
 }
 
 export type ExerciseSessionsRecord = {
@@ -106,6 +119,16 @@ export type LabsRecord = {
 	docs?: string
 }
 
+export enum NotificationsTypeOptions {
+	"help" = "help",
+}
+export type NotificationsRecord = {
+	type: NotificationsTypeOptions
+	user: RecordIdString
+	exercise?: RecordIdString
+	done?: boolean
+}
+
 export type PlansRecord = {
 	name: string
 	description: string
@@ -114,14 +137,22 @@ export type PlansRecord = {
 	optionalFeatures?: RecordIdString[]
 }
 
+export enum UsersRoleOptions {
+	"user" = "user",
+	"admin" = "admin",
+}
 export type UsersRecord = {
 	name?: string
 	avatar?: string
 	plan?: RecordIdString
+	role: UsersRoleOptions
+	company?: RecordIdString
+	workshop?: boolean
 }
 
 // Response types include system fields and match responses from the PocketBase API
 export type CompaniesResponse = Required<CompaniesRecord> & BaseSystemFields
+export type ExerciseSessionLogsResponse<Texpand = unknown> = Required<ExerciseSessionLogsRecord> & BaseSystemFields<Texpand>
 export type ExerciseSessionsResponse<Texpand = unknown> = Required<ExerciseSessionsRecord> & BaseSystemFields<Texpand>
 export type ExercisesResponse<Texpand = unknown> = Required<ExercisesRecord> & BaseSystemFields<Texpand>
 export type FaqsResponse = Required<FaqsRecord> & BaseSystemFields
@@ -129,6 +160,7 @@ export type FeaturesResponse = Required<FeaturesRecord> & BaseSystemFields
 export type HooksResponse = Required<HooksRecord> & BaseSystemFields
 export type LabSessionsResponse<Texpand = unknown> = Required<LabSessionsRecord> & BaseSystemFields<Texpand>
 export type LabsResponse = Required<LabsRecord> & BaseSystemFields
+export type NotificationsResponse<Texpand = unknown> = Required<NotificationsRecord> & BaseSystemFields<Texpand>
 export type PlansResponse<Texpand = unknown> = Required<PlansRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
@@ -136,6 +168,7 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 
 export type CollectionRecords = {
 	companies: CompaniesRecord
+	exercise_session_logs: ExerciseSessionLogsRecord
 	exercise_sessions: ExerciseSessionsRecord
 	exercises: ExercisesRecord
 	faqs: FaqsRecord
@@ -143,12 +176,14 @@ export type CollectionRecords = {
 	hooks: HooksRecord
 	lab_sessions: LabSessionsRecord
 	labs: LabsRecord
+	notifications: NotificationsRecord
 	plans: PlansRecord
 	users: UsersRecord
 }
 
 export type CollectionResponses = {
 	companies: CompaniesResponse
+	exercise_session_logs: ExerciseSessionLogsResponse
 	exercise_sessions: ExerciseSessionsResponse
 	exercises: ExercisesResponse
 	faqs: FaqsResponse
@@ -156,6 +191,7 @@ export type CollectionResponses = {
 	hooks: HooksResponse
 	lab_sessions: LabSessionsResponse
 	labs: LabsResponse
+	notifications: NotificationsResponse
 	plans: PlansResponse
 	users: UsersResponse
 }

@@ -45,7 +45,7 @@
   ];
 </script>
 
-<div class="navbar shadow-md h-16 pt-4">
+<div class="navbar  h-16 pt-4">
   <div class="navbar-start z-10">
     <div class="dropdown">
       <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -65,7 +65,7 @@
         {/each}
       </ul>
     </div>
-    <a class="btn btn-ghost normal-case text-xl hidden lg:flex -mt-2" href="/">
+    <a class="btn btn-ghost normal-case text-xl hidden lg:flex -mt-2" href="/app">
       <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8 mr-2" /> KubeLab</a
     >
   </div>

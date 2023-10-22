@@ -52,7 +52,7 @@
 </script>
 
 {#key this_lab_session}
-  <div class="rounded-xl border-2 relative">
+  <div class="rounded-xl relative bg-white dark:bg-transparent dark:border-2">
     <div class="flex items-center gap-x-4 border-b-2 p-6">
       <div class="text-sm font-medium leading-6">{this_lab.title}</div>
       <div class="relative ml-auto">

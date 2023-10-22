@@ -32,13 +32,14 @@
 </script>
 
 <div
-  class="absolute top-16 bottom-0 left-0 right-0 p-4 bg-no-repeat bg-cover bg-center justify-center"
+  class="absolute top-16 bottom-0 left-0 right-0 p-4 bg-no-repeat bg-cover bg-center justify-center
+bg-gradient-to-r from-blue-500 to-purple-500 dark:from-base-100 dark:to-base-100"
 >
-  <h1 class="text-center text-4xl font-bold mb-8">Dashboard</h1>
+  <h1 class="text-center text-4xl text-white font-bold mb-8">Dashboard</h1>
   <div class="grid grid-cols-3 gap-4 justify-center items-center">
     <div />
     <div
-      class="stats w-full col-span-3 sm:col-span-1 shadow border-2 border-neutral hover:shadow-md transition-all duration-150 ease-in-out"
+      class="stats w-full col-span-3 sm:col-span-1 shadow  hover:shadow-md transition-all duration-150 ease-in-out"
     >
       <div class="stat">
         <div class="stat-title">Your <strong>average</strong> time to resolution</div>
@@ -47,7 +48,7 @@
     </div>
 
     <div
-      class="stats col-span-3 mt-4 shadow w-full hover:shadow-md transition-all duration-150 ease-in-out border-2 border-neutral"
+      class="stats col-span-3 mt-4 shadow w-full hover:shadow-md transition-all duration-150 ease-in-out"
     >
       <a href="/labs">
         <div class="stat">

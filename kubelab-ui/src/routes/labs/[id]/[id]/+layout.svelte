@@ -4,6 +4,8 @@
   import {
     ArrowLeft,
     CheckCircle,
+    HelpCircle,
+    LifeBuoy,
     RotateCw,
     StopCircle,
     StretchHorizontal,
@@ -30,11 +32,18 @@
     sidebar_exercises,
     sidebar_lab
   } from "$lib/stores/sidebar.js";
+  import {
+    ExerciseSessionLogsTypeOptions,
+    type ExerciseSessionLogsRecord,
+    type NotificationsRecord,
+    NotificationsTypeOptions
+  } from "$lib/pocketbase/generated-types.js";
 
   $metadata.title = "Exercises";
 
   export let data;
   let restartLoading = false;
+  let helpRequested = false;
 
   function handleSwitchExercise(exercise_session_id: string) {
     let lab_session_id = data.pathname.split("/")[2];
@@ -97,6 +106,26 @@
               });
 
               filterExercisesByLab(labId);
+
+              // make an entry in the exercise_session_logs collection
+
+              const exercise_session_log_data: ExerciseSessionLogsRecord = {
+                // @ts-ignore
+                user: client.authStore.model?.id,
+                exercise_session: $exercise_session.id,
+                type: ExerciseSessionLogsTypeOptions.end,
+                timestamp: new Date().toISOString()
+              };
+
+              client
+                .collection("exercise_session_logs")
+                .create(exercise_session_log_data)
+                .then((response) => {
+                  console.log(response);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
             });
         } else {
           toast.error("Exercise not completed");
@@ -105,6 +134,56 @@
       .catch((error) => {
         console.error(error);
         toast.error("Exercise not completed");
+      });
+  }
+
+  async function askForHelp() {
+    // help if last notification is older than 5 minutes
+    let notification = await client
+      .collection("notifications")
+      .getFullList({
+        sort: "-created"
+      })
+      .then((response) => {
+        return response.find((notification) => {
+          return (
+            notification.user === client.authStore.model?.id &&
+            notification.type === NotificationsTypeOptions.help
+          );
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    if (notification) {
+      let notificationDate = new Date(notification.created);
+      let now = new Date();
+      let diff = now.getTime() - notificationDate.getTime();
+      let diffMinutes = Math.floor(diff / 1000 / 60);
+      if (diffMinutes < 5) {
+        toast.error("You can only ask for help every 5 minutes");
+        return;
+      }
+    }
+
+    const notification_data: NotificationsRecord = {
+      // @ts-ignore
+      user: client.authStore.model?.id,
+      exercise: $exercise.id,
+      type: NotificationsTypeOptions.help
+    };
+
+    client
+      .collection("notifications")
+      .create(notification_data)
+      .then((response) => {
+        toast.success("Help requested, please wait for your trainer.");
+        helpRequested = true;
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Help request failed");
       });
   }
 
@@ -164,16 +243,13 @@
   function isCurrentExercise(exercise_id: string) {
     return $exercise.id === exercise_id;
   }
-
-  console.log($exercises)
-
 </script>
 
 {#key $exercise}
   <div class="absolute top-0 h-20 left-0 right-0 ">
     <div class="mt-5 flex justify-between px-2">
       <button
-        class="btn btn-neutral btn-outline"
+        class="btn btn-neutral "
         on:click={() => {
           if ($sidebar_lab) {
             sidebarOpen.set(true);
@@ -187,11 +263,11 @@
       <ToggleConfetti>
         <button
           slot="label"
-          class="btn btn-outline {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
+          class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
           on:click={() => handleCheckExercise()}
         >
           <CheckCircle class="inline-block mr-2" />
-          Check
+          <span> Check </span>
         </button>
         <div
           style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
@@ -215,7 +291,7 @@
           }}
           class="join-item btn {$horizontalView
             ? ' btn-neutral dark:btn-primary dark:text-neutral '
-            : 'btn-outline'} "
+            : ''} "
         >
           <StretchHorizontal />
         </button>
@@ -224,7 +300,7 @@
             horizontalView.set(false);
           }}
           class="join-item btn {$horizontalView
-            ? 'btn-outline'
+            ? ''
             : ' btn-neutral dark:btn-primary dark:text-neutral '}"
         >
           <StretchVertical />
@@ -239,15 +315,13 @@
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          <button class="btn btn-outline btn-error" on:click={() => handleStopExercise()}>
+          <button class="btn  btn-error" on:click={() => handleStopExercise()}>
             <StopCircle class="inline-block mr-2" />
             Stop
           </button>
 
           <button
-            class="btn btn-outline {!$exercise_session.agentRunning
-              ? 'btn-disabled'
-              : 'btn-warning'}"
+            class="btn  {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
             on:click={() => handleRestartExercise()}
           >
             {#if restartLoading}
@@ -258,6 +332,19 @@
               Reset Exercise
             {/if}
           </button>
+          {#if client.authStore.model?.workshop == true}
+            <button
+              class="btn btn-neutral dark:hover:text-base-200 {helpRequested
+                ? 'btn-disabled'
+                : 'btn-primary'}"
+              on:click={() => {
+                askForHelp();
+              }}
+            >
+              <HelpCircle class="inline-block mr-2" />
+              Call for Support
+            </button>
+          {/if}
         {/if}
       </div>
       <div class="">

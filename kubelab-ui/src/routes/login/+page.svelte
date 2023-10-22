@@ -29,8 +29,9 @@
 
 <!-- component -->
 <div
-  class="bg-no-repeat bg-cover bg-center relative"
-  style="background-image: url(/images/bg.svg);"
+  class="bg-no-repeat bg-cover bg-center relative
+  bg-gradient-to-r from-blue-500 to-purple-500 dark:from-base-100 dark:to-base-100
+  "
 >
   <div class="absolute sm:inset-0 z-0" />
   <div class="min-h-screen sm:flex sm:flex-row mx-0 justify-center">

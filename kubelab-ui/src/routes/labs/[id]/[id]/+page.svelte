@@ -7,7 +7,7 @@
   import { terminal_size } from "$lib/stores/terminal";
   import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/stores";
-  import type { ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
+  import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
   import { Check, CheckCircle, InfoIcon, Lightbulb, Play } from "lucide-svelte";
@@ -125,6 +125,27 @@
         });
 
         filterExercisesByLab(labId);
+
+        // make an entry in the exercise_session_logs collection
+
+        const exercise_session_log_data: ExerciseSessionLogsRecord = {
+            // @ts-ignore
+            user: client.authStore.model?.id,
+            exercise_session: $exercise_session.id,
+            type: ExerciseSessionLogsTypeOptions.start,
+            timestamp: new Date().toISOString()
+          };
+
+          client
+            .collection("exercise_session_logs")
+            .create(exercise_session_log_data)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
       })
       .catch((error) => {
         console.error(error);
@@ -157,7 +178,7 @@
 {#key $page.params}
   {#if $horizontalView}
     <Splitpanes horizontal class="p-2 mt-2 pb-2">
-      <Pane class="my-2">
+      <Pane class=" rounded-t-lg">
         <Splitpanes>
           <Pane class="relative">
             <div
@@ -235,7 +256,7 @@
           </Pane>
         </Splitpanes>
       </Pane>
-      <Pane bind:size={$terminal_size.height}>
+      <Pane bind:size={$terminal_size.height} class="rounded-b-lg">
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
@@ -280,7 +301,7 @@
     </Splitpanes>
   {:else}
     <Splitpanes class="p-2 mt-2">
-      <Pane bind:size={$terminal_size.height}>
+      <Pane bind:size={$terminal_size.height} class="rounded-l-lg">
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
@@ -322,7 +343,7 @@
           {/key}
         {/if}
       </Pane>
-      <Pane>
+      <Pane class="rounded-r-lg">
         <Splitpanes horizontal>
           <Pane class="relative">
             <div

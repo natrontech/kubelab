@@ -75,9 +75,9 @@
 />
 
 {#if $lab_sessions.length > 0}
-  <h1 class="text-center text-4xl font-bold my-4">Labs</h1>
+  <h1 class="text-center text-4xl font-bold my-4 text-white">Labs</h1>
   {#key $lab_sessions}
-    <p class="text-center text-xl my-4">
+    <p class="text-center text-xl my-4 text-white">
       <!-- display number of running labs x/1 -->
       Running labs:
       <span class="font-bold"
