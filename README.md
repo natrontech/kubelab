@@ -41,7 +41,7 @@ KubeLab is built using:
 - [pocketbase](https://pocketbase.io)
 
 <p align="center">
-	<img height="400px" src="assets/screenshots/terminal_new.png" />
+	<img height="400px" src="assets/screenshot.png" />
 </p>
 
 **Please note:** This project is still in its early stages, and we're diligently working to enhance your experience. However, bugs might appear, and your patience and feedback will be greatly appreciated.
