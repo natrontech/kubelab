@@ -1,14 +1,21 @@
 <script lang="ts">
   import { navigating } from "$app/stores";
   import { client, logout } from "$lib/pocketbase";
+    import { avatarUrl } from "$lib/stores/data";
   import darkTheme from "$lib/stores/theme";
   import type { NavRoute } from "$lib/types";
-  import { TerminalSquare, Github, Presentation, Sun, Moon, BarChart2, Building2 } from "lucide-svelte";
+  import {
+    TerminalSquare,
+    Github,
+    Presentation,
+    Sun,
+    Moon,
+    BarChart2,
+    Building2
+  } from "lucide-svelte";
 
-  let avatarUrl: string = "";
-
-  if (client.authStore) {
-    avatarUrl =
+  $: if (client.authStore) {
+    $avatarUrl =
       "/api/files/" +
       client.authStore.model?.collectionId +
       "/" +
@@ -90,9 +97,7 @@
       <label tabindex="0" class="btn btn-ghost lg:hidden -mt-2">
         <img src="/images/kubelab-logo.png" alt="logo" class="w-8 h-8" />
       </label>
-      <ul
-        class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 "
-      >
+      <ul class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 ">
         {#each routes as route}
           <li>
             <a href={route.href}>
@@ -142,7 +147,7 @@
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label tabindex="0" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img src={avatarUrl} />
+          <img src={$avatarUrl} />
         </div>
       </label>
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -150,6 +155,9 @@
         tabindex="0"
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52 "
       >
+        <li>
+          <a href="/app/profile"> Profile </a>
+        </li>
         <li><button on:click={() => logout()}>Logout</button></li>
       </ul>
     </div>
