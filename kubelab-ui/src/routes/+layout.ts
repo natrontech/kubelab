@@ -18,24 +18,12 @@ export const load = ({ url }) => {
                 throw redirect(307, "/app");
             }
         }
-        // } else {
-        //     if (pathname !== "/login/") {
-        //         client.authStore.clear();
-        //         throw redirect(307, "/login/");
-        //     }
-        // }
 
         if (client.authStore.isValid) {
             if (pathname === "/login/" || pathname === "/signup/") {
                 throw redirect(307, "/app");
             }
         }
-        // } else {
-        //     if (pathname !== "/login/") {
-        //         client.authStore.clear();
-        //         throw redirect(307, "/login/");
-        //     }
-        // }
     }
 
     return {
