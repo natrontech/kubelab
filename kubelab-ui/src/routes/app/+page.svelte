@@ -156,10 +156,7 @@
               {company.name}</TableBodyCell
             >
             <TableBodyCell>
-              <a
-                href={`https://kubelab.ch/admin
-                /${company.id}`}>kubelab.ch/admin/{company.id}</a
-              >
+              <a href={`https://kubelab.ch/admin/${company.id}`}>kubelab.ch/admin/{company.id}</a>
             </TableBodyCell>
           </TableBodyRow>
         {/each}
