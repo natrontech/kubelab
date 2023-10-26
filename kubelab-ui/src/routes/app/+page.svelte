@@ -13,13 +13,6 @@
     TableHeadCell
   } from "flowbite-svelte";
   import type { CompaniesResponse } from "$lib/pocketbase/generated-types";
-  import { page } from "$app/stores";
-
-  interface Company {
-    id: string;
-    name: string;
-    logo: string;
-  }
 
   let companies: CompaniesResponse[] = [];
 

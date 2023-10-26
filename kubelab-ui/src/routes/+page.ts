@@ -9,7 +9,7 @@ export const load = async () => {
     const plans: PlansResponse[] = await client.collection("plans").getFullList(200, {
         expand: "features,optionalFeatures",
         sort: "price"
-    });
+    })
 
     const faqs: FaqsResponse[] = await client.collection("faqs").getFullList(200, {});
 

@@ -5,7 +5,8 @@
     type ExerciseSessionLogsResponse,
     type NotificationsResponse,
     type ExerciseSessionsResponse,
-    type CompaniesResponse
+    type CompaniesResponse,
+    type ExercisesResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_session_logs } from "$lib/stores/data";
   import {
@@ -36,6 +37,7 @@
   export let data: any;
   let company_id = data.props.id || "";
   let all_exercise_sessions: ExerciseSessionsResponse[] = [];
+  let all_exercises: ExercisesResponse[] = [];
 
   interface Company {
     id: string;
@@ -82,6 +84,14 @@
       //@ts-ignore
       (exercise_session) => exercise_session.expand.user.company == company_id
     );
+    let exercises_response: ExercisesResponse[] = await client
+      .collection("exercises")
+      .getFullList(100, {
+        expand: "lab",
+        sort: "-lab"
+      });
+
+    all_exercises = exercises_response;
 
     // set all_exercise_sessions to the filtered exercise_sessions
     all_exercise_sessions = exercise_sessions_response;
@@ -92,6 +102,7 @@
     user_name: string;
     avatarUrl: string;
     average_time: number;
+    solved_exercises_percentage: number;
   }
 
   let all_ranking: Ranking[] = [];
@@ -100,6 +111,7 @@
     // in exercise_sessions, we have all the exercise_sessions of the company. We need to group them by user
 
     let users: any = {};
+
 
     all_exercise_sessions.forEach((exercise_session: any) => {
       if (users[exercise_session.expand.user.id]) {
@@ -158,12 +170,28 @@
           user_exercise_sessions[0].expand.user?.id +
           "/" +
           user_exercise_sessions[0].expand.user.avatar,
-        average_time: average_time
+        average_time: average_time,
+        solved_exercises_percentage: Math.round(
+          (user_exercise_sessions.length / all_exercises.length) * 100
+        )
       });
     });
 
+    // first sort by the solved_exercises_percentage and then by the average_time
     ranking.sort((a, b) => {
-      return a.average_time - b.average_time;
+      if (a.solved_exercises_percentage > b.solved_exercises_percentage) {
+        return -1;
+      } else if (a.solved_exercises_percentage < b.solved_exercises_percentage) {
+        return 1;
+      } else {
+        if (a.average_time < b.average_time) {
+          return -1;
+        } else if (a.average_time > b.average_time) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
     });
 
     // parse the average time to a human readable format -> minutes and seconds
@@ -336,7 +364,7 @@
   <div
     class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-scroll scrollbar-thin left-36 right-36 grid grid-cols-2 gap-4"
   >
-  <img class="mx-auto mb-8 absolute top-4 left-4 w-36" src={company.logo} alt={company.name} />
+    <img class="mx-auto mb-8 absolute top-4 left-4 w-36" src={company.logo} alt={company.name} />
     <div class="flow-root p-2 rounded-lg col-span-2">
       <!-- a centralized title with "User Activities" -->
       <div class="text-center mb-5">
@@ -349,6 +377,7 @@
           <TableHeadCell>Rank</TableHeadCell>
           <TableHeadCell>User</TableHeadCell>
           <TableHeadCell>Average Time</TableHeadCell>
+          <TableHeadCell>Solved Exercises</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y">
           {#each all_ranking as item, idx}
@@ -364,6 +393,7 @@
                 {item.user_name}</TableBodyCell
               >
               <TableBodyCell>{item.average_time}</TableBodyCell>
+              <TableBodyCell>{item.solved_exercises_percentage}%</TableBodyCell>
             </TableBodyRow>
           {/each}
         </TableBody>
@@ -402,14 +432,15 @@
                       <span class="text-sm text-gray-500">
                         {#if notification.type == NotificationsTypeOptions.help}
                           <span class="font-medium text-gray-900"
-                            >{notification.expand.user.name}</span
+                            >
+                            {notification.expand?.user.name}</span
                           >{" "}
                           requested help
                         {/if}
                         {#if notification.exercise}
                           {" "} for the exercise{" "}
                           <span class="font-medium text-gray-900"
-                            >{notification.expand.exercise.title}</span
+                            >{notification.expand?.exercise.title}</span
                           >
                           {" "}
                         {/if}
