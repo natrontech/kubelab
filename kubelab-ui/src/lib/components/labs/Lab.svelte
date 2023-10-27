@@ -54,7 +54,7 @@
 {#key this_lab_session}
   <div class="rounded-xl relative bg-white dark:bg-transparent dark:border-2 ">
     <div class="flex items-center gap-x-4 border-b-2 p-6">
-      <div class="text-sm font-medium leading-6">{this_lab.title}</div>
+      <div class="text-lg font-bold leading-6">{this_lab.title}</div>
       <div class="relative ml-auto">
         <button class="btn btn-outline" on:click={() => handleSideBar()}>
           <Inspect />
