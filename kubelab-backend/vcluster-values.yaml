@@ -19,7 +19,7 @@ isolation:
   limitRange:
     enabled: false
   networkPolicy:
-    enabled: true
+    enabled: false
     outgoingConnections:
       ipBlock:
         cidr: 8.8.8.8/32

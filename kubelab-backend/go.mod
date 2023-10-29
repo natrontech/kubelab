@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/pocketbase/dbx v1.10.1
-	github.com/pocketbase/pocketbase v0.19.0
+	github.com/pocketbase/pocketbase v0.19.1
 	helm.sh/helm/v3 v3.11.2
 	k8s.io/api v0.27.2
 	k8s.io/apimachinery v0.27.2
