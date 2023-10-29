@@ -1,10 +1,13 @@
 <script lang="ts">
   import type {
+    ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse,
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
+  import { getExerciseSessionByExercise } from "$lib/stores/data";
+  import { loadingExercises } from "$lib/stores/loading";
   import {
     sidebar_exercise_sessions,
     sidebar_exercises,
@@ -73,11 +76,7 @@
     <dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
       <div class="flex justify-between gap-x-4 py-3">
         <dt class="">Status</dt>
-        <dd
-          class="badge badge-outline {this_lab_session.clusterRunning
-            ? 'badge-success'
-            : ''}"
-        >
+        <dd class="badge badge-outline {this_lab_session.clusterRunning ? 'badge-success' : ''}">
           {#if this_lab_session.clusterRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />
           {:else}

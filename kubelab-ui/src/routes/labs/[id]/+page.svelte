@@ -39,7 +39,10 @@
       agentRunning: true
     };
 
-    $loadingExercises = $loadingExercises.concat(exercise_id);
+    loadingExercises.update((exercises) => {
+      exercises.add(exercise_id);
+      return new Set(exercises); // Required for Svelte's reactivity
+    });
 
     // const labId = window.location.pathname.split("/")[2];
 
@@ -76,7 +79,6 @@
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
             .then((response) => {
-              console.log(response);
             })
             .catch((error) => {
               console.log(error);
@@ -87,7 +89,10 @@
           toast.error(error.message);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+          loadingExercises.update((exercises) => {
+            exercises.delete(exercise_id);
+            return new Set(exercises); // Required for Svelte's reactivity
+          });
         });
     }
   }
@@ -130,7 +135,7 @@
                   class="btn {isExerciseRunning(exercise.id) ? 'btn-disabled' : 'btn-neutral'}"
                   on:click={() => startExercise(exercise.id)}
                 >
-                  {#if $loadingExercises.includes(exercise.id)}
+                  {#if $loadingExercises.has(exercise.id)}
                     <span class="loading loading-dots loading-md" />
                   {:else}
                     <Play />

@@ -22,15 +22,8 @@
     sidebar_lab,
     sidebar_lab_session
   } from "$lib/stores/sidebar";
-  import { getDeltaTime, getTimeAgo } from "$lib/utils/time";
-  import {
-    CheckCircle,
-    MoreHorizontal,
-    Pause,
-    Play,
-    Terminal,
-    TerminalSquare
-  } from "lucide-svelte";
+  import { getDeltaTime } from "$lib/utils/time";
+  import { CheckCircle, Info, MoreHorizontal, Pause, Play, Terminal } from "lucide-svelte";
   import { onMount } from "svelte";
   import toast from "svelte-french-toast";
   export let this_exercise_session: ExerciseSessionsResponse;
@@ -56,7 +49,10 @@
       agentRunning: false
     };
 
-    $loadingExercises = $loadingExercises.concat(exercise_id);
+    loadingExercises.update((exercises) => {
+      exercises.add(exercise_id);
+      return new Set(exercises); // Required for Svelte's reactivity
+    });
 
     // const labId = window.location.pathname.split("/")[2];
 
@@ -91,7 +87,10 @@
           toast.error(error.message);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+          loadingExercises.update((exercises) => {
+            exercises.delete(exercise_id);
+            return new Set(exercises); // Required for Svelte's reactivity
+          });
         });
     }
   }
@@ -106,7 +105,10 @@
       agentRunning: true
     };
 
-    $loadingExercises = $loadingExercises.concat(exercise_id);
+    loadingExercises.update((exercises) => {
+      exercises.add(exercise_id);
+      return new Set(exercises); // Required for Svelte's reactivity
+    });
 
     // const labId = window.location.pathname.split("/")[2];
 
@@ -117,7 +119,6 @@
         .update(exercise_session_id, data)
         // @ts-ignore
         .then((response: any) => {
-          // goto(`/labs/${labId}/${exercise_id}`);
           toast.success("Exercise started");
           this_exercise_session = response;
           $sidebar_exercise_sessions = $sidebar_exercise_sessions.map((exercise_session) => {
@@ -150,7 +151,7 @@
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
             .then((response) => {
-              console.log(response);
+
             })
             .catch((error) => {
               console.log(error);
@@ -160,7 +161,10 @@
           toast.error(error.message);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+          loadingExercises.update((exercises) => {
+            exercises.delete(exercise_id);
+            return new Set(exercises); // Required for Svelte's reactivity
+          });
         });
     }
   }
@@ -175,10 +179,20 @@
       {#if $sidebar_lab_session.clusterRunning}
         <div class="relative ml-auto dropdown dropdown-end dropdown-bottom">
           <button class="btn btn-neutral flex justify-center items-center  relative">
-            {#if $loadingExercises.includes(this_exercise.id)}
-              <span
-                class="capitalize"
-              >Actions</span> <span class="loading loading-dots loading-sm inline-block p-2" />
+            {#if $loadingExercises.has(this_exercise.id)}
+              <span class="capitalize">Actions</span>
+              <span class="loading loading-dots loading-sm inline-block p-2" />
+              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
+                <li>
+                  <!-- exercise is starting... -->
+                  <button
+                    class="border-2 "
+                  >
+                    <Info class="w-4 h-4 mr-1 inline-block" />
+                    Starting Exercise</button
+                  >
+                </li>
+              </ul>
             {:else}
               <button class="-m-3 block p-2.5">
                 Actions <MoreHorizontal class="w-6 h-6 inline-block" strokeWidth={3} />
@@ -202,14 +216,20 @@
                 </li>
                 {#if this_exercise_session.agentRunning}
                   <li>
-                    <button class="border-2 text-error border-error hover:bg-error hover:text-primary" on:click={() => stopExercise(this_exercise.id)}>
+                    <button
+                      class="border-2 text-error border-error hover:bg-error hover:text-primary"
+                      on:click={() => stopExercise(this_exercise.id)}
+                    >
                       <Pause class="w-4 h-4 mr-1 inline-block" />
                       Stop Exercise</button
                     >
                   </li>
                 {:else}
                   <li>
-                    <button class="border-2 text-success border-success hover:bg-success hover:text-primary" on:click={() => startExercise(this_exercise.id)}>
+                    <button
+                      class="border-2 text-success border-success hover:bg-success hover:text-primary"
+                      on:click={() => startExercise(this_exercise.id)}
+                    >
                       <Play class="w-4 h-4 mr-1 inline-block" />
                       Start Exercise</button
                     >
@@ -234,11 +254,7 @@
     <dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
       <div class="flex justify-between gap-x-4 py-3">
         <dt class="">Status</dt>
-        <dd
-          class="badge badge-outline {this_exercise_session.agentRunning
-            ? 'badge-success'
-            : ''}"
-        >
+        <dd class="badge badge-outline {this_exercise_session.agentRunning ? 'badge-success' : ''}">
           {#if this_exercise_session.agentRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />
           {:else}

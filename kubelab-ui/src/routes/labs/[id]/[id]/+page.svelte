@@ -7,10 +7,14 @@
   import { terminal_size } from "$lib/stores/terminal";
   import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/stores";
-  import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types.js";
+  import {
+    ExerciseSessionLogsTypeOptions,
+    type ExerciseSessionLogsRecord,
+    type ExerciseSessionsRecord
+  } from "$lib/pocketbase/generated-types.js";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
-  import { Check, CheckCircle, InfoIcon, Lightbulb, Play } from "lucide-svelte";
+  import { CheckCircle, InfoIcon, Lightbulb, Play } from "lucide-svelte";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -22,9 +26,9 @@
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
   import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
   import horizontalView from "$lib/stores/tableView";
+  import { loadingExercises } from "$lib/stores/loading";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
-  let loading = "";
   let loadingMD = "";
   let showSolution = "";
 
@@ -103,7 +107,10 @@
       agentRunning: true
     };
 
-    loading = window.location.pathname.split("/")[3];
+    loadingExercises.update((exercises) => {
+      exercises.add($exercise.id);
+      return new Set(exercises); // Required for Svelte's reactivity
+    });
 
     await client
       .collection("exercise_sessions")
@@ -129,30 +136,32 @@
         // make an entry in the exercise_session_logs collection
 
         const exercise_session_log_data: ExerciseSessionLogsRecord = {
-            // @ts-ignore
-            user: client.authStore.model?.id,
-            exercise_session: $exercise_session.id,
-            type: ExerciseSessionLogsTypeOptions.start,
-            timestamp: new Date().toISOString()
-          };
+          // @ts-ignore
+          user: client.authStore.model?.id,
+          exercise_session: $exercise_session.id,
+          type: ExerciseSessionLogsTypeOptions.start,
+          timestamp: new Date().toISOString()
+        };
 
-          client
-            .collection("exercise_session_logs")
-            .create(exercise_session_log_data)
-            .then((response) => {
-              console.log(response);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-
+        client
+          .collection("exercise_session_logs")
+          .create(exercise_session_log_data)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.error(error);
         toast.error("Exercise failed to start. Lab is probably still starting.");
       })
       .finally(() => {
-        loading = "";
+        loadingExercises.update((exercises) => {
+          exercises.delete($exercise.id);
+          return new Set(exercises); // Required for Svelte's reactivity
+        });
       });
   }
 
@@ -175,7 +184,7 @@
   }
 </script>
 
-{#key $page.params}
+{#key ($page.params, $loadingExercises)}
   {#if $horizontalView}
     <Splitpanes horizontal class="p-2 mt-2 pb-2">
       <Pane class=" rounded-t-lg">
@@ -240,7 +249,8 @@
                 <dialog id="my_modal_1" class="modal">
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Solution</h3>
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
+                    >
                     <SvelteMarkdown
                       source={solution}
                       renderers={{
@@ -286,8 +296,8 @@
                       : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
                     on:click={() => handleStartExercise()}
                   >
-                    {#if loading === window.location.pathname.split("/")[3]}
-                      <span class="loading loading-dots loading-md" /> Start Terminal
+                    {#if $loadingExercises.has($exercise.id)}
+                      <span class="loading loading-dots loading-md" /> starting...
                     {:else}
                       <Play /> Start Terminal
                     {/if}
@@ -312,7 +322,9 @@
           <!-- button to start the agent -->
           {#key $page.params}
             <div
-              class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone($exercise.id)
+              class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone(
+                $exercise.id
+              )
                 ? 'bg-green-200'
                 : ''}"
             >
@@ -328,15 +340,14 @@
                 <button
                   class="btn {checkIfExerciseIsDone($exercise.id)
                     ? 'btn-warning'
-                    : 'btn-neutral dark:btn-primary dark:text-neutral'} mt-4"
+                    : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
                   on:click={() => handleStartExercise()}
                 >
-                  {#if loading === window.location.pathname.split("/")[3]}
-                    <span class="loading loading-dots loading-md" /> Start Terminal
+                  {#if $loadingExercises.has($exercise.id)}
+                    <span class="loading loading-dots loading-md" /> starting...
                   {:else}
                     <Play /> Start Terminal
                   {/if}
-                  {checkIfExerciseIsDone($exercise.id) ? " - Exercise already Done" : ""}
                 </button>
               </div>
             </div>

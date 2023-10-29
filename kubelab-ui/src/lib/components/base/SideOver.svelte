@@ -14,11 +14,7 @@
   import toast from "svelte-french-toast";
   import { loadingExercises, loadingLabs } from "$lib/stores/loading";
   import { client } from "$lib/pocketbase";
-  import {
-    sidebar_exercise_sessions,
-    sidebar_lab,
-    sidebar_lab_session
-  } from "$lib/stores/sidebar";
+  import { sidebar_exercise_sessions, sidebar_lab, sidebar_lab_session } from "$lib/stores/sidebar";
   import Exercise from "../labs/Exercise.svelte";
 
   let docs: string;
@@ -35,17 +31,22 @@
       });
   }
 
-  async function startLab() {
+  async function startLab(lab_session_id: string) {
     // if there is more than one lab_session clusterRunning = true, fail
     if ($lab_sessions.filter((lab_session) => lab_session.clusterRunning).length > 1) {
       toast.error("There are already two lab running");
       return;
     }
 
-    if ($loadingLabs.length > 0) {
-      toast.error("There is already a lab starting");
+    if ($loadingLabs.size > 1) {
+      toast.error("There are already 2 labs starting/stopping");
       return;
     }
+
+    loadingLabs.update((labs) => {
+      labs.add(lab_session_id);
+      return new Set(labs); // Required for Svelte's reactivity
+    });
 
     const data: LabSessionsRecord = {
       clusterRunning: true,
@@ -55,15 +56,15 @@
       startTime: new Date().toISOString()
     };
 
-    $loadingLabs = $loadingLabs.concat($sidebar_lab_session.id);
-
     await client
       .collection("lab_sessions")
-      .update($sidebar_lab_session.id, data)
+      .update(lab_session_id, data)
       // @ts-ignore
       .then((record: LabSessionsResponse) => {
         toast.success("Lab started");
+
         $sidebar_lab_session = record;
+
         lab_sessions.update((lab_sessions) => {
           return lab_sessions.map((lab_session) => {
             if (lab_session.id === record.id) {
@@ -81,12 +82,20 @@
         updateDataStores().catch((error) => {
           toast.error(error);
         });
-        $loadingLabs = $loadingLabs.filter((id) => id !== $sidebar_lab_session.id);
+        loadingLabs.update((labs) => {
+          labs.delete(lab_session_id);
+          return new Set(labs); // Required for Svelte's reactivity
+        });
       });
   }
 
   // TODO: add modal to confirm stop lab
-  async function stopLab() {
+  async function stopLab(lab_session_id: string) {
+    loadingLabs.update((labs) => {
+      labs.add(lab_session_id);
+      return new Set(labs); // Required for Svelte's reactivity
+    });
+
     const data: LabSessionsRecord = {
       clusterRunning: false,
       // @ts-ignore
@@ -94,8 +103,6 @@
       lab: $sidebar_lab.id,
       endTime: new Date().toISOString()
     };
-
-    $loadingLabs = $loadingLabs.concat($sidebar_lab_session.id);
 
     // update each exercise session to stop agentRunning = false
     $sidebar_exercise_sessions.forEach(async (sidebar_exercise_session) => {
@@ -105,7 +112,12 @@
         user: client.authStore.model?.id,
         exercise: sidebar_exercise_session.exercise
       };
-      $loadingExercises = $loadingExercises.concat(sidebar_exercise_session.id);
+
+      loadingExercises.update((exercises) => {
+        exercises.add(sidebar_exercise_session.id);
+        return new Set(exercises); // Required for Svelte's reactivity
+      });
+
       await client
         .collection("exercise_sessions")
         .update(sidebar_exercise_session.id, exercise_session_data)
@@ -133,7 +145,13 @@
           console.error(error);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== sidebar_exercise_session.id);
+          updateDataStores().catch((error) => {
+            toast.error(error);
+          });
+          loadingExercises.update((exercises) => {
+            exercises.delete(sidebar_exercise_session.id);
+            return new Set(exercises); // Required for Svelte's reactivity
+          });
         });
     });
 
@@ -143,7 +161,9 @@
       // @ts-ignore
       .then((record: LabSessionsResponse) => {
         toast.success("Lab stopped");
+
         $sidebar_lab_session = record;
+
         lab_sessions.update((lab_sessions) => {
           return lab_sessions.map((lab_session) => {
             if (lab_session.id === record.id) {
@@ -161,7 +181,10 @@
         updateDataStores().catch((error) => {
           toast.error(error);
         });
-        $loadingLabs = $loadingLabs.filter((id) => id !== $sidebar_lab_session.id);
+        loadingLabs.update((labs) => {
+          labs.delete(lab_session_id);
+          return new Set(labs); // Required for Svelte's reactivity
+        });
       });
   }
 </script>
@@ -181,9 +204,7 @@
           </h2>
         </div>
         <div
-          class="badge badge-outline {$sidebar_lab_session.clusterRunning
-            ? 'badge-success'
-            : ''}"
+          class="badge badge-outline {$sidebar_lab_session.clusterRunning ? 'badge-success' : ''}"
         >
           {#if $sidebar_lab_session.clusterRunning}
             <Play class="w-4 h-4 mr-1 inline-block" />
@@ -194,8 +215,11 @@
         </div>
         <div class="grid grid-cols-1 gap-2 mt-4">
           {#if !$sidebar_lab_session.clusterRunning}
-            <button class="btn btn-outline btn-success" on:click={() => startLab()}>
-              {#if $loadingLabs.includes($sidebar_lab_session.id)}
+            <button
+              class="btn btn-outline btn-success"
+              on:click={() => startLab($sidebar_lab_session.id)}
+            >
+              {#if $loadingLabs.has($sidebar_lab_session.id)}
                 <span class="loading loading-dots loading-md" />
               {:else}
                 <Play class="w-5 h-5 mr-2 inline-block" />
@@ -203,8 +227,11 @@
               {/if}
             </button>
           {:else}
-            <button class="btn btn-outline btn-error" on:click={() => stopLab()}>
-              {#if $loadingLabs.includes($sidebar_lab_session.id)}
+            <button
+              class="btn btn-outline btn-error"
+              on:click={() => stopLab($sidebar_lab_session.id)}
+            >
+              {#if $loadingLabs.has($sidebar_lab_session.id)}
                 <span class="loading loading-dots loading-md" />
               {:else}
                 <Pause class="w-5 h-5 mr-2 inline-block" />
