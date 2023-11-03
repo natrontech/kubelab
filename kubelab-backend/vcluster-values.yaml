@@ -7,6 +7,8 @@ sync:
     enabled: true
   hoststorageclasses:
     enabled: true
+  events:
+    enabled: false
 storage:
   persistence: false
 isolation:
