@@ -6,7 +6,7 @@
     LabSessionsResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_sessions, lab_sessions, updateDataStores } from "$lib/stores/data";
-  import { Pause, Play, TestTube2, X } from "lucide-svelte";
+  import { AlertTriangle, Pause, Play, TestTube2, X } from "lucide-svelte";
   import SvelteMarkdown from "svelte-markdown";
   import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
@@ -16,9 +16,11 @@
   import { client } from "$lib/pocketbase";
   import { sidebar_exercise_sessions, sidebar_lab, sidebar_lab_session } from "$lib/stores/sidebar";
   import Exercise from "../labs/Exercise.svelte";
+  import { Button, Modal } from "flowbite-svelte";
 
   let docs: string;
   export let drawerHidden = true;
+  let confirmation = false;
 
   async function getMarkdown() {
     fetch($sidebar_lab.docs)
@@ -227,17 +229,25 @@
               {/if}
             </button>
           {:else}
-            <button
-              class="btn btn-outline btn-error"
-              on:click={() => stopLab($sidebar_lab_session.id)}
-            >
-              {#if $loadingLabs.has($sidebar_lab_session.id)}
+            {#if $loadingLabs.has($sidebar_lab_session.id)}
+              <button class="btn btn-outline btn-disabled">
                 <span class="loading loading-dots loading-md" />
-              {:else}
+                Stopping lab
+              </button>
+            {:else if confirmation}
+              <button
+                class="btn btn-outline btn-warning"
+                on:click={() => stopLab($sidebar_lab_session.id)}
+              >
+                <AlertTriangle class="w-5 h-5 mr-2 inline-block" />
+                Are you sure?
+              </button>
+            {:else}
+              <button class="btn btn-outline btn-error" on:click={() => (confirmation = true)}>
                 <Pause class="w-5 h-5 mr-2 inline-block" />
                 Stop lab
-              {/if}
-            </button>
+              </button>
+            {/if}
           {/if}
         </div>
         <!-- svelte-ignore a11y-no-noninteractive-tabindex -->

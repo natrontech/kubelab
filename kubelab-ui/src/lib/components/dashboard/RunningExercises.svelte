@@ -18,6 +18,7 @@
   import { Pause, Terminal } from "lucide-svelte";
   import toast from "svelte-french-toast";
 
+
   let running_exercises: ExerciseSessionsResponse[] = $exercise_sessions.filter(
     (exercise_session) => exercise_session.agentRunning
   );

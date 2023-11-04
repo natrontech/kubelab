@@ -143,7 +143,7 @@
               });
           } else {
             let filteredText = filterDuplicateLines(text);
-            toast.error("❌ not completed: " + filteredText, {
+            toast.error("Not completed: " + filteredText, {
               style: "border: 1px solid #B22222; padding: 16px; color: #B22222;", // red-themed style
               iconTheme: {
                 primary: "#B22222",
