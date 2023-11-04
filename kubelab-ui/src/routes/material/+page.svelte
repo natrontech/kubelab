@@ -11,7 +11,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("/assets/slides_day_1-compressed.pdf")}
+          on:click={() => window.open("/assets/slides_day_1.pdf")}
         >
           <Download /> Download
         </button>
@@ -25,7 +25,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("/assets/slides_day_2-compressed.pdf")}
+          on:click={() => window.open("/assets/slides_day_2.pdf")}
         >
           <Download /> Download
         </button>
