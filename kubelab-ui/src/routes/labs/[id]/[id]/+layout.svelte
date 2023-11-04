@@ -50,6 +50,12 @@
     goto("/labs/" + lab_session_id + "/" + exercise_session_id);
   }
 
+  function filterDuplicateLines(text: any) {
+    const lines = text.split("\n"); // Split the text into lines
+    const uniqueLines = [...new Set(lines)]; // Filter out duplicate lines
+    return uniqueLines.join("\n").trim(); // Join the unique lines back into a single string
+  }
+
   async function handleCheckExercise() {
     // fetch get https://agentUrl/check
     // if 200, then exercise is completed
@@ -68,69 +74,85 @@
       client.authStore.model?.id;
 
     await fetch("https://" + agentUrl + "/check")
-      .then((response) => {
-        if (response.status === 200) {
-          client
-            .collection("exercise_sessions")
-            .update($exercise_session.id, {
-              endTime: new Date().toISOString(),
-              agentRunning: false
-            })
-            .then((record: any) => {
-              let duration =
-                new Date(record.endTime).getTime() - new Date(record.startTime).getTime();
-              // show in m and s
-              let diffString = Math.floor(duration / 1000 / 60) + "m ";
-              diffString += Math.floor((duration / 1000) % 60) + "s";
-              toast.success("Exercise completed in " + diffString);
-              exercise_session.set(record);
-
-              let labId = window.location.pathname.split("/")[2];
-
-              exercise_sessions.update((exercise_sessions) => {
-                return exercise_sessions.map((exercise_session) => {
-                  if (exercise_session.id === record.id) {
-                    return record;
+      .then((response) =>
+        response.text().then((text) => {
+          if (response.status === 200) {
+            client
+              .collection("exercise_sessions")
+              .update($exercise_session.id, {
+                endTime: new Date().toISOString(),
+                agentRunning: false
+              })
+              .then((record: any) => {
+                let duration =
+                  new Date(record.endTime).getTime() - new Date(record.startTime).getTime();
+                // show in m and s
+                let diffString = Math.floor(duration / 1000 / 60) + "m ";
+                diffString += Math.floor((duration / 1000) % 60) + "s";
+                toast.success("Exercise completed in " + diffString, {
+                  style: "border: 1px solid #008000; padding: 16px; color: #008000;", // green-themed style
+                  iconTheme: {
+                    primary: "#008000",
+                    secondary: "#F0FFF0" // light green background
                   }
-                  return exercise_session;
                 });
+
+                exercise_session.set(record);
+
+                let labId = window.location.pathname.split("/")[2];
+
+                exercise_sessions.update((exercise_sessions) => {
+                  return exercise_sessions.map((exercise_session) => {
+                    if (exercise_session.id === record.id) {
+                      return record;
+                    }
+                    return exercise_session;
+                  });
+                });
+
+                sidebar_exercise_sessions.update((exercise_sessions) => {
+                  return exercise_sessions.map((exercise_session) => {
+                    if (exercise_session.id === record.id) {
+                      return record;
+                    }
+                    return exercise_session;
+                  });
+                });
+
+                filterExercisesByLab(labId);
+
+                // make an entry in the exercise_session_logs collection
+
+                const exercise_session_log_data: ExerciseSessionLogsRecord = {
+                  // @ts-ignore
+                  user: client.authStore.model?.id,
+                  exercise_session: $exercise_session.id,
+                  type: ExerciseSessionLogsTypeOptions.end,
+                  timestamp: new Date().toISOString()
+                };
+
+                client
+                  .collection("exercise_session_logs")
+                  .create(exercise_session_log_data)
+                  .then((response) => {
+                    console.log(response);
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
               });
-
-              sidebar_exercise_sessions.update((exercise_sessions) => {
-                return exercise_sessions.map((exercise_session) => {
-                  if (exercise_session.id === record.id) {
-                    return record;
-                  }
-                  return exercise_session;
-                });
-              });
-
-              filterExercisesByLab(labId);
-
-              // make an entry in the exercise_session_logs collection
-
-              const exercise_session_log_data: ExerciseSessionLogsRecord = {
-                // @ts-ignore
-                user: client.authStore.model?.id,
-                exercise_session: $exercise_session.id,
-                type: ExerciseSessionLogsTypeOptions.end,
-                timestamp: new Date().toISOString()
-              };
-
-              client
-                .collection("exercise_session_logs")
-                .create(exercise_session_log_data)
-                .then((response) => {
-                  console.log(response);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
+          } else {
+            let filteredText = filterDuplicateLines(text);
+            toast.error("❌ not completed: " + filteredText, {
+              style: "border: 1px solid #B22222; padding: 16px; color: #B22222;", // red-themed style
+              iconTheme: {
+                primary: "#B22222",
+                secondary: "#FFE4E1" // light red background
+              }
             });
-        } else {
-          toast.error("Exercise not completed");
-        }
-      })
+          }
+        })
+      )
       .catch((error) => {
         console.error(error);
         toast.error("Exercise not completed");
