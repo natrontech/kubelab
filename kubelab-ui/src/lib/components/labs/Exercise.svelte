@@ -23,12 +23,13 @@
     sidebar_lab_session
   } from "$lib/stores/sidebar";
   import { getDeltaTime } from "$lib/utils/time";
-  import { CheckCircle, Info, MoreHorizontal, Pause, Play, Terminal } from "lucide-svelte";
+  import { AlertTriangle, CheckCircle, Info, MoreHorizontal, Pause, Play, Terminal } from "lucide-svelte";
   import { onMount } from "svelte";
   import toast from "svelte-french-toast";
   export let this_exercise_session: ExerciseSessionsResponse;
   export let index: number;
   let this_exercise: ExercisesResponse;
+  let confirmation = false;
 
   onMount(() => {
     let exercise = $sidebar_exercises.find(
@@ -150,9 +151,7 @@
           client
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
-            .then((response) => {
-
-            })
+            .then((response) => {})
             .catch((error) => {
               console.log(error);
             });
@@ -185,9 +184,7 @@
               <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
                 <li>
                   <!-- exercise is starting... -->
-                  <button
-                    class="border-2 "
-                  >
+                  <button class="border-2 ">
                     <Info class="w-4 h-4 mr-1 inline-block" />
                     Starting Exercise</button
                   >
@@ -216,13 +213,23 @@
                 </li>
                 {#if this_exercise_session.agentRunning}
                   <li>
+                    {#if confirmation}
                     <button
-                      class="border-2 text-error border-error hover:bg-error hover:text-primary"
+                    class="border-2 text-warning border-warning hover:bg-warning hover:text-primary"
                       on:click={() => stopExercise(this_exercise.id)}
                     >
-                      <Pause class="w-4 h-4 mr-1 inline-block" />
-                      Stop Exercise</button
+                      <AlertTriangle class="w-5 h-5 mr-2 inline-block" />
+                      Are you sure?
+                    </button>
+                    {:else}
+                    <div
+                      class="border-2 text-error border-error hover:bg-error hover:text-primary"
+                      on:click={() => (confirmation = true)}
                     >
+                      <Pause class="w-4 h-4 mr-1 inline-block" />
+                      Stop Exercise</div
+                    >
+                    {/if}
                   </li>
                 {:else}
                   <li>

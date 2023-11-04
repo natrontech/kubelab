@@ -10,7 +10,7 @@
     accept: "image/*",
     multiple: false,
     placeholder: "Choose file",
-    class: "w-64 dark:text-white",
+    class: "w-64 dark:text-white border-none",
     style: "width: 100%;"
   };
 
