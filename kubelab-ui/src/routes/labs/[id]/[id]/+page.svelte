@@ -329,26 +329,25 @@
                 : ''}"
             >
               <div class="text-center">
-                <h1 class="text-4xl font-bold">
-                  {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
-                </h1>
-                <p class="text-xl">
-                  {checkIfExerciseIsDone($exercise.id)
-                    ? "Click the button below to restart the exercise. You must finish it again!"
-                    : "Click the button below to start the exercise"}
-                </p>
-                <button
-                  class="btn {checkIfExerciseIsDone($exercise.id)
-                    ? 'btn-warning'
-                    : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
-                  on:click={() => handleStartExercise()}
-                >
-                  {#if $loadingExercises.has($exercise.id)}
-                    <span class="loading loading-dots loading-md" /> starting...
-                  {:else}
-                    <Play /> Start Terminal
-                  {/if}
-                </button>
+                {#if checkIfExerciseIsDone($exercise.id)}
+                  <h1 class="text-4xl font-bold">
+                    <CheckCircle class="inline-block w-12 h-12" />
+                    {checkIfExerciseIsDone($exercise.id) ? "Exercise done" : "Exercise not started"}
+                  </h1>
+                {:else}
+                  <button
+                    class="btn {checkIfExerciseIsDone($exercise.id)
+                      ? 'btn-warning'
+                      : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
+                    on:click={() => handleStartExercise()}
+                  >
+                    {#if $loadingExercises.has($exercise.id)}
+                      <span class="loading loading-dots loading-md" /> starting...
+                    {:else}
+                      <Play /> Start Terminal
+                    {/if}
+                  </button>
+                {/if}
               </div>
             </div>
           {/key}
