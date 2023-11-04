@@ -33,3 +33,4 @@ dist/
 .ash_history
 /docker-compose.override.yml
 _temp/
+local_userlist_november.csv
