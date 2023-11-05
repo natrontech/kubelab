@@ -39,6 +39,7 @@
     type NotificationsRecord,
     NotificationsTypeOptions
   } from "$lib/pocketbase/generated-types.js";
+    import { Tooltip } from "flowbite-svelte";
 
   $metadata.title = "Exercises";
 
@@ -359,30 +360,32 @@
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          <button class="btn" on:click={() => handleOpenVSCode()}>
+          <button class="btn btn-info" on:click={() => handleOpenVSCode()}>
             <FileCode2 class="inline-block" />
-            Code Editor
           </button>
+          <Tooltip>Open Code Editor</Tooltip>
 
           <button class="btn btn-error" on:click={() => handleStopExercise()}>
             <StopCircle class="inline-block" />
           </button>
+          <Tooltip>Stop Exercise</Tooltip>
 
           <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
             <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
           </button>
+          <Tooltip>Reset Exercise</Tooltip>
           {#if client.authStore.model?.workshop == true}
             <button
-              class="btn btn-neutral dark:hover:text-base-200 {helpRequested
+              class="btn btn-accent dark:text-black {helpRequested
                 ? 'btn-disabled'
-                : 'btn-primary'}"
+                : 'btn-accent'}"
               on:click={() => {
                 askForHelp();
               }}
             >
-              <HelpCircle class="inline-block mr-2" />
-              Call for Support
+              <HelpCircle class="inline-block" />
             </button>
+            <Tooltip>Call for Help</Tooltip>
           {/if}
         {/if}
       </div>
