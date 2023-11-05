@@ -51,15 +51,16 @@ func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBas
 	}
 
 	deploymentParams := k8s.DeploymentParams{
-		Name:       "kubelab-agent-" + exercise.Id,
-		Namespace:  helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
-		Image:      env.Config.KubelabImage,
-		Replicas:   1,
-		Kubeconfig: string(secret.Data["config"]),
-		Bootstrap:  string(bootstrapBody),
-		Check:      string(checkBody),
-		Host:       env.Config.AllowedHosts,
-		UserRecord: user,
+		Name:           "kubelab-agent-" + exercise.Id,
+		Namespace:      helm.GetNamespaceName(exercise.GetString("lab"), e.Record.GetString("user")),
+		Image:          env.Config.KubelabImage,
+		Replicas:       1,
+		Kubeconfig:     string(secret.Data["config"]),
+		Bootstrap:      string(bootstrapBody),
+		Check:          string(checkBody),
+		Host:           env.Config.AllowedHosts,
+		UserRecord:     user,
+		CodeServerPath: "kubelab-" + exercise.GetString("lab") + "-" + exercise.Id + "-" + e.Record.GetString("user"),
 	}
 
 	// create a new deployment
@@ -90,7 +91,15 @@ func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBas
 		UserRecord:  user,
 	}
 
-	// create a new ingress
+	// create a first ingress
+	ingressParams.UseFirstRule = true
+	_, err = k8s.CreateIngress(ingressParams)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// create a second ingress
+	ingressParams.UseFirstRule = false
 	_, err = k8s.CreateIngress(ingressParams)
 	if err != nil {
 		log.Println(err)

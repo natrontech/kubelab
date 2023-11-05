@@ -4,6 +4,7 @@
   import {
     ArrowLeft,
     CheckCircle,
+    FileCode2,
     HelpCircle,
     LifeBuoy,
     RotateCw,
@@ -262,6 +263,27 @@
       });
   }
 
+  function handleOpenVSCode() {
+    // open target blank new tab with the url
+    let lab_session_id = data.pathname.split("/")[2];
+    let exercise_id = window.location.pathname.split("/")[3];
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
+    console.log(agentHost);
+    let agentUrl =
+      "kubelab-" +
+      lab_session_id +
+      "-" +
+      exercise_id +
+      "-" +
+      client.authStore.model?.id +
+      "." +
+      agentHost;
+
+    // open new tab with agentUrl
+
+    window.open("https://" + agentUrl, "_blank");
+  }
+
   function isCurrentExercise(exercise_id: string) {
     return $exercise.id === exercise_id;
   }
@@ -337,22 +359,17 @@
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          <button class="btn  btn-error" on:click={() => handleStopExercise()}>
-            <StopCircle class="inline-block mr-2" />
-            Stop
+          <button class="btn" on:click={() => handleOpenVSCode()}>
+            <FileCode2 class="inline-block" />
+            Code Editor
           </button>
 
-          <button
-            class="btn  {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
-            on:click={() => handleRestartExercise()}
-          >
-            {#if restartLoading}
-              <RotateCw class="inline-block mr-2 animate-spin" />
-              Reset Exercise
-            {:else}
-              <RotateCw class="inline-block mr-2" />
-              Reset Exercise
-            {/if}
+          <button class="btn btn-error" on:click={() => handleStopExercise()}>
+            <StopCircle class="inline-block" />
+          </button>
+
+          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
+            <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
           </button>
           {#if client.authStore.model?.workshop == true}
             <button

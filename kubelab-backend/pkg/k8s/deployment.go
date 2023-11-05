@@ -15,15 +15,16 @@ import (
 )
 
 type DeploymentParams struct {
-	Name       string
-	Namespace  string
-	Image      string
-	Replicas   int32
-	Kubeconfig string
-	Bootstrap  string
-	Check      string
-	Host       string
-	UserRecord *models.Record
+	Name           string
+	Namespace      string
+	Image          string
+	Replicas       int32
+	Kubeconfig     string
+	Bootstrap      string
+	Check          string
+	Host           string
+	UserRecord     *models.Record
+	CodeServerPath string
 }
 
 func CreateDeployment(params DeploymentParams) (*appsv1.Deployment, error) {
@@ -35,7 +36,7 @@ func CreateDeployment(params DeploymentParams) (*appsv1.Deployment, error) {
 		"bootstrap.sh": params.Bootstrap,
 	})
 
-	deployment := constructDeployment(params.Name, params.Namespace, params.Image, params.Replicas, params.Host, params.UserRecord)
+	deployment := constructDeployment(params.Name, params.Namespace, params.Image, params.Replicas, params.Host, params.UserRecord, params.CodeServerPath)
 	deployed, err := Clientset.AppsV1().Deployments(params.Namespace).Create(Ctx, deployment, metav1.CreateOptions{})
 	if err != nil {
 		log.Println(err)
@@ -53,7 +54,7 @@ func createConfigMap(namespace, name string, data map[string]string) {
 	}
 }
 
-func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record) *appsv1.Deployment {
+func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record, codeServerPath string) *appsv1.Deployment {
 	scriptVolumeName := "scripts-" + name
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -165,6 +166,14 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 								{
 									Name:  "DEFAULT_WORKSPACE",
 									Value: "/home/kubelab-agent",
+								},
+								// {
+								// 	Name:  "PROXY_DOMAIN",
+								// 	Value: codeServerPath + "." + host,
+								// },
+								{
+									Name:  "CS_DISABLE_PROXY",
+									Value: "true",
 								},
 							},
 							Ports: []v1.ContainerPort{
