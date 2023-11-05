@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hostpath-pv
+  namespace: kubelab
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi # Adjust size as needed
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/kubelab" # Directory on the host
