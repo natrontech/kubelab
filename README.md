@@ -95,7 +95,7 @@ KubeLab is deployed in a Kubernetes cluster. Please check out the example [deplo
 The following environment variables are required for KubeLab to function properly:
 
 | Variable Name | Default | Description |
-| --- | --- |
+| --- | --- | --- |
 | `LOCAL` | `false` | Set to `true` if you're running KubeLab locally. It will take your local kubeconfig under .kube/config |
 | `KUBELAB_AGENT_IMAGE` | `ghcr.io/natrontech/kubelab-agent:latest` | The image for the agent |
 | `CODE_SERVER_IMAGE` | `ghcr.io/natrontech/kubelab-code-server:latest` | The image for the code-server |
