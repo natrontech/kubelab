@@ -365,15 +365,6 @@
           </button>
           <Tooltip>Open Code Editor</Tooltip>
 
-          <button class="btn btn-error" on:click={() => handleStopExercise()}>
-            <StopCircle class="inline-block" />
-          </button>
-          <Tooltip>Stop Exercise</Tooltip>
-
-          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
-            <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
-          </button>
-          <Tooltip>Reset Exercise</Tooltip>
           {#if client.authStore.model?.workshop == true}
             <button
               class="btn btn-accent dark:text-black {helpRequested
@@ -387,6 +378,16 @@
             </button>
             <Tooltip>Call for Help</Tooltip>
           {/if}
+
+          <button class="btn btn-error" on:click={() => handleStopExercise()}>
+            <StopCircle class="inline-block" />
+          </button>
+          <Tooltip>Stop Exercise</Tooltip>
+
+          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
+            <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
+          </button>
+          <Tooltip>Reset Exercise</Tooltip>
         {/if}
       </div>
       <div class="">
