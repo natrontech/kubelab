@@ -18,7 +18,7 @@
     TableHeadCell
   } from "flowbite-svelte";
   import { CheckCircle, HelpCircle, Play } from "lucide-svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import toast from "svelte-french-toast";
 
   interface Activity {
@@ -286,13 +286,6 @@
     await getAllExerciseSessions();
     await getCompany();
 
-    // set an interval to get the exercise_session_logs every 5 seconds
-    setInterval(async () => {
-      await getExerciseSessionLogs();
-      await getNotifications();
-      await getAllExerciseSessions();
-    }, 10000);
-
     // watch for new notifications and post them to the notifications array
     client.collection("notifications").subscribe("*", function (e) {
       if (e.action === "create") {
@@ -303,11 +296,6 @@
         });
       }
     });
-  });
-
-  onDestroy(() => {
-    // clear the interval when the component is destroyed
-    setInterval(() => {});
   });
 
   function parseLogToActivity(log: any) {
