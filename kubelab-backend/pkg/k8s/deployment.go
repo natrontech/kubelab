@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/natrontech/kubelab/pkg/env"
 	"github.com/natrontech/kubelab/pkg/util"
 	"github.com/pocketbase/pocketbase/models"
 	appsv1 "k8s.io/api/apps/v1"
@@ -151,7 +152,7 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 						},
 						{
 							Name:  "code-server",
-							Image: "lscr.io/linuxserver/code-server:latest",
+							Image: env.Config.CodeServerImage,
 							Env: []v1.EnvVar{
 								{
 									Name:  "PUID",
