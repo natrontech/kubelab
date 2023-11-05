@@ -15,7 +15,7 @@ type config struct {
 	IngressClass           string `env:"AGENT_INGRESS_CLASS" envDefault:"nginx"`
 	PodsLimit              string `env:"PODS_LIMIT" envDefault:"70"`
 	StorageLimit           string `env:"STORAGE_LIMIT" envDefault:"50Gi"`
-	VClusterChartVersion   string `env:"VCLUSTER_CHART_VERSION" envDefault:"0.15.5"`
+	VClusterChartVersion   string `env:"VCLUSTER_CHART_VERSION" envDefault:"0.16.4"`
 	VClusterValuesFilePath string `env:"VCLUSTER_VALUES_FILE_PATH" envDefault:"./vcluster-values.yaml"`
 }
 

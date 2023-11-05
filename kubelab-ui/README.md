@@ -13,6 +13,7 @@ The above produces `build` output directory which is then used by PocketBase to 
 
 ```bash
 # start the backend, if not already running ...
+source .env
 npm run dev:backend
 # and then start the frontend ...
 npm run dev
