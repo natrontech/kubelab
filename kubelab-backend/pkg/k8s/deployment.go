@@ -5,23 +5,26 @@ import (
 	"strings"
 	"time"
 
+	"github.com/natrontech/kubelab/pkg/env"
 	"github.com/natrontech/kubelab/pkg/util"
 	"github.com/pocketbase/pocketbase/models"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
 )
 
 type DeploymentParams struct {
-	Name       string
-	Namespace  string
-	Image      string
-	Replicas   int32
-	Kubeconfig string
-	Bootstrap  string
-	Check      string
-	Host       string
-	UserRecord *models.Record
+	Name           string
+	Namespace      string
+	Image          string
+	Replicas       int32
+	Kubeconfig     string
+	Bootstrap      string
+	Check          string
+	Host           string
+	UserRecord     *models.Record
+	CodeServerPath string
 }
 
 func CreateDeployment(params DeploymentParams) (*appsv1.Deployment, error) {
@@ -33,7 +36,7 @@ func CreateDeployment(params DeploymentParams) (*appsv1.Deployment, error) {
 		"bootstrap.sh": params.Bootstrap,
 	})
 
-	deployment := constructDeployment(params.Name, params.Namespace, params.Image, params.Replicas, params.Host, params.UserRecord)
+	deployment := constructDeployment(params.Name, params.Namespace, params.Image, params.Replicas, params.Host, params.UserRecord, params.CodeServerPath)
 	deployed, err := Clientset.AppsV1().Deployments(params.Namespace).Create(Ctx, deployment, metav1.CreateOptions{})
 	if err != nil {
 		log.Println(err)
@@ -51,7 +54,7 @@ func createConfigMap(namespace, name string, data map[string]string) {
 	}
 }
 
-func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record) *appsv1.Deployment {
+func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record, codeServerPath string) *appsv1.Deployment {
 	scriptVolumeName := "scripts-" + name
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -83,7 +86,7 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 						{
 							Name:    "init-copy-chmod-chown",
 							Image:   "busybox",
-							Command: []string{"sh", "-c", "cp /config/config /config-writable/kubeconfig && chmod 0600 /config-writable/kubeconfig && chown 1001:1001 /config-writable/kubeconfig && cp /scripts/* /scripts-writable && chmod 0700 /scripts-writable/* && chown 1001:1001 /scripts-writable/*"},
+							Command: []string{"sh", "-c", "cp /config/config /config-writable/kubeconfig && chmod 0600 /config-writable/kubeconfig && chown 1001:1001 /config-writable/kubeconfig && cp /scripts-source/* /scripts-writable && chmod 0700 /scripts-writable/* && chown 1001:1001 /scripts-writable/*"},
 							VolumeMounts: []v1.VolumeMount{
 								{
 									Name:      "kubeconfig",
@@ -94,12 +97,27 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 									MountPath: "/config-writable",
 								},
 								{
-									Name:      scriptVolumeName,
-									MountPath: "/scripts",
+									Name:      scriptVolumeName,  // The name of the ConfigMap volume
+									MountPath: "/scripts-source", // Source directory for the scripts
 								},
 								{
-									Name:      scriptVolumeName + "-writable",
+									Name:      scriptVolumeName + "-writable", // The writable directory
 									MountPath: "/scripts-writable",
+								},
+							},
+						},
+						{
+							Name:    "init-kubelab-agent-home",
+							Image:   image, // using the same image as kubelab-container
+							Command: []string{"sh", "-c", "mkdir -p /shared-kubelab-agent-home && cp -r /home/kubelab-agent/. /shared-kubelab-agent-home/"},
+							SecurityContext: &v1.SecurityContext{
+								RunAsUser:  pointer.Int64(1001),
+								RunAsGroup: pointer.Int64(1001),
+							},
+							VolumeMounts: []v1.VolumeMount{
+								{
+									Name:      "kubelab-agent-home",
+									MountPath: "/shared-kubelab-agent-home",
 								},
 							},
 						},
@@ -124,8 +142,60 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 								},
 								{
 									Name:      scriptVolumeName + "-writable",
-									MountPath: "/home/kubelab-agent/.kubelab",
+									MountPath: "/scripts",
 									ReadOnly:  true,
+								},
+								{
+									Name:      "kubelab-agent-home",
+									MountPath: "/home/kubelab-agent",
+								},
+							},
+						},
+						{
+							Name:  "code-server",
+							Image: env.Config.CodeServerImage,
+							Env: []v1.EnvVar{
+								{
+									Name:  "PUID",
+									Value: "1001",
+								},
+								{
+									Name:  "PGID",
+									Value: "1001",
+								},
+								{
+									Name:  "DEFAULT_WORKSPACE",
+									Value: "/home/kubelab-agent",
+								},
+								// {
+								// 	Name:  "PROXY_DOMAIN",
+								// 	Value: codeServerPath + "." + host,
+								// },
+								{
+									Name:  "CS_DISABLE_PROXY",
+									Value: "true",
+								},
+							},
+							Ports: []v1.ContainerPort{
+								{
+									ContainerPort: 8443,
+								},
+							},
+							VolumeMounts: []v1.VolumeMount{
+								{
+									Name:      "kubeconfig-writable",
+									MountPath: "/home/kubelab-agent/.kube/config",
+									SubPath:   "kubeconfig",
+									ReadOnly:  true,
+								},
+								{
+									Name:      scriptVolumeName + "-writable",
+									MountPath: "/scripts",
+									ReadOnly:  true,
+								},
+								{
+									Name:      "kubelab-agent-home",
+									MountPath: "/home/kubelab-agent",
 								},
 							},
 						},
@@ -159,6 +229,12 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 						},
 						{
 							Name: scriptVolumeName + "-writable",
+							VolumeSource: v1.VolumeSource{
+								EmptyDir: &v1.EmptyDirVolumeSource{},
+							},
+						},
+						{
+							Name: "kubelab-agent-home",
 							VolumeSource: v1.VolumeSource{
 								EmptyDir: &v1.EmptyDirVolumeSource{},
 							},

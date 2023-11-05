@@ -4,6 +4,7 @@
   import {
     ArrowLeft,
     CheckCircle,
+    FileCode2,
     HelpCircle,
     LifeBuoy,
     RotateCw,
@@ -38,6 +39,7 @@
     type NotificationsRecord,
     NotificationsTypeOptions
   } from "$lib/pocketbase/generated-types.js";
+    import { Tooltip } from "flowbite-svelte";
 
   $metadata.title = "Exercises";
 
@@ -262,6 +264,27 @@
       });
   }
 
+  function handleOpenVSCode() {
+    // open target blank new tab with the url
+    let lab_session_id = data.pathname.split("/")[2];
+    let exercise_id = window.location.pathname.split("/")[3];
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
+    console.log(agentHost);
+    let agentUrl =
+      "kubelab-" +
+      lab_session_id +
+      "-" +
+      exercise_id +
+      "-" +
+      client.authStore.model?.id +
+      "." +
+      agentHost;
+
+    // open new tab with agentUrl
+
+    window.open("https://" + agentUrl, "_blank");
+  }
+
   function isCurrentExercise(exercise_id: string) {
     return $exercise.id === exercise_id;
   }
@@ -337,36 +360,34 @@
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          <button class="btn  btn-error" on:click={() => handleStopExercise()}>
-            <StopCircle class="inline-block mr-2" />
-            Stop
+          <button class="btn btn-info" on:click={() => handleOpenVSCode()}>
+            <FileCode2 class="inline-block" />
           </button>
+          <Tooltip>Open Code Editor</Tooltip>
 
-          <button
-            class="btn  {!$exercise_session.agentRunning ? 'btn-disabled' : 'btn-warning'}"
-            on:click={() => handleRestartExercise()}
-          >
-            {#if restartLoading}
-              <RotateCw class="inline-block mr-2 animate-spin" />
-              Reset Exercise
-            {:else}
-              <RotateCw class="inline-block mr-2" />
-              Reset Exercise
-            {/if}
-          </button>
           {#if client.authStore.model?.workshop == true}
             <button
-              class="btn btn-neutral dark:hover:text-base-200 {helpRequested
+              class="btn btn-accent dark:text-black {helpRequested
                 ? 'btn-disabled'
-                : 'btn-primary'}"
+                : 'btn-accent'}"
               on:click={() => {
                 askForHelp();
               }}
             >
-              <HelpCircle class="inline-block mr-2" />
-              Call for Support
+              <HelpCircle class="inline-block" />
             </button>
+            <Tooltip>Call for Help</Tooltip>
           {/if}
+
+          <button class="btn btn-error" on:click={() => handleStopExercise()}>
+            <StopCircle class="inline-block" />
+          </button>
+          <Tooltip>Stop Exercise</Tooltip>
+
+          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
+            <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
+          </button>
+          <Tooltip>Reset Exercise</Tooltip>
         {/if}
       </div>
       <div class="">

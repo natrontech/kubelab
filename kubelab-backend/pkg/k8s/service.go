@@ -32,7 +32,12 @@ func CreateService(params ServiceParams) (*v1.Service, error) {
 			},
 			Ports: []v1.ServicePort{
 				{
+					Name: "main-port", // You can name this appropriately
 					Port: params.Port,
+				},
+				{
+					Name: "code-server-port", // Name for the code-server port
+					Port: 8443,               // Assuming code-server runs on port 8080
 				},
 			},
 			Type: v1.ServiceTypeClusterIP,

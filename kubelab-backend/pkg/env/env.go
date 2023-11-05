@@ -9,6 +9,7 @@ import (
 type config struct {
 	Local                  bool   `env:"LOCAL"`
 	KubelabImage           string `env:"KUBELAB_AGENT_IMAGE" envDefault:"ghcr.io/natrontech/kubelab-agent:latest"`
+	CodeServerImage        string `env:"CODE_SERVER_IMAGE" envDefault:"ghcr.io/natrontech/kubelab-code-server:latest"`
 	AllowedHosts           string `env:"ALLOWED_HOSTS" envDefault:"*"`
 	ResourceName           string `env:"RESOURCE_NAME" envDefault:"kubelab"`
 	IngressClass           string `env:"AGENT_INGRESS_CLASS" envDefault:"nginx"`

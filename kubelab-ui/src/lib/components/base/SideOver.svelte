@@ -291,7 +291,7 @@
       </div>
       {#key $sidebar_exercise_sessions}
         <div
-          class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none "
+          class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none pb-4"
         >
           {#each $sidebar_exercise_sessions as exercise_session, idx}
             <Exercise this_exercise_session={exercise_session} index={idx} />
