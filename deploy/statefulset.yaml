@@ -22,24 +22,32 @@ spec:
         ports:
         - containerPort: 8090
         volumeMounts:
-        - name: pb-data
+        - name: pb-data-hostpath
           mountPath: /app/kubelab/pb_data
         envFrom:
         - configMapRef:
             name: kubelab-config
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "16Gi"
+            cpu: "4"
           limits:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "16Gi"
+            cpu: "8"
+      nodeSelector:
+        hostpath-node: "true"
+      volumes:
+      - name: pb-data-hostpath
+        persistentVolumeClaim:
+          claimName: hostpath-pvc
   volumeClaimTemplates:
   - metadata:
-      name: pb-data
+      name: pb-data-hostpath
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 10Gi
-      storageClassName: nfs-data
+      storageClassName: manual
+      volumeMode: Filesystem
+      volumeName: hostpath-pv
