@@ -20,7 +20,8 @@ export const exercise_session: Writable<ExerciseSessionsResponse> =
     writable<ExerciseSessionsResponse>();
 export const exercise_sessions: Writable<ExerciseSessionsResponse[]> =
     writable<ExerciseSessionsResponse[]>();
-export const exercise_session_logs: Writable<ExerciseSessionLogsResponse[]> = writable<ExerciseSessionLogsResponse[]>();
+export const exercise_session_logs: Writable<ExerciseSessionLogsResponse[]> =
+    writable<ExerciseSessionLogsResponse[]>();
 export const companies: Writable<CompaniesResponse[]> = writable<CompaniesResponse[]>();
 
 export async function getLabSession(labId: string) {
@@ -106,7 +107,9 @@ export async function updateDataStores(filter: UpdateFilter = { filter: UpdateFi
     // get labs and set labs store
     await client
         .collection("labs")
-        .getFullList()
+        .getFullList({
+            sort: "title"
+        })
         .then((response: unknown) => {
             labs.set(response as LabsResponse[]);
             return response;
