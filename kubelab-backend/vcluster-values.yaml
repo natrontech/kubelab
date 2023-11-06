@@ -12,7 +12,7 @@ sync:
 storage:
   persistence: false
 isolation:
-  enabled: true
+  enabled: false
   podSecurityStandard: baseline
   nodeProxyPermission:
     enabled: false
