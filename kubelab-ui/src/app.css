@@ -30,3 +30,18 @@ h3 {
 .btn {
     @apply border-2;
 }
+
+.splitpanes__splitter {
+	background-color: darkgray !important;
+	position: relative;
+    opacity: 0;
+}
+
+
+.splitpanes--horizontal > .splitpanes__splitter {
+    border-top: none !important;
+}
+
+.splitpanes--vertical > .splitpanes__splitter {
+    border-left: none !important;
+}
