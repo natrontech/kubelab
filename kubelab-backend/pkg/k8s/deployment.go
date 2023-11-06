@@ -138,7 +138,6 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 									Name:      "kubeconfig-writable",
 									MountPath: "/home/kubelab-agent/.kube/config",
 									SubPath:   "kubeconfig",
-									ReadOnly:  true,
 								},
 								{
 									Name:      scriptVolumeName + "-writable",
@@ -186,7 +185,6 @@ func constructDeployment(name, namespace, image string, replicas int32, host str
 									Name:      "kubeconfig-writable",
 									MountPath: "/config/.kube/config",
 									SubPath:   "kubeconfig",
-									ReadOnly:  true,
 								},
 								{
 									Name:      scriptVolumeName + "-writable",
