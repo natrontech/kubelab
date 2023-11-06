@@ -1,7 +1,7 @@
 <script lang="ts">
     import { client } from "$lib/pocketbase";
     import { avatarUrl } from "$lib/stores/data";
-  import { Label, Fileupload, Button } from "flowbite-svelte";
+  import { Fileupload, Button, Label } from "flowbite-svelte";
     import toast from "svelte-french-toast";
 
   let fileuploadprops = {
@@ -16,6 +16,11 @@
 
   async function updateProfile() {
     let fileupload: HTMLInputElement | null = document.getElementById("user_avatar") as HTMLInputElement;
+
+    if (!fileupload.files?.length) {
+      toast.error("No file selected");
+      return;
+    }
 
     if (fileupload && fileupload.files && fileupload.files.length > 0) {
       let file: File = fileupload.files[0];
@@ -42,8 +47,8 @@
         // update the avatarUrl
         $avatarUrl = "/api/files/" + client.authStore.model?.collectionId + "/" + client.authStore.model?.id + "/" + client.authStore.model?.avatar;
 
-      } catch (error) {
-        console.error("Error uploading file:", error);
+      } catch (error: any) {
+        toast.error(error.message);
       }
     }
   }
@@ -69,6 +74,7 @@
     </div>
   </div>
   <div class="flex flex-row items-center">
+    <Label for="user_avatar" class="mr-4">Max 5MB</Label>
     <Fileupload {...fileuploadprops} />
     <Button class="btn btn-neutral" on:click={updateProfile}>Upload</Button>
   </div>
