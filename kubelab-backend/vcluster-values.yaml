@@ -9,11 +9,13 @@ sync:
     enabled: true
   events:
     enabled: false
+vcluster:
+  image: rancher/k3s:v1.27.7-k3s1
 storage:
   persistence: false
 isolation:
-  enabled: false
-  podSecurityStandard: baseline
+  enabled: true
+  podSecurityStandard: privileged
   nodeProxyPermission:
     enabled: false
   resourceQuota:
