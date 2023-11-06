@@ -154,6 +154,7 @@
             exercises.delete(sidebar_exercise_session.id);
             return new Set(exercises); // Required for Svelte's reactivity
           });
+          confirmation = false;
         });
     });
 

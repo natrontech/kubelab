@@ -25,6 +25,7 @@
   import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
   import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
+  import ListComponent from "$lib/components/markdown/ListComponent.svelte";
   import horizontalView from "$lib/stores/tableView";
   import { loadingExercises } from "$lib/stores/loading";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
@@ -199,7 +200,8 @@
                   renderers={{
                     codespan: CodeSpanComponent,
                     code: CodeComponent,
-                    link: LinkComponent
+                    link: LinkComponent,
+                    list: ListComponent
                   }}
                 />
               {/key}
@@ -225,7 +227,8 @@
                       renderers={{
                         codespan: CodeSpanComponent,
                         code: CodeComponent,
-                        link: LinkComponent
+                        link: LinkComponent,
+                        list: ListComponent
                       }}
                     />
                   </form>
@@ -256,7 +259,8 @@
                       renderers={{
                         codespan: CodeSpanComponent,
                         code: CodeComponent,
-                        link: LinkComponent
+                        link: LinkComponent,
+                        list: ListComponent
                       }}
                     />
                   </form>
@@ -365,7 +369,8 @@
                   renderers={{
                     codespan: CodeSpanComponent,
                     code: CodeComponent,
-                    link: LinkComponent
+                    link: LinkComponent,
+                    list: ListComponent
                   }}
                 />
               {/key}
@@ -391,7 +396,8 @@
                       renderers={{
                         codespan: CodeSpanComponent,
                         code: CodeComponent,
-                        link: LinkComponent
+                        link: LinkComponent,
+                        list: ListComponent
                       }}
                     />
                   </form>
@@ -421,7 +427,8 @@
                       renderers={{
                         codespan: CodeSpanComponent,
                         code: CodeComponent,
-                        link: LinkComponent
+                        link: LinkComponent,
+                        list: ListComponent
                       }}
                     />
                     <div class="modal-action">

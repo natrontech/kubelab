@@ -92,6 +92,7 @@
             exercises.delete(exercise_id);
             return new Set(exercises); // Required for Svelte's reactivity
           });
+          confirmation = false;
         });
     }
   }
