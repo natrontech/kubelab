@@ -214,11 +214,11 @@
 {#key ($page.params, $loadingExercises)}
   {#if $horizontalView}
     <Splitpanes horizontal class="p-2 mt-2 pb-2">
-      <Pane class=" rounded-t-lg">
+      <Pane class=" rounded-lg">
         <Splitpanes>
           <Pane class="relative">
             <div
-              class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
+              class="py-6 px-8 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
             >
               {#key $page.params}
                 <SvelteMarkdown
@@ -296,7 +296,7 @@
           </Pane>
         </Splitpanes>
       </Pane>
-      <Pane bind:size={$terminal_size.height} class="rounded-b-lg">
+      <Pane bind:size={$terminal_size.height} class="rounded-lg">
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
@@ -310,7 +310,7 @@
                   src={codeUrl}
                   on:load={() => handleIframeLoad()}
                   title="Code Editor"
-                  class=" p-2 w-full h-full  bg-transparent"
+                  class="w-full h-full  bg-transparent"
                 />
               {:else}
                 <Desktop {Console} />
@@ -355,23 +355,22 @@
     </Splitpanes>
   {:else}
     <Splitpanes class="p-2 mt-2">
-      <Pane bind:size={$terminal_size.height} class="rounded-l-lg">
+      <Pane bind:size={$terminal_size.height} class="rounded-lg">
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
               {#if $codeView}
                 {#if $loadingCodeEditor}
-                  <span class="loading loading-dots loading-lg" />
-                {/if}
-                {#if $loadingCodeEditor}
-                  <span class="loading loading-dots loading-lg" />
+                  <div class="flex justify-center items-center h-full dark:bg-neutral">
+                    <span class="loading loading-dots loading-lg" />
+                  </div>
                 {/if}
                 {#key ($page.params, codeUrl)}
                   <iframe
                     src={codeUrl}
                     on:load={() => handleIframeLoad()}
                     title="Code Editor"
-                    class=" p-2 w-full h-full  bg-transparent"
+                    class="w-full h-full  bg-transparent"
                   />
                 {/key}
               {:else}
@@ -414,11 +413,11 @@
           {/key}
         {/if}
       </Pane>
-      <Pane class="rounded-r-lg">
+      <Pane class="rounded-lg">
         <Splitpanes horizontal>
           <Pane class="relative">
             <div
-              class="p-2 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
+              class="p-6 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
             >
               {#key $page.params}
                 <SvelteMarkdown
