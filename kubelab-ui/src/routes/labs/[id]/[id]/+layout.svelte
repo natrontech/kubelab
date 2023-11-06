@@ -10,7 +10,8 @@
     RotateCw,
     StopCircle,
     StretchHorizontal,
-    StretchVertical
+    StretchVertical,
+    Terminal
   } from "lucide-svelte";
   import { client } from "$lib/pocketbase/index.js";
   import toast from "svelte-french-toast";
@@ -20,7 +21,8 @@
     exercise_session,
     exercise_sessions,
     exercises,
-    filterExercisesByLab
+    filterExercisesByLab,
+    loadingCodeEditor
   } from "$lib/stores/data.js";
 
   // @ts-ignore
@@ -39,7 +41,8 @@
     type NotificationsRecord,
     NotificationsTypeOptions
   } from "$lib/pocketbase/generated-types.js";
-    import { Tooltip } from "flowbite-svelte";
+  import { Tooltip } from "flowbite-svelte";
+  import codeView from "$lib/stores/codeView.js";
 
   $metadata.title = "Exercises";
 
@@ -265,24 +268,9 @@
   }
 
   function handleOpenVSCode() {
-    // open target blank new tab with the url
-    let lab_session_id = data.pathname.split("/")[2];
-    let exercise_id = window.location.pathname.split("/")[3];
-    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
-    console.log(agentHost);
-    let agentUrl =
-      "kubelab-" +
-      lab_session_id +
-      "-" +
-      exercise_id +
-      "-" +
-      client.authStore.model?.id +
-      "." +
-      agentHost;
-
-    // open new tab with agentUrl
-
-    window.open("https://" + agentUrl, "_blank");
+    // window.open(codeUrl, "_blank");
+    $codeView = !$codeView;
+    $loadingCodeEditor = true;
   }
 
   function isCurrentExercise(exercise_id: string) {
@@ -293,18 +281,34 @@
 {#key $exercise}
   <div class="absolute top-0 h-20 left-0 right-0 ">
     <div class="mt-5 flex justify-between px-2">
-      <button
-        class="btn btn-neutral "
-        on:click={() => {
-          if ($sidebar_lab) {
-            sidebarOpen.set(true);
-          }
-          goto("/labs/");
-        }}
-      >
-        <ArrowLeft class="inline-block w-4 h-4 mr-2" />
-        Labs
-      </button>
+      <div>
+        <button
+          class="btn btn-neutral inline"
+          on:click={() => {
+            if ($sidebar_lab) {
+              sidebarOpen.set(true);
+            }
+            goto("/labs/");
+          }}
+        >
+          <ArrowLeft class="inline-block w-4 h-4 mr-2" />
+          Labs
+        </button>
+        <button class="btn btn-neutral inline-block" on:click={() => handleOpenVSCode()}>
+          {#if $codeView}
+            <Terminal class="inline-block" />
+          {:else}
+            <FileCode2 class="inline-block" />
+          {/if}
+        </button>
+        <Tooltip class="bg-neutral z-20">
+          {#if $codeView}
+            Open Terminal
+          {:else}
+            Open Code Editor
+          {/if}
+        </Tooltip>
+      </div>
       <ToggleConfetti>
         <button
           slot="label"
@@ -356,38 +360,32 @@
   <div class="absolute top-16 bottom-16 left-0 right-0 z-0">
     <slot />
   </div>
+
   <div class="absolute h-16 bottom-0 left-0 right-0">
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          <button class="btn btn-info" on:click={() => handleOpenVSCode()}>
-            <FileCode2 class="inline-block" />
-          </button>
-          <Tooltip>Open Code Editor</Tooltip>
-
           {#if client.authStore.model?.workshop == true}
             <button
-              class="btn btn-accent dark:text-black {helpRequested
-                ? 'btn-disabled'
-                : 'btn-accent'}"
+              class="btn btn-accent dark:text-black {helpRequested ? 'btn-disabled' : 'btn-accent'}"
               on:click={() => {
                 askForHelp();
               }}
             >
               <HelpCircle class="inline-block" />
             </button>
-            <Tooltip>Call for Help</Tooltip>
+            <Tooltip class="bg-neutral">Call for Help</Tooltip>
           {/if}
 
           <button class="btn btn-error" on:click={() => handleStopExercise()}>
             <StopCircle class="inline-block" />
           </button>
-          <Tooltip>Stop Exercise</Tooltip>
+          <Tooltip class="bg-neutral">Stop Exercise</Tooltip>
 
           <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
             <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
           </button>
-          <Tooltip>Reset Exercise</Tooltip>
+          <Tooltip class="bg-neutral">Reset Exercise</Tooltip>
         {/if}
       </div>
       <div class="">

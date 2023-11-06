@@ -9,6 +9,7 @@ import type {
 } from "$lib/pocketbase/generated-types";
 import { get, writable, type Writable } from "svelte/store";
 
+export const loadingCodeEditor: Writable<boolean> = writable<boolean>(false);
 export const avatarUrl: Writable<string> = writable<string>();
 export const lab: Writable<LabsResponse> = writable<LabsResponse>();
 export const labs: Writable<LabsResponse[]> = writable<LabsResponse[]>();

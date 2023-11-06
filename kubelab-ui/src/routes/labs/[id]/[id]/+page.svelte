@@ -20,7 +20,8 @@
     exercise,
     exercise_session,
     exercise_sessions,
-    filterExercisesByLab
+    filterExercisesByLab,
+    loadingCodeEditor
   } from "$lib/stores/data";
   import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
   import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
@@ -28,6 +29,7 @@
   import ListComponent from "$lib/components/markdown/ListComponent.svelte";
   import horizontalView from "$lib/stores/tableView";
   import { loadingExercises } from "$lib/stores/loading";
+  import codeView from "$lib/stores/codeView";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
   let loadingMD = "";
@@ -36,6 +38,30 @@
   let docs: string;
   let hint: string;
   let solution: string;
+  let clear: any;
+
+  export let data: any;
+  let codeUrl: string;
+
+  function handleIframeLoad() {
+    $loadingCodeEditor = false;
+  }
+
+  $: {
+    // open target blank new tab with the url
+    let lab_session_id = data.pathname.split("/")[2];
+    let exercise_id = window.location.pathname.split("/")[3];
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
+    codeUrl =
+      "https://kubelab-" +
+      lab_session_id +
+      "-" +
+      exercise_id +
+      "-" +
+      client.authStore.model?.id +
+      "." +
+      agentHost;
+  }
 
   async function getMarkdown() {
     loadingMD = window.location.pathname.split("/")[3];
@@ -72,8 +98,6 @@
     });
   }
 
-  let clear: any;
-
   $: {
     $page.params.id;
     if (exercise) {
@@ -88,15 +112,17 @@
   }
 
   onMount(async () => {
+    $loadingCodeEditor = true;
     Console = (await import("$lib/components/Console.svelte")).default;
   });
 
   onDestroy(() => {
+    $loadingCodeEditor = false;
     Console = PlaceholderComponent;
     clearInterval(clear);
   });
 
-  $metadata.title = "Exercise";
+  $metadata.title = "Exercise " + $exercise.title;
 
   async function handleStartExercise() {
     const data: ExerciseSessionsRecord = {
@@ -274,7 +300,21 @@
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
-              <Desktop {Console} />
+              {#if $codeView}
+                {#if $loadingCodeEditor}
+                  <div class="flex justify-center items-center h-full dark:bg-neutral">
+                    <span class="loading loading-dots loading-lg" />
+                  </div>
+                {/if}
+                <iframe
+                  src={codeUrl}
+                  on:load={() => handleIframeLoad()}
+                  title="Code Editor"
+                  class=" p-2 w-full h-full  bg-transparent"
+                />
+              {:else}
+                <Desktop {Console} />
+              {/if}
             {/if}
           {/key}
         {:else}
@@ -319,7 +359,24 @@
         {#if $exercise_session.agentRunning}
           {#key $page.params}
             {#if $exercise_session.exercise === $exercise.id}
-              <Desktop {Console} />
+              {#if $codeView}
+                {#if $loadingCodeEditor}
+                  <span class="loading loading-dots loading-lg" />
+                {/if}
+                {#if $loadingCodeEditor}
+                  <span class="loading loading-dots loading-lg" />
+                {/if}
+                {#key ($page.params, codeUrl)}
+                  <iframe
+                    src={codeUrl}
+                    on:load={() => handleIframeLoad()}
+                    title="Code Editor"
+                    class=" p-2 w-full h-full  bg-transparent"
+                  />
+                {/key}
+              {:else}
+                <Desktop {Console} />
+              {/if}
             {/if}
           {/key}
         {:else}
