@@ -281,9 +281,9 @@
 {#key $exercise}
   <div class="absolute top-0 h-20 left-0 right-0 ">
     <div class="mt-5 flex justify-between px-2">
-      <div>
+      <div class="grid grid-cols-2 gap-2">
         <button
-          class="btn btn-neutral inline"
+          class="btn btn-neutral"
           on:click={() => {
             if ($sidebar_lab) {
               sidebarOpen.set(true);
@@ -294,66 +294,76 @@
           <ArrowLeft class="inline-block w-4 h-4 mr-2" />
           Labs
         </button>
-        <button class="btn btn-neutral inline-block" on:click={() => handleOpenVSCode()}>
-          {#if $codeView}
+        <div class="join ">
+          <button
+            on:click={() => {
+              codeView.set(false);
+            }}
+            class="join-item btn {!$codeView
+              ? ' btn-neutral dark:btn-primary dark:text-neutral'
+              : 'btn-outline'} "
+          >
             <Terminal class="inline-block" />
-          {:else}
+          </button>
+          <button
+            on:click={() => {
+              codeView.set(true);
+            }}
+            class="join-item btn {!$codeView
+              ? 'btn-outline'
+              : ' btn-neutral dark:btn-primary dark:text-neutral '}"
+          >
             <FileCode2 class="inline-block" />
-          {/if}
-        </button>
-        <Tooltip class="bg-neutral z-20">
-          {#if $codeView}
-            Open Terminal
-          {:else}
-            Open Code Editor
-          {/if}
-        </Tooltip>
-      </div>
-      <ToggleConfetti>
-        <button
-          slot="label"
-          class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
-          on:click={() => handleCheckExercise()}
-        >
-          <CheckCircle class="inline-block mr-2" />
-          <span> Check </span>
-        </button>
-        <div
-          style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
-        >
-          {#if $exercise_session.endTime}
-            <Confetti
-              x={[-5, 5]}
-              y={[0, 0.1]}
-              delay={[0, 2000]}
-              duration="3000"
-              amount="100"
-              fallDistance="100vh"
-            />
-          {/if}
+          </button>
         </div>
-      </ToggleConfetti>
-      <div class="join grid grid-cols-2">
-        <button
-          on:click={() => {
-            horizontalView.set(true);
-          }}
-          class="join-item btn {$horizontalView
-            ? ' btn-neutral dark:btn-primary dark:text-neutral '
-            : ''} "
-        >
-          <StretchHorizontal />
-        </button>
-        <button
-          on:click={() => {
-            horizontalView.set(false);
-          }}
-          class="join-item btn {$horizontalView
-            ? ''
-            : ' btn-neutral dark:btn-primary dark:text-neutral '}"
-        >
-          <StretchVertical />
-        </button>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="join grid grid-cols-2">
+          <button
+            on:click={() => {
+              horizontalView.set(true);
+            }}
+            class="join-item btn {$horizontalView
+              ? ' btn-neutral dark:btn-primary dark:text-neutral'
+              : 'btn-outline'} "
+          >
+            <StretchHorizontal />
+          </button>
+          <button
+            on:click={() => {
+              horizontalView.set(false);
+            }}
+            class="join-item btn {$horizontalView
+              ? 'btn-outline'
+              : ' btn-neutral dark:btn-primary dark:text-neutral '}"
+          >
+            <StretchVertical />
+          </button>
+        </div>
+        <ToggleConfetti>
+          <button
+            slot="label"
+            class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
+            on:click={() => handleCheckExercise()}
+          >
+            <CheckCircle class="inline-block mr-2" />
+            <span> Check </span>
+          </button>
+          <div
+            style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
+          >
+            {#if $exercise_session.endTime}
+              <Confetti
+                x={[-5, 5]}
+                y={[0, 0.1]}
+                delay={[0, 2000]}
+                duration="3000"
+                amount="100"
+                fallDistance="100vh"
+              />
+            {/if}
+          </div>
+        </ToggleConfetti>
       </div>
     </div>
   </div>
