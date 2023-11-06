@@ -26,3 +26,5 @@ isolation:
       ipBlock:
         cidr: 8.8.8.8/32
         except: []
+syncer:
+  kubeConfigContextName: "kubelab-vcluster"
