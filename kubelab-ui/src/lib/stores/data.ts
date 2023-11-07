@@ -133,25 +133,25 @@ export async function updateDataStores(filter: UpdateFilter = { filter: UpdateFi
             console.log(error);
         });
 
-    if (get(lab_sessions).length < get(labs).length) {
-        // only create lab_sessions for labs that are not already in lab_sessions
-        const filtered_labs = get(labs).filter(
-            (lab) => !get(lab_sessions).find((lab_session) => lab_session.lab === lab.id)
-        );
+    // if (get(lab_sessions).length < get(labs).length) {
+    //     // only create lab_sessions for labs that are not already in lab_sessions
+    //     const filtered_labs = get(labs).filter(
+    //         (lab) => !get(lab_sessions).find((lab_session) => lab_session.lab === lab.id)
+    //     );
 
-        for (const lab of filtered_labs) {
-            const data = {
-                user: client.authStore.model?.id,
-                lab: lab.id,
-                clusterRunning: false
-            };
-            const record: LabSessionsResponse = await client
-                .collection("lab_sessions")
-                .create(data);
-            // update lab_sessions
-            lab_sessions.update((lab_sessions) => [...lab_sessions, record]);
-        }
-    }
+    //     for (const lab of filtered_labs) {
+    //         const data = {
+    //             user: client.authStore.model?.id,
+    //             lab: lab.id,
+    //             clusterRunning: false
+    //         };
+    //         const record: LabSessionsResponse = await client
+    //             .collection("lab_sessions")
+    //             .create(data);
+    //         // update lab_sessions
+    //         lab_sessions.update((lab_sessions) => [...lab_sessions, record]);
+    //     }
+    // }
 
     // get exercises and set exercises store
     await client
@@ -188,28 +188,28 @@ export async function updateDataStores(filter: UpdateFilter = { filter: UpdateFi
         });
 
     // if exercise_sessions is empty, create exercise_sessions for each exercise
-    if (get(exercise_sessions).length < get(exercises).length) {
-        // only create exercise_sessions for exercises that are not already in exercise_sessions
-        const filtered_exercises = get(exercises).filter(
-            (exercise) =>
-                !get(exercise_sessions).find(
-                    (exercise_session) => exercise_session.exercise === exercise.id
-                )
-        );
+    // if (get(exercise_sessions).length < get(exercises).length) {
+    //     // only create exercise_sessions for exercises that are not already in exercise_sessions
+    //     const filtered_exercises = get(exercises).filter(
+    //         (exercise) =>
+    //             !get(exercise_sessions).find(
+    //                 (exercise_session) => exercise_session.exercise === exercise.id
+    //             )
+    //     );
 
-        for (const exercise of filtered_exercises) {
-            const data = {
-                user: client.authStore.model?.id,
-                exercise: exercise.id,
-                clusterRunning: false
-            };
-            const record: ExerciseSessionsResponse = await client
-                .collection("exercise_sessions")
-                .create(data);
-            // update exercise_sessions
-            exercise_sessions.update((exercise_sessions) => [...exercise_sessions, record]);
-        }
-    }
+    //     for (const exercise of filtered_exercises) {
+    //         const data = {
+    //             user: client.authStore.model?.id,
+    //             exercise: exercise.id,
+    //             clusterRunning: false
+    //         };
+    //         const record: ExerciseSessionsResponse = await client
+    //             .collection("exercise_sessions")
+    //             .create(data);
+    //         // update exercise_sessions
+    //         exercise_sessions.update((exercise_sessions) => [...exercise_sessions, record]);
+    //     }
+    // }
 }
 
 export async function setLabStartTime(labSessionId: string) {
