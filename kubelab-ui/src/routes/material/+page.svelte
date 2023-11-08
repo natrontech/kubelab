@@ -70,7 +70,7 @@
         <button
           class="btn btn-neutral"
           on:click={() =>
-            window.open("https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/")}
+            window.open("https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/")}
         >
           <ExternalLink /> Go to Docs
         </button>
