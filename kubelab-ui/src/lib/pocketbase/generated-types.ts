@@ -52,28 +52,28 @@ export enum ExerciseSessionLogsTypeOptions {
 }
 export type ExerciseSessionLogsRecord = {
 	user: RecordIdString
-	exercise_session: RecordIdString
 	timestamp: IsoDateString
+	exercise_session: RecordIdString
 	type: ExerciseSessionLogsTypeOptions
 }
 
 export type ExerciseSessionsRecord = {
+	agentRunning?: boolean
 	user: RecordIdString
 	startTime?: IsoDateString
 	endTime?: IsoDateString
 	exercise: RecordIdString
-	agentRunning?: boolean
 }
 
 export type ExercisesRecord = {
 	title?: string
 	description?: string
-	lab: RecordIdString
 	docs?: string
 	hint?: string
 	solution?: string
 	check?: string
 	bootstrap?: string
+	lab: RecordIdString
 }
 
 export type FaqsRecord = {
@@ -125,8 +125,8 @@ export enum NotificationsTypeOptions {
 export type NotificationsRecord = {
 	type: NotificationsTypeOptions
 	user: RecordIdString
-	exercise?: RecordIdString
 	done?: boolean
+	exercise?: RecordIdString
 }
 
 export type PlansRecord = {

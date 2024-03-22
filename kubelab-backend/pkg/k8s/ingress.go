@@ -105,7 +105,7 @@ func CreateIngress(params IngressParams) (*networkingv1.Ingress, error) {
 			IngressClassName: func() *string { s := env.Config.IngressClass; return &s }(),
 			TLS: []networkingv1.IngressTLS{
 				{
-					Hosts: []string{params.Host},
+					SecretName: env.Config.TlsSecretName,
 				},
 			},
 			Rules: rules,
