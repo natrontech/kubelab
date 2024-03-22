@@ -89,11 +89,6 @@
               bind:value={user.password}
             />
           </div>
-          <div class="flex items-center justify-between">
-            <div class="text-sm">
-              <a href="#" class="text-blue-400 hover:text-blue-500"> Forgot your password? </a>
-            </div>
-          </div>
           <div>
             <button type="submit" class="btn btn-neutral btn-block">
               {#if loading}
@@ -106,7 +101,7 @@
         </div>
         <div class="pt-5 text-center text-gray-400 text-xs">
           <span>
-            Copyright © 2023
+            Copyright © {new Date().getFullYear()}
             <a
               href="https://natron.io"
               rel=""

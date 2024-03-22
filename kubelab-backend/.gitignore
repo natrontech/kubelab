@@ -2,6 +2,7 @@
 /pocketbase
 /pocketbase*.zip
 /pb_data
+/pb_data_old
 /tmp
 /bin
 ./pocketbase

@@ -17,6 +17,8 @@ type config struct {
 	StorageLimit           string `env:"STORAGE_LIMIT" envDefault:"50Gi"`
 	VClusterChartVersion   string `env:"VCLUSTER_CHART_VERSION" envDefault:"0.16.4"`
 	VClusterValuesFilePath string `env:"VCLUSTER_VALUES_FILE_PATH" envDefault:"./vcluster-values.yaml"`
+	CronTick               string `env:"CRON_TICK" envDefault:"* * * * *"`
+	TlsSecretName          string `env:"TLS_SECRET_NAME" envDefault:"kubelab-ch-wildcard-cert"`
 }
 
 var Config config

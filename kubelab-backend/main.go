@@ -15,6 +15,7 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/jsvm"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	"github.com/pocketbase/pocketbase/tools/cron"
 )
 
 func defaultPublicDir() string {
@@ -76,6 +77,22 @@ func main() {
 		case "exercise_sessions":
 			return controller.HandleExerciseSessions(e, app)
 		}
+		return nil
+	})
+
+	// scheduler for syncing lab and exercise sessions
+	app.OnBeforeBootstrap().Add(func(e *core.BootstrapEvent) error {
+		scheduler := cron.New()
+
+		// Run sync every minute
+		scheduler.MustAdd("sessions_syncer", env.Config.CronTick, func() {
+			err := controller.AutoSessionSyncController(app)
+			if err != nil {
+				log.Printf("Error syncing sessions: %v\n", err)
+			}
+		})
+
+		scheduler.Start()
 		return nil
 	})
 
