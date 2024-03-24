@@ -111,27 +111,26 @@ To get started, ensure that you have a Kubernetes cluster (v1.27+).
 
 1. Take a look at the [deployment](./deployment) folder for an example deployment.
 2. Create a wildcard certificate and store it in a secret. (You can use [cert-manager](https://cert-manager.io/docs/) for this)
-
-	```yaml
-	apiVersion: cert-manager.io/v1
-	kind: Certificate
-	metadata:
-		name: kubelab-ch-wildcard-cert
-		namespace: cert-manager
-	spec:
-		secretName: kubelab-ch-wildcard-cert # The secret name where the certificate will be stored, make sure to use this name in the TlsSecretName environment variable
-		issuerRef:
-			name: letsencrypt
-			kind: ClusterIssuer
-		dnsNames:
-			- "*.kubelab.ch"
-		secretTemplate:
-			annotations:
-				reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-				reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
-				reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-				reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: ""
-	```
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+	name: kubelab-ch-wildcard-cert
+	namespace: cert-manager
+spec:
+	secretName: kubelab-ch-wildcard-cert # The secret name where the certificate will be stored, make sure to use this name in the TlsSecretName environment variable
+	issuerRef:
+		name: letsencrypt
+		kind: ClusterIssuer
+	dnsNames:
+		- "*.kubelab.ch"
+	secretTemplate:
+		annotations:
+			reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+			reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
+			reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+			reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: ""
+```
 3. Deploy the [reflector](https://github.com/emberstack/kubernetes-reflector/tree/main/src/helm/reflector) to sync the TLS secret with each namespace.
 4. Deploy the KubeLab as described in the [deployment](./deployment) folder.
 5. Access the Pocketbase UI and create a admin user. (https://<ingress-url>/_)
