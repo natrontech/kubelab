@@ -33,7 +33,7 @@
 
 Welcome to KubeLab! Our advanced web-based platform offers a rich set of interactive labs, specifically crafted for Kubernetes workshops. We aim to revolutionize your learning experience by making it more interactive, engaging, and practical. Our labs will help you grasp and apply complex Kubernetes concepts in a real-world context.
 
-KubeLab is a proud offering by [Natron Tech](https://natron.io), and if you're interested in a tailor-made Kubernetes workshop for your company, do not hesitate to reach out to us!
+KubeLab is a proud offering by [Natron Tech](https://natron.io), and if you're interested in a tailor-made Kubernetes services or workshops for your company, do not hesitate to reach out to us!
 
 KubeLab is built using:
 
@@ -41,6 +41,7 @@ KubeLab is built using:
 - [xterm.js](https://xtermjs.org/)
 - [code-server](https://docs.linuxserver.io/images/docker-code-server/)
 - [pocketbase](https://pocketbase.io)
+- [vcluster](https://vcluster.com)
 
 <p align="center">
 	<img height="500px" src="assets/screenrecording.gif" />
@@ -94,22 +95,24 @@ KubeLab is deployed in a Kubernetes cluster. Please check out the example [deplo
 
 The following environment variables are required for KubeLab to function properly:
 
-| Variable Name | Default | Description |
-| --- | --- | --- |
-| `LOCAL` | `false` | Set to `true` if you're running KubeLab locally. It will take your local kubeconfig under .kube/config |
-| `KUBELAB_AGENT_IMAGE` | `ghcr.io/natrontech/kubelab-agent:latest` | The image for the agent |
-| `CODE_SERVER_IMAGE` | `ghcr.io/natrontech/kubelab-code-server:latest` | The image for the code-server |
-| `ALLOWED_HOSTS` | `*` | The allowed hosts for the backend |
-| `RESOURCE_NAME` | `kubelab` | The name of the resource |
-| `AGENT_INGRESS_CLASS` | `nginx` | The ingress class for the agent |
-| `PODS_LIMIT` | `70` | The maximum number of pods allowed per session |
-| `STORAGE_LIMIT` | `50Gi` | The maximum storage allowed per session |
-| `VCLUSTER_CHART_VERSION` | `0.16.4` | The version of the vcluster chart |
-| `VCLUSTER_VALUES_FILE_PATH` | `./vcluster-values.yaml` | The path to the vcluster values file |
+| Variable Name               | Default                                         | Description                                                                                            |
+| --------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `LOCAL`                     | `false`                                         | Set to `true` if you're running KubeLab locally. It will take your local kubeconfig under .kube/config |
+| `KUBELAB_AGENT_IMAGE`       | `ghcr.io/natrontech/kubelab-agent:latest`       | The image for the agent                                                                                |
+| `CODE_SERVER_IMAGE`         | `ghcr.io/natrontech/kubelab-code-server:latest` | The image for the code-server                                                                          |
+| `ALLOWED_HOSTS`             | `*`                                             | The allowed hosts for the backend                                                                      |
+| `RESOURCE_NAME`             | `kubelab`                                       | The name of the resource                                                                               |
+| `AGENT_INGRESS_CLASS`       | `nginx`                                         | The ingress class for the agent                                                                        |
+| `PODS_LIMIT`                | `70`                                            | The maximum number of pods allowed per session                                                         |
+| `STORAGE_LIMIT`             | `50Gi`                                          | The maximum storage allowed per session                                                                |
+| `VCLUSTER_CHART_VERSION`    | `0.16.4`                                        | The version of the vcluster chart                                                                      |
+| `VCLUSTER_VALUES_FILE_PATH` | `./vcluster-values.yaml`                        | The path to the vcluster values file                                                                   |
+| `CronTick`                  | `* * * * *`                                     | The cron tick which creates user sessions for each lab and exercise                                    |
+| `TlsSecretName`             | `kubelab-tls`                                   | The name of the TLS secret which will be for each agent ingress instance (use a wildcard certificate)  |
 
 ## Known Issues
 
-- Some links in the frontend are hardcoded to `kubelab.ch`. This is a temporary workaround until we have a proper solution to serve the static frontend files dynamically.
+- Either you need to create a wildcard Certificate and use it as the default TLS secret or you need to use something like [reflector](https://github.com/emberstack/kubernetes-reflector/tree/main/src/helm/reflector) to sync the TLS secret with each namespace.
 - The labs need to be manually created via an upload script in [./kubelab-fill](./kubelab-fill). This will be automated in the future.
 - Signup is not yet implemented. We're working on it and want to make a free signup with a limited number of sessions available soon.
 - The frontend is not yet optimized for mobile devices. This is not a priority for us at the moment, but we'll get to it eventually.
