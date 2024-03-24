@@ -67,7 +67,6 @@
     "svelte-icons-pack": "^2.1.0",
     "svelte-local-storage-store": "^0.6.4",
     "svelte-markdown": "^0.2.3",
-    "svelte-material-icons": "^3.0.4",
     "xterm": "^5.1.0",
     "xterm-addon-fit": "^0.7.0"
   }
