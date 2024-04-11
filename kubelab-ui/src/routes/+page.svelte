@@ -6,8 +6,7 @@
   import Hero from "$lib/components/landingpage/Hero.svelte";
   import type {
     CompaniesResponse,
-    FaqsResponse,
-    PlansResponse
+    FaqsResponse
   } from "$lib/pocketbase/generated-types";
 
   export let data: any;
@@ -21,7 +20,6 @@
   <Hero />
   <Companies {companies} />
   <Features />
-  <!-- <Pricing plans={plans} /> -->
   <Faq {faqs} />
   <!-- <Cta /> -->
   <!-- <Footer /> -->
