@@ -100,7 +100,7 @@ Interested in contributing to KubeLab? Please make sure you have the following p
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [Node.js](https://nodejs.org/en/download/) (v18+)
-- [Go](https://golang.org/doc/install) (v1.21+)
+- [Go](https://golang.org/doc/install) (v1.22+)
 - [modd](https://github.com/cortesi/modd/releases)
 
 Please refer to our detailed development guides for the [backend](./kubelab-backend/README.md) and [frontend](./kubelab-ui/README.md) to get started. For contributing, please read our [CONTRIBUTING.md](CONTRIBUTING.md) for information on code conduct and the process for submitting pull requests.
