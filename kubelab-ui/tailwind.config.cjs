@@ -26,7 +26,7 @@ module.exports = {
           "primary-focus": "#1D242A",
         },
         dark: {
-          ...require("daisyui/src/theming/themes")["[data-theme=dark]"],
+          ...require("daisyui/src/theming/themes")["dark"],
           "primary": "#fff",
           "secondary": "#252E36",
           "primary-focus": "#fff",
