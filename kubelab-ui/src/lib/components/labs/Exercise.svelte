@@ -27,7 +27,6 @@
   import { onMount } from "svelte";
   import toast from "svelte-french-toast";
   export let this_exercise_session: ExerciseSessionsResponse;
-  export let index: number;
   let this_exercise: ExercisesResponse;
   let confirmation = false;
 
