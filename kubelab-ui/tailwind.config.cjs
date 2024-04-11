@@ -21,12 +21,12 @@ module.exports = {
     themes: [
       {
         light: {
-          ...require("daisyui/src/theming/themes")["[data-theme=light]"],
+          ...require("daisyui/src/theming/themes")["[light]"],
           "primary": "#1D242A",
           "primary-focus": "#1D242A",
         },
         dark: {
-          ...require("daisyui/src/theming/themes")["[data-theme=dark]"],
+          ...require("daisyui/src/theming/themes")["[dark]"],
           "primary": "#fff",
           "secondary": "#252E36",
           "primary-focus": "#fff",
