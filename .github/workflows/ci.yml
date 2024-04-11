@@ -16,7 +16,7 @@ jobs:
         working-directory: kubelab-backend
     strategy:
       matrix:
-        goVer: [1.20]
+        goVer: [1.22]
 
     steps:
     - name: Set up Go ${{ matrix.goVer }}
