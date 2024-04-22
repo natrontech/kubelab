@@ -55,7 +55,7 @@
     "@floating-ui/dom": "^1.2.8",
     "@picocss/pico": "^1.5.10",
     "@sveltejs/adapter-node": "^1.2.1",
-    "@sveltejs/adapter-static": "^2.0.2",
+    "@sveltejs/adapter-static": "^2.0.3",
     "@webcontainer/api": "^1.1.4",
     "chart.js": "^4.3.0",
     "lucide-svelte": "^0.265.0",
