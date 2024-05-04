@@ -56,7 +56,7 @@
     "@picocss/pico": "^2.0.6",
     "@sveltejs/adapter-node": "^1.2.1",
     "@sveltejs/adapter-static": "^2.0.3",
-    "@webcontainer/api": "^1.1.4",
+    "@webcontainer/api": "^1.1.9",
     "chart.js": "^4.3.0",
     "lucide-svelte": "^0.265.0",
     "marked": "^5.0.4",
