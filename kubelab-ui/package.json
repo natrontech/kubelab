@@ -24,7 +24,7 @@
     "@types/marked": "^5.0.0",
     "@types/node": "^20.11.30",
     "@types/prismjs": "^1.26.3",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.45.0",
     "autoprefixer": "^10.4.13",
     "daisyui": "^4.10.2",
