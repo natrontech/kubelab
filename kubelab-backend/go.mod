@@ -9,7 +9,7 @@ require (
 	github.com/pocketbase/pocketbase v0.22.12
 	helm.sh/helm/v3 v3.14.4
 	k8s.io/api v0.30.0
-	k8s.io/apimachinery v0.30.0
+	k8s.io/apimachinery v0.30.1
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 )
 
