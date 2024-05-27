@@ -8,7 +8,7 @@ require (
 	github.com/pocketbase/dbx v1.10.1
 	github.com/pocketbase/pocketbase v0.22.12
 	helm.sh/helm/v3 v3.14.4
-	k8s.io/api v0.30.0
+	k8s.io/api v0.30.1
 	k8s.io/apimachinery v0.30.1
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 )
@@ -204,7 +204,7 @@ require (
 	google.golang.org/api v0.180.0 // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
-	k8s.io/client-go v0.30.0
+	k8s.io/client-go v0.30.1
 	modernc.org/libc v1.50.5 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
