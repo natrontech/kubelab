@@ -22,7 +22,7 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.10",
     "@types/marked": "^5.0.0",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.14.8",
     "@types/prismjs": "^1.26.3",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.45.0",
