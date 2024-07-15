@@ -6,7 +6,7 @@ toolchain go1.22.5
 require (
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/pocketbase/dbx v1.10.1
-	github.com/pocketbase/pocketbase v0.22.16
+	github.com/pocketbase/pocketbase v0.22.17
 	helm.sh/helm/v3 v3.15.3
 	k8s.io/api v0.30.2
 	k8s.io/apimachinery v0.30.2
