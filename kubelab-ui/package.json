@@ -46,7 +46,7 @@
     "svelte-splitpanes": "^0.7.14",
     "tailwind-scrollbar": "^3.0.4",
     "tailwindcss": "^3.4.3",
-    "tslib": "^2.6.2",
+    "tslib": "^2.6.3",
     "typescript": "^5.4.5",
     "vite": "^4.0.0"
   },
