@@ -23,7 +23,7 @@
     "@tailwindcss/typography": "^0.5.13",
     "@types/marked": "^5.0.0",
     "@types/node": "^20.14.10",
-    "@types/prismjs": "^1.26.3",
+    "@types/prismjs": "^1.26.4",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.13",
