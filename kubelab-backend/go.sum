@@ -413,8 +413,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pocketbase/dbx v1.10.1 h1:cw+vsyfCJD8YObOVeqb93YErnlxwYMkNZ4rwN0G0AaA=
 github.com/pocketbase/dbx v1.10.1/go.mod h1:xXRCIAKTHMgUCyCKZm55pUOdvFziJjQfXaWKhu2vhMs=
-github.com/pocketbase/pocketbase v0.22.18 h1:yVckUhi5GDORqCb0BbtlvRB1CVxHY9HO9btEaeZHVJU=
-github.com/pocketbase/pocketbase v0.22.18/go.mod h1:0QFvDOOW7ANId78ChZSagyHbmP6CgMxDQrQFXzeaDpA=
+github.com/pocketbase/pocketbase v0.22.19 h1:Hu9J2nsRQIaw8MiDLzE65xUPyMPjf4DcS2f+QmH1G+c=
+github.com/pocketbase/pocketbase v0.22.19/go.mod h1:0QFvDOOW7ANId78ChZSagyHbmP6CgMxDQrQFXzeaDpA=
 github.com/poy/onpar v1.1.2 h1:QaNrNiZx0+Nar5dLgTVp5mXkyoVFIbepjyEoGSnhbAY=
 github.com/poy/onpar v1.1.2/go.mod h1:6X8FLNoxyr9kkmnlqpK6LSoiOtrO6MICtWwEuWkLjzg=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
