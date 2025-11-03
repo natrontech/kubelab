@@ -1,11 +1,12 @@
 module github.com/natrontech/kubelab
 
-go 1.22
+go 1.22.0
+
 toolchain go1.22.5
 
 require (
 	github.com/caarlos0/env/v8 v8.0.0
-	github.com/pocketbase/dbx v1.10.1
+	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.22.18
 	helm.sh/helm/v3 v3.15.4
 	k8s.io/api v0.30.3
