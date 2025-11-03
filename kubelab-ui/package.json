@@ -34,7 +34,7 @@
     "eslint-plugin-svelte3": "^4.0.0",
     "flowbite": "^2.3.0",
     "flowbite-svelte": "^0.46.0",
-    "flowbite-svelte-icons": "^0.4.4",
+    "flowbite-svelte-icons": "^3.0.0",
     "mdsvex": "^0.11.0",
     "pocketbase": "^0.21.2",
     "postcss": "^8.4.38",
