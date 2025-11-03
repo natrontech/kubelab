@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Copy } from "lucide-svelte";
-    import toast from "svelte-french-toast";
+  import toast from "svelte-french-toast";
 
   export let raw: string;
 
@@ -10,10 +10,7 @@
   }
 </script>
 
-<button
-  class="btn btn-sm btn-neutral dark:btn-primary dark:text-neutral"
-  on:click={copyCode}
->
+<button class="btn btn-sm btn-neutral dark:btn-primary dark:text-neutral" on:click={copyCode}>
   <code>{raw.replace(/`/g, "")}</code>
   <Copy class="inline ml-2" size={16} />
 </button>
@@ -23,5 +20,4 @@
     /* disable caps lock */
     text-transform: none;
   }
-
 </style>

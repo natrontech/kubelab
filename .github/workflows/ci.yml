@@ -16,7 +16,7 @@ jobs:
         working-directory: kubelab-backend
     strategy:
       matrix:
-        goVer: [1.22]
+        goVer: [1.24]
 
     steps:
     - name: Set up Go ${{ matrix.goVer }}
@@ -50,6 +50,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
       - name: Install dependencies
         run: npm install --legacy-peer-deps
       - name: Build
