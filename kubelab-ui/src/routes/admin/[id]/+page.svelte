@@ -9,17 +9,11 @@
     type ExercisesResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_session_logs } from "$lib/stores/data";
-  import {
-    Table,
-    TableBody,
-    TableBodyCell,
-    TableBodyRow,
-    TableHead,
-    TableHeadCell
-  } from "flowbite-svelte";
+  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
   import { CheckCircle, HelpCircle, Play } from "lucide-svelte";
   import { onDestroy, onMount } from "svelte";
   import toast from "svelte-french-toast";
+  import Avatar from "$lib/components/ui/Avatar.svelte";
 
   interface Activity {
     exercise_title: string;
@@ -27,6 +21,7 @@
     timestamp: string;
     end_time: string;
     user_name: string;
+    user_email: string;
     start_time: string;
     avatarUrl: string;
     type: "start" | "end";
@@ -100,6 +95,7 @@
 
   interface Ranking {
     user_name: string;
+    user_email: string;
     avatarUrl: string;
     average_time: number;
     solved_exercises_percentage: number;
@@ -111,7 +107,6 @@
     // in exercise_sessions, we have all the exercise_sessions of the company. We need to group them by user
 
     let users: any = {};
-
 
     all_exercise_sessions.forEach((exercise_session: any) => {
       if (users[exercise_session.expand.user.id]) {
@@ -163,6 +158,7 @@
 
       ranking.push({
         user_name: user_exercise_sessions[0].expand.user.name,
+        user_email: user_exercise_sessions[0].expand.user.email,
         avatarUrl:
           "/api/files/" +
           user_exercise_sessions[0].expand.user?.collectionId +
@@ -318,6 +314,7 @@
       start_time: log.expand.exercise_session.startTime,
       end_time: log.expand.exercise_session.endTime,
       user_name: log.expand.user.name,
+      user_email: log.expand.user.email,
       avatarUrl:
         "/api/files/" +
         log.expand.user?.collectionId +
@@ -349,64 +346,70 @@
   }
 </script>
 
-<div
-  class="absolute top-0 bottom-0 left-0 right-0 p-4 bg-no-repeat bg-cover bg-center justify-center
-  bg-gradient-to-r from-blue-500 to-purple-500 dark:from-base-100 dark:to-base-100
-  "
-  style=""
->
-  <div>
-    <h1 class="text-center text-4xl font-bold mb-8 text-white">
+<div class="container mx-auto py-12 px-4">
+  <div class="text-center space-y-4 mb-12">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground">
       Workshop Dashboard
-      {company.name}
     </h1>
+    <p class="text-xl text-muted-foreground">
+      {company.name}
+    </p>
   </div>
-  <div
-    class="justify-center items-center bg-white p-5 rounded-lg absolute top-20 bottom-10 overflow-y-scroll scrollbar-thin left-36 right-36 grid grid-cols-2 gap-4"
-  >
-    <img class="mx-auto mb-8 absolute top-4 left-4 w-36" src={company.logo} alt={company.name} />
-    <div class="flow-root p-2 rounded-lg col-span-2">
-      <!-- a centralized title with "User Activities" -->
-      <div class="text-center mb-5">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Ranking</h3>
-        <p class="mt-1 text-sm text-gray-500">Average time to solution</p>
-      </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-3 flex justify-center">
+      <img class="w-48 object-contain" src={company.logo} alt={company.name} />
+    </div>
+  </div>
 
-      <Table class="bg-gray-200 rounded-lg shadow-lg">
-        <TableHead class="text-left">
-          <TableHeadCell>Rank</TableHeadCell>
-          <TableHeadCell>User</TableHeadCell>
-          <TableHeadCell>Average Time</TableHeadCell>
-          <TableHeadCell>Solved Exercises</TableHeadCell>
-        </TableHead>
-        <TableBody tableBodyClass="divide-y">
-          {#each all_ranking as item, idx}
-            <TableBodyRow>
-              <TableBodyCell>{idx + 1}</TableBodyCell>
-              <TableBodyCell>
-                <img
-                  class="h-10 w-10 items-center justify-center inline-block rounded-full bg-gray-400 ring-8 ring-white"
-                  src={item.avatarUrl}
-                  alt=""
-                />
-                {" "}
-                {item.user_name}</TableBodyCell
-              >
-              <TableBodyCell>{item.average_time}</TableBodyCell>
-              <TableBodyCell>{item.solved_exercises_percentage}%</TableBodyCell>
-            </TableBodyRow>
-          {/each}
-        </TableBody>
-      </Table>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="lg:col-span-2">
+      <div class="border-2 rounded-lg bg-card shadow-xl">
+        <div class="p-6 border-b bg-muted/30">
+          <h3 class="text-2xl font-bold text-foreground">Ranking</h3>
+          <p class="text-sm text-muted-foreground mt-1">Average time to solution</p>
+        </div>
+        <div class="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow class="text-left">
+                <TableHead>Rank</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Average Time</TableHead>
+                <TableHead>Solved Exercises</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {#each all_ranking as item, idx}
+                <TableRow>
+                  <TableCell class="font-bold text-primary">{idx + 1}</TableCell>
+                  <TableCell>
+                    <div class="flex items-center gap-3">
+                      <Avatar
+                        src={item.avatarUrl}
+                        alt={item.user_name}
+                        email={item.user_email}
+                        size="md"
+                      />
+                      <span class="font-medium">{item.user_name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{item.average_time}</TableCell>
+                  <TableCell>{item.solved_exercises_percentage}%</TableCell>
+                </TableRow>
+              {/each}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
 
-    <div class="flow-root col-span-1 p-2 rounded-lg min-h-full">
-      <!-- a centralized title with "User Activities" -->
-      <div class="text-center mb-5">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Notifications</h3>
-        <p class="mt-1 text-sm text-gray-500">Last 10 notifications</p>
+    <div class="border-2 rounded-lg bg-card shadow-xl">
+      <div class="p-6 border-b bg-muted/30">
+        <h3 class="text-2xl font-bold text-foreground">Notifications</h3>
+        <p class="text-sm text-muted-foreground mt-1">Latest updates and requests</p>
       </div>
-      <ul class="-mb-8">
+      <div class="p-6">
+        <ul class="-mb-8">
         {#if notifications.length > 0}
           {#each notifications as notification, idx}
             <li>
@@ -418,29 +421,28 @@
                       <span class="absolute -top-1.5 left-0">
                         <span
                           class="animate-ping absolute inline-flex h-4 w-4 rounded-full top-1 -left-0.5 bg-red-400 opacity-75"
-                        />
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                        ></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                       </span>
                     {:else}
                       <span class="absolute -top-1.5 left-0">
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                       </span>
                     {/if}
                   </div>
                   <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                     <div>
-                      <span class="text-sm text-gray-500">
+                      <span class="text-sm text-muted-foreground">
                         {#if notification.type == NotificationsTypeOptions.help}
-                          <span class="font-medium text-gray-900"
-                            >
-                            {notification.expand?.user.name}</span
+                          <span class="font-medium text-foreground">
+                            {(notification as any).expand?.user?.name}</span
                           >{" "}
                           requested help
                         {/if}
                         {#if notification.exercise}
                           {" "} for the exercise{" "}
-                          <span class="font-medium text-gray-900"
-                            >{notification.expand?.exercise.title}</span
+                          <span class="font-medium text-foreground"
+                            >{(notification as any).expand?.exercise?.title}</span
                           >
                           {" "}
                         {/if}
@@ -448,17 +450,17 @@
                     </div>
 
                     <div class="whitespace-nowrap">
-                      <span class="text-right text-sm text-gray-500">
+                      <span class="text-right text-sm text-muted-foreground">
                         <time datetime={notification.created}>
                           {getRelativeTime(notification.created)} ago
                         </time>
                       </span>
                       {#if notification.done == false}
-                        <button class="btn btn-sm" on:click={() => setDone(notification)}>
+                        <button class="px-3 py-1 text-sm rounded-md bg-primary text-white hover:bg-primary/90 transition-colors" on:click={() => setDone(notification)}>
                           Mark as done
                         </button>
                       {:else}
-                        <button class="btn btn-sm btn-success">Done</button>
+                        <button class="px-3 py-1 text-sm rounded-md bg-green-600 text-white" disabled>Done</button>
                       {/if}
                     </div>
                   </div>
@@ -468,16 +470,16 @@
           {/each}
         {/if}
       </ul>
+      </div>
     </div>
 
-    <div class="flow-root p-2 rounded-lg col-span-1">
-      <!-- a centralized title with "User Activities" -->
-      <div class="text-center mb-5">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">User Activities</h3>
-        <p class="mt-1 text-sm text-gray-500">Last 10 activities</p>
+    <div class="border-2 rounded-lg bg-card shadow-xl">
+      <div class="p-6 border-b bg-muted/30">
+        <h3 class="text-2xl font-bold text-foreground">User Activities</h3>
+        <p class="text-sm text-muted-foreground mt-1">Recent user actions</p>
       </div>
-
-      <ul class="-mb-8">
+      <div class="p-6">
+        <ul class="-mb-8">
         {#if activities.length > 0}
           {#each activities as activity, idx}
             <li>
@@ -486,36 +488,37 @@
                   <span
                     class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
                     aria-hidden="true"
-                  />
+                  ></span>
                 {/if}
                 <div class="relative flex items-start space-x-3">
                   <div class="relative">
-                    <img
-                      class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white"
+                    <Avatar
                       src={activity.avatarUrl}
-                      alt=""
+                      alt={activity.user_name}
+                      email={activity.user_email}
+                      size="md"
                     />
 
-                    <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
+                    <span class="absolute -bottom-0.5 -right-1 rounded-full bg-white dark:bg-background p-0.5 ring-2 ring-border">
                       {#if activity.type === "start"}
-                        <Play class="h-5 w-5 text-gray-400" strokeWidth={2} />
+                        <Play class="h-4 w-4 text-gray-400" strokeWidth={2} />
                       {:else}
-                        <CheckCircle class="h-5 w-5 text-green-400" />
+                        <CheckCircle class="h-4 w-4 text-green-500" />
                       {/if}
                     </span>
                   </div>
                   <div class="min-w-0 flex-1">
                     <div>
                       <div class="text-sm">
-                        <span class="font-bold">{activity.user_name}</span>
+                        <span class="font-bold text-foreground">{activity.user_name}</span>
                       </div>
-                      <p class="mt-0.5 text-sm text-gray-500">
+                      <p class="mt-0.5 text-sm text-muted-foreground">
                         <time datetime={activity.timestamp}>
                           {getRelativeTime(activity.timestamp)} ago
                         </time>
                       </p>
                     </div>
-                    <div class="mt-2 text-sm ">
+                    <div class="mt-2 text-sm text-muted-foreground">
                       <p>
                         {activity.type === "start" ? "Started" : "Finished"}
                         {#if activity.type === "end"}
@@ -524,9 +527,9 @@
                           {getRelativeTimeDuration(activity.start_time, activity.end_time)}
                         {/if}
                         {" "}
-                        <strong>{activity.exercise_title}</strong>
+                        <strong class="text-foreground">{activity.exercise_title}</strong>
                         in{" "}
-                        <strong>{activity.lab_title}</strong>
+                        <strong class="text-foreground">{activity.lab_title}</strong>
                         <br />
                       </p>
                     </div>
@@ -537,6 +540,7 @@
           {/each}
         {/if}
       </ul>
+      </div>
     </div>
   </div>
 </div>

@@ -9,9 +9,6 @@
   import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data";
   import { metadata } from "$lib/stores/metadata";
 
-  import { Drawer } from "flowbite-svelte";
-  import { sineIn } from "svelte/easing";
-
   $metadata.title = "Labs";
 
   function getLabSessions(lab_id: string): LabSessionsResponse {
@@ -43,57 +40,48 @@
   }
 
   let drawerHidden = true;
-  let transitionParamsRight = {
-    x: 320,
-    duration: 200,
-    easing: sineIn
-  };
 </script>
 
-<Drawer
-  backdrop={true}
-  placement="right"
-  transitionType="fly"
-  transitionParams={transitionParamsRight}
-  bind:hidden={drawerHidden}
-  width="w-full sm:w-2/5 "
-  class="absolute h-full overflow-y-scroll scrollbar-none shadow-lg p-0
-    bg-base-100
-    dark:bg-base-900
-    dark:text-white
-    text-base-900
-    z-50
-  "
+<!-- Backdrop -->
+{#if !drawerHidden}
+  <div
+    class="fixed inset-0 bg-black/50 z-40 transition-opacity"
+    on:click={() => drawerHidden = true}
+    on:keydown={(e) => e.key === 'Escape' && (drawerHidden = true)}
+    role="button"
+    tabindex="-1"
+  ></div>
+{/if}
+
+<!-- Drawer -->
+<div
+  class="fixed top-0 right-0 bottom-0 w-full sm:w-2/5 bg-background border-l shadow-lg z-50 overflow-y-auto transform transition-transform duration-200 {drawerHidden ? 'translate-x-full' : 'translate-x-0'}"
 >
   <SideOver bind:drawerHidden />
-</Drawer>
-
-<div
-  class=" top-0 bottom-0 right-0 left-0 bg-black z-40 {drawerHidden
-    ? ' bg-opacity-0'
-    : 'absolute bg-opacity-40 '} transition-all duration-200 ease-in-out  "
-/>
-{#if $lab_sessions.length > 0}
-  <h1 class="text-center text-4xl font-bold my-4 text-white">Labs</h1>
-  {#key $lab_sessions}
-    <p class="text-center text-xl my-4 text-white">
-      <!-- display number of running labs x/1 -->
-      Running labs:
-      <span class="font-bold"
-        >{$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}</span
-      > / 2
-    </p>
-  {/key}
-  <!-- <SideOver /> -->
-  <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 overflow-y-scroll scrollbar-none absolute w-full top-36 bottom-0">
-    {#each $labs as this_lab}
-      <Lab
-        {this_lab}
-        this_lab_session={getLabSessions(this_lab.id)}
-        this_exercises={getExercises(this_lab.id)}
-        this_exercise_sessions={getExercisesSessions(this_lab.id)}
-        bind:drawerHidden
-      />
-    {/each}
-  </div>
-{/if}
+</div>
+    {#if $lab_sessions.length > 0}
+      <div class="container mx-auto py-12 px-4">
+        <div class="text-center space-y-4 mb-12">
+          <h1 class="text-4xl md:text-5xl font-bold text-foreground">Labs</h1>
+          {#key $lab_sessions}
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Running labs:
+              <span class="font-bold text-primary"
+                >{$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}</span
+              > / 2
+            </p>
+          {/key}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {#each $labs as this_lab}
+            <Lab
+              {this_lab}
+              this_lab_session={getLabSessions(this_lab.id)}
+              this_exercises={getExercises(this_lab.id)}
+              this_exercise_sessions={getExercisesSessions(this_lab.id)}
+              bind:drawerHidden
+            />
+          {/each}
+        </div>
+      </div>
+    {/if}

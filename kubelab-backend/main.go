@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/natrontech/kubelab/hooks"
+	"github.com/natrontech/kubelab/pkg/collections"
 	"github.com/natrontech/kubelab/pkg/controller"
 	"github.com/natrontech/kubelab/pkg/env"
 	"github.com/natrontech/kubelab/pkg/k8s"
@@ -45,43 +46,54 @@ func main() {
 		defaultPublicDir(),
 		"the directory to serve static files",
 	)
-	migrationsDir := "" // default to "pb_migrations" (for js) and "migrations" (for go)
-
-	// load js files to allow loading external JavaScript migrations
-	jsvm.MustRegister(app, jsvm.Config{
-		// Dir: migrationsDir,
-		MigrationsDir: migrationsDir,
-	})
-
-	// register the `migrate` command
+	// Migrations are now handled programmatically via collections package
+	// Keep jsvm and migratecmd registered for compatibility
+	jsvm.MustRegister(app, jsvm.Config{})
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-		TemplateLang: migratecmd.TemplateLangJS, // or migratecmd.TemplateLangGo (default)
-		Dir:          migrationsDir,
-		Automigrate:  true,
+		Automigrate: false,
 	})
 
 	// call this only if you want to use the configurable "hooks" functionality
 	hooks.PocketBaseInit(app)
 
-	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
+		// Call e.Next() first to initialize the serve listener
+		if err := e.Next(); err != nil {
+			return err
+		}
+
 		// serves static files from the provided public dir (if exists)
-		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDirFlag), true))
+		e.Router.GET("/"+apis.StaticWildcardParam, apis.Static(os.DirFS(publicDirFlag), true))
 
 		return nil
 	})
 
-	app.OnRecordBeforeUpdateRequest().Add(func(e *core.RecordUpdateEvent) error {
+	app.OnRecordUpdateRequest().BindFunc(func(e *core.RecordRequestEvent) error {
 		switch e.Collection.Name {
 		case "lab_sessions":
 			return controller.HandleLabSessions(e, app)
 		case "exercise_sessions":
 			return controller.HandleExerciseSessions(e, app)
+		default:
+			return e.Next()
 		}
-		return nil
 	})
 
 	// scheduler for syncing lab and exercise sessions
-	app.OnBeforeBootstrap().Add(func(e *core.BootstrapEvent) error {
+	app.OnBootstrap().BindFunc(func(e *core.BootstrapEvent) error {
+		// Call e.Next() first to continue the bootstrap process
+		if err := e.Next(); err != nil {
+			return err
+		}
+
+		// Initialize collections
+		log.Println("Initializing collections...")
+		if err := collections.InitializeCollections(app); err != nil {
+			log.Printf("Error initializing collections: %v\n", err)
+			return err
+		}
+		log.Println("Collections initialized successfully")
+
 		scheduler := cron.New()
 
 		// Run sync every minute
