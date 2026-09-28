@@ -24,7 +24,6 @@
 
     click();
   });
-
 </script>
 
 <span on:click={click} class:relative>

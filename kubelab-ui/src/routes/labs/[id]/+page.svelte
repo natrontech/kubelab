@@ -7,11 +7,18 @@
     getExerciseSessionByExercise,
     lab
   } from "$lib/stores/data";
-  import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
+  import {
+    ExerciseSessionLogsTypeOptions,
+    type ExerciseSessionLogsRecord,
+    type ExerciseSessionsRecord
+  } from "$lib/pocketbase/generated-types";
   import { client } from "$lib/pocketbase";
   import toast from "svelte-french-toast";
   import { loadingExercises } from "$lib/stores/loading";
   import { onDestroy, onMount } from "svelte";
+  import { Button } from "$lib/components/ui/button";
+  import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { Badge } from "$lib/components/ui/badge";
 
   $metadata.title = "Exercises";
 
@@ -78,12 +85,10 @@
           client
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
-            .then((response) => {
-            })
+            .then((response) => {})
             .catch((error) => {
               console.log(error);
             });
-
         })
         .catch((error) => {
           toast.error(error.message);
@@ -98,59 +103,75 @@
   }
 </script>
 
-<a class="btn btn-neutral  top-5 absolute" href="/labs/" on:click={() => show = false}>
-  <ArrowLeft class="inline-block w-4 h-4 mr-2" />
-  Labs
-</a>
-<h1 class="text-center text-4xl font-bold my-4">Exercises</h1>
-<div class="grid grid-cols-3 gap-4">
-  {#if show}
-    {#key $exercise_sessions}
-      {#each $exercises as exercise, i}
-        <div
-          class="card w-full {getExerciseSessionByExercise(exercise.id)?.endTime
-            ? 'bg-green-200'
-            : 'bg-base-200'} border-4 border-neutral"
-        >
-          <div class="card-body">
-            <p class="badge badge-outline  absolute top-2 right-2">#{i + 1}</p>
-            <p
-              class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.agentRunning
-                ? 'badge-success'
-                : 'badge-error'} absolute top-2 left-2"
-            >
-              {getExerciseSessionByExercise(exercise.id)?.agentRunning ? "Running" : "Stopped"}
-            </p>
-            <p
-              class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.endTime
-                ? ''
-                : 'badge-error'} absolute bottom-2 left-2"
-            >
-              {getExerciseSessionByExercise(exercise.id)?.endTime ? "Completed" : "Not Completed"}
-            </p>
-            <h2 class="card-title mt-2">{exercise.title}</h2>
-            <div class="flex gap-2 justify-end">
-              <div class="tooltip" data-tip="start exercise">
-                <button
-                  class="btn {isExerciseRunning(exercise.id) ? 'btn-disabled' : 'btn-neutral'}"
+<div class="container mx-auto py-8 px-4">
+  <div class="mb-6">
+    <a href="/labs/" on:click={() => (show = false)}>
+      <Button variant="outline">
+        <ArrowLeft class="inline-block w-4 h-4 mr-2" />
+        Back to Labs
+      </Button>
+    </a>
+  </div>
+  
+  <h1 class="text-center text-4xl font-bold mb-8 text-foreground">
+    Exercises
+  </h1>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {#if show}
+      {#key $exercise_sessions}
+        {#each $exercises as exercise, i}
+          <Card class="hover:shadow-lg transition-all relative {getExerciseSessionByExercise(exercise.id)?.endTime ? 'border-green-500 border-2' : ''}">
+            <CardHeader>
+              <div class="flex items-start justify-between">
+                <Badge variant="outline" class="absolute top-4 right-4">#{i + 1}</Badge>
+                <div class="space-y-2">
+                  <Badge 
+                    variant={getExerciseSessionByExercise(exercise.id)?.agentRunning ? "default" : "outline"}
+                    class={getExerciseSessionByExercise(exercise.id)?.agentRunning ? "bg-green-600" : ""}
+                  >
+                    {getExerciseSessionByExercise(exercise.id)?.agentRunning ? "Running" : "Stopped"}
+                  </Badge>
+                  {#if getExerciseSessionByExercise(exercise.id)?.endTime}
+                    <Badge variant="default" class="bg-green-600">
+                      ✓ Completed
+                    </Badge>
+                  {:else}
+                    <Badge variant="outline" class="text-muted-foreground">
+                      Not Completed
+                    </Badge>
+                  {/if}
+                </div>
+              </div>
+              <CardTitle class="mt-4">{exercise.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div class="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isExerciseRunning(exercise.id)}
                   on:click={() => startExercise(exercise.id)}
                 >
                   {#if $loadingExercises.has(exercise.id)}
-                    <span class="loading loading-dots loading-md" />
+                    <span class="loading loading-dots loading-sm mr-2"></span>
+                    Starting...
                   {:else}
-                    <Play />
+                    <Play class="h-4 w-4 mr-2" />
+                    Start
                   {/if}
-                </button>
+                </Button>
+                <a href={exercise.id}>
+                  <Button variant="default">
+                    <TerminalSquare class="h-4 w-4 mr-2" />
+                    Console
+                  </Button>
+                </a>
               </div>
-              <a href={exercise.id} class="card-actions justify-end cursor-pointer">
-                <div class="tooltip" data-tip="open console">
-                  <button class="btn btn-neutral"><TerminalSquare /></button>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
-      {/each}
-    {/key}
-  {/if}
+            </CardContent>
+          </Card>
+        {/each}
+      {/key}
+    {/if}
+  </div>
 </div>

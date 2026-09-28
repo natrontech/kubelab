@@ -10,20 +10,20 @@ import type {
 import { get, writable, type Writable } from "svelte/store";
 
 export const loadingCodeEditor: Writable<boolean> = writable<boolean>(false);
-export const avatarUrl: Writable<string> = writable<string>();
-export const lab: Writable<LabsResponse> = writable<LabsResponse>();
-export const labs: Writable<LabsResponse[]> = writable<LabsResponse[]>();
-export const lab_session: Writable<LabSessionsResponse> = writable<LabSessionsResponse>();
-export const lab_sessions: Writable<LabSessionsResponse[]> = writable<LabSessionsResponse[]>();
-export const exercise: Writable<ExercisesResponse> = writable<ExercisesResponse>();
-export const exercises: Writable<ExercisesResponse[]> = writable<ExercisesResponse[]>();
-export const exercise_session: Writable<ExerciseSessionsResponse> =
-    writable<ExerciseSessionsResponse>();
+export const avatarUrl: Writable<string> = writable<string>("");
+export const lab: Writable<LabsResponse | null> = writable<LabsResponse | null>(null);
+export const labs: Writable<LabsResponse[]> = writable<LabsResponse[]>([]);
+export const lab_session: Writable<LabSessionsResponse | null> = writable<LabSessionsResponse | null>(null);
+export const lab_sessions: Writable<LabSessionsResponse[]> = writable<LabSessionsResponse[]>([]);
+export const exercise: Writable<ExercisesResponse | null> = writable<ExercisesResponse | null>(null);
+export const exercises: Writable<ExercisesResponse[]> = writable<ExercisesResponse[]>([]);
+export const exercise_session: Writable<ExerciseSessionsResponse | null> =
+    writable<ExerciseSessionsResponse | null>(null);
 export const exercise_sessions: Writable<ExerciseSessionsResponse[]> =
-    writable<ExerciseSessionsResponse[]>();
+    writable<ExerciseSessionsResponse[]>([]);
 export const exercise_session_logs: Writable<ExerciseSessionLogsResponse[]> =
-    writable<ExerciseSessionLogsResponse[]>();
-export const companies: Writable<CompaniesResponse[]> = writable<CompaniesResponse[]>();
+    writable<ExerciseSessionLogsResponse[]>([]);
+export const companies: Writable<CompaniesResponse[]> = writable<CompaniesResponse[]>([]);
 
 export async function getLabSession(labId: string) {
     return get(labs).find((lab) => lab.id === labId);
@@ -109,7 +109,7 @@ export async function updateDataStores(filter: UpdateFilter = { filter: UpdateFi
     await client
         .collection("labs")
         .getFullList({
-            sort: "title"
+            sort: "order,name"
         })
         .then((response: unknown) => {
             labs.set(response as LabsResponse[]);

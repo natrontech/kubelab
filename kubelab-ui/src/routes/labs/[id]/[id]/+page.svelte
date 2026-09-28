@@ -303,15 +303,15 @@
               {#if $codeView}
                 {#if $loadingCodeEditor}
                   <div class="flex justify-center items-center h-full dark:bg-neutral">
-                    <span class="loading loading-dots loading-lg" />
+                    <span class="loading loading-dots loading-lg"></span>
                   </div>
                 {/if}
                 <iframe
                   src={codeUrl}
                   on:load={() => handleIframeLoad()}
                   title="Code Editor"
-                  class="w-full h-full  bg-transparent"
-                />
+                  class="w-full h-full bg-transparent"
+                ></iframe>
               {:else}
                 <Desktop {Console} />
               {/if}
@@ -362,7 +362,7 @@
               {#if $codeView}
                 {#if $loadingCodeEditor}
                   <div class="flex justify-center items-center h-full dark:bg-neutral">
-                    <span class="loading loading-dots loading-lg" />
+                    <span class="loading loading-dots loading-lg"></span>
                   </div>
                 {/if}
                 {#key ($page.params, codeUrl)}
@@ -370,8 +370,8 @@
                     src={codeUrl}
                     on:load={() => handleIframeLoad()}
                     title="Code Editor"
-                    class="w-full h-full  bg-transparent"
-                  />
+                    class="w-full h-full bg-transparent"
+                  ></iframe>
                 {/key}
               {:else}
                 <Desktop {Console} />

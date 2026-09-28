@@ -23,9 +23,20 @@
     sidebar_lab_session
   } from "$lib/stores/sidebar";
   import { getDeltaTime } from "$lib/utils/time";
-  import { AlertTriangle, CheckCircle, Info, MoreHorizontal, Pause, Play, Terminal } from "lucide-svelte";
+  import {
+    AlertTriangle,
+    CheckCircle,
+    Info,
+    MoreHorizontal,
+    Pause,
+    Play,
+    Terminal
+  } from "lucide-svelte";
   import { onMount } from "svelte";
   import toast from "svelte-french-toast";
+  import { Card, CardContent, CardHeader } from "$lib/components/ui/card";
+  import { Button } from "$lib/components/ui/button";
+  import { Badge } from "$lib/components/ui/badge";
   export let this_exercise_session: ExerciseSessionsResponse;
   let this_exercise: ExercisesResponse;
   let confirmation = false;
@@ -170,121 +181,134 @@
 </script>
 
 {#if this_exercise}
-  <div class="overflow-hidden rounded-xl border-2 h-auto">
-    <div class="flex items-center gap-x-4 border-b-2 p-6">
-      <div class="text-sm font-medium leading-6 ">
-        {this_exercise.title}
+  <Card class="hover:shadow-md transition-all">
+    <CardHeader class="border-b">
+      <div class="flex items-center gap-x-4">
+        <h4 class="text-sm font-medium flex-1">{this_exercise.title}</h4>
+        {#if $sidebar_lab_session.clusterRunning}
+          <div class="relative dropdown dropdown-end dropdown-bottom">
+            <Button
+              variant="default"
+              size="sm"
+              class="relative"
+              disabled={$loadingExercises.has(this_exercise.id)}
+            >
+              {#if $loadingExercises.has(this_exercise.id)}
+                <span class="loading loading-dots loading-sm"></span>
+                Actions
+                <ul class="dropdown-content z-[1] menu p-2 shadow bg-card border rounded-lg w-52 gap-2 mt-2">
+                  <li>
+                    <Button variant="ghost" size="sm" class="justify-start gap-2 w-full" disabled>
+                      <Info class="w-4 h-4" />
+                      Starting Exercise
+                    </Button>
+                  </li>
+                </ul>
+              {:else}
+                <button class="-m-3 block p-2.5">
+                  Actions <MoreHorizontal class="w-5 h-5 inline-block" strokeWidth={3} />
+                </button>
+                <ul class="dropdown-content z-[1] menu p-2 shadow bg-card border rounded-lg w-52 gap-2 mt-2">
+                  <li>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="justify-start gap-2 w-full text-primary hover:text-primary"
+                      on:click={() => {
+                        sidebarOpen.set(false);
+                        exercise.set(this_exercise);
+                        exercises.set($sidebar_exercises);
+                        new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+                          goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
+                        );
+                      }}
+                    >
+                      <Terminal class="w-4 h-4" />
+                      Shell
+                    </Button>
+                  </li>
+                  {#if this_exercise_session.agentRunning}
+                    <li>
+                      {#if confirmation}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          class="justify-start gap-2 w-full text-yellow-600 hover:text-yellow-600"
+                          on:click={() => stopExercise(this_exercise.id)}
+                        >
+                          <AlertTriangle class="w-4 h-4" />
+                          Are you sure?
+                        </Button>
+                      {:else}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          class="justify-start gap-2 w-full text-red-600 hover:text-red-600"
+                          on:click={() => (confirmation = true)}
+                        >
+                          <Pause class="w-4 h-4" />
+                          Stop Exercise
+                        </Button>
+                      {/if}
+                    </li>
+                  {:else}
+                    <li>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        class="justify-start gap-2 w-full text-green-600 hover:text-green-600"
+                        on:click={() => startExercise(this_exercise.id)}
+                      >
+                        <Play class="w-4 h-4" />
+                        Start Exercise
+                      </Button>
+                    </li>
+                  {/if}
+                </ul>
+              {/if}
+              {#if this_exercise_session.agentRunning}
+                <span class="absolute flex h-3 w-3 -top-1 -right-1">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+              {/if}
+            </Button>
+          </div>
+        {:else}
+          <p class="text-destructive text-sm">Lab not running</p>
+        {/if}
       </div>
-      {#if $sidebar_lab_session.clusterRunning}
-        <div class="relative ml-auto dropdown dropdown-end dropdown-bottom">
-          <button class="btn btn-neutral flex justify-center items-center  relative">
-            {#if $loadingExercises.has(this_exercise.id)}
-              <span class="capitalize">Actions</span>
-              <span class="loading loading-dots loading-sm inline-block p-2" />
-              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
-                <li>
-                  <!-- exercise is starting... -->
-                  <button class="border-2 ">
-                    <Info class="w-4 h-4 mr-1 inline-block" />
-                    Starting Exercise</button
-                  >
-                </li>
-              </ul>
-            {:else}
-              <button class="-m-3 block p-2.5">
-                Actions <MoreHorizontal class="w-6 h-6 inline-block" strokeWidth={3} />
-              </button>
-              <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 gap-2">
-                <li>
-                  <button
-                    on:click={() => {
-                      sidebarOpen.set(false);
-                      exercise.set(this_exercise);
-                      exercises.set($sidebar_exercises);
-                      new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-                        goto(`/labs/${$sidebar_lab.id}/${this_exercise.id}`)
-                      );
-                    }}
-                    class="border-2 text-primary"
-                  >
-                    <Terminal class="w-4 h-4 mr-1 inline-block" />
-                    Shell</button
-                  >
-                </li>
-                {#if this_exercise_session.agentRunning}
-                  <li>
-                    {#if confirmation}
-                    <button
-                    class="border-2 text-warning border-warning hover:bg-warning hover:text-primary"
-                      on:click={() => stopExercise(this_exercise.id)}
-                    >
-                      <AlertTriangle class="w-5 h-5 mr-2 inline-block" />
-                      Are you sure?
-                    </button>
-                    {:else}
-                    <div
-                      class="border-2 text-error border-error hover:bg-error hover:text-primary"
-                      on:click={() => (confirmation = true)}
-                    >
-                      <Pause class="w-4 h-4 mr-1 inline-block" />
-                      Stop Exercise</div
-                    >
-                    {/if}
-                  </li>
-                {:else}
-                  <li>
-                    <button
-                      class="border-2 text-success border-success hover:bg-success hover:text-primary"
-                      on:click={() => startExercise(this_exercise.id)}
-                    >
-                      <Play class="w-4 h-4 mr-1 inline-block" />
-                      Start Exercise</button
-                    >
-                  </li>
-                {/if}
-              </ul>
-            {/if}
-            {#if this_exercise_session.agentRunning}
-              <span class="absolute flex h-4 w-4 -top-2 -right-2">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
-                />
-                <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
-              </span>
-            {/if}
-          </button>
+    </CardHeader>
+    <CardContent class="pt-6">
+      <dl class="space-y-4 text-sm">
+        <div class="flex justify-between items-center">
+          <dt class="text-muted-foreground">Status</dt>
+          <dd>
+            <Badge variant={this_exercise_session.agentRunning ? "default" : "outline"} class="gap-1">
+              {#if this_exercise_session.agentRunning}
+                <Play class="w-3 h-3" />
+                Running
+              {:else}
+                <Pause class="w-3 h-3" />
+                Stopped
+              {/if}
+            </Badge>
+          </dd>
         </div>
-      {:else}
-        <p class="text-error text-sm relative ml-auto">Lab not running</p>
-      {/if}
-    </div>
-    <dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-      <div class="flex justify-between gap-x-4 py-3">
-        <dt class="">Status</dt>
-        <dd class="badge badge-outline {this_exercise_session.agentRunning ? 'badge-success' : ''}">
-          {#if this_exercise_session.agentRunning}
-            <Play class="w-4 h-4 mr-1 inline-block" />
-          {:else}
-            <Pause class="w-4 h-4 mr-1 inline-block" />
-          {/if}
-          {this_exercise_session.agentRunning ? "Running" : "Stopped"}
-        </dd>
-      </div>
-      <div class="flex justify-between gap-x-4 py-3">
-        <dt class="">Done</dt>
-        <dd class={this_exercise_session.agentRunning ? "text-success" : "text-gray-400"}>
-          <span class="ml-1 text-xs">
+        <div class="flex justify-between items-center">
+          <dt class="text-muted-foreground">Done</dt>
+          <dd>
             {#if this_exercise_session.endTime && !this_exercise_session.agentRunning}
-              <span class="text-success">
-                <CheckCircle class="w-5 h-5 inline-block" />
+              <span class="flex items-center gap-1 text-green-600 font-medium">
+                <CheckCircle class="w-4 h-4" />
                 {getDeltaTime(this_exercise_session.startTime, this_exercise_session.endTime)}
               </span>
             {:else}
-              <span class="text-gray-400">not yet</span>
+              <span class="text-muted-foreground">not yet</span>
             {/if}
-          </span>
-        </dd>
-      </div>
-    </dl>
-  </div>
+          </dd>
+        </div>
+      </dl>
+    </CardContent>
+  </Card>
 {/if}
