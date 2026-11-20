@@ -1,6 +1,6 @@
 <script lang="ts">
-  import "../app.postcss";
   import "../app.css";
+  import "../app.postcss";
   import "../styles/xterm.css";
   import "../styles/prism.css";
   import { metadata } from "$lib/stores/metadata";
@@ -10,6 +10,7 @@
   import { page } from "$app/stores";
   import { Toaster } from "svelte-french-toast";
   import darkTheme from "$lib/stores/theme";
+  import { onMount } from "svelte";
 
   // export let data: any;
 
@@ -22,13 +23,19 @@
   });
 
   // add  class="dark" data-theme="dark" to <html> if dark mode is enabled
-  $: if ($darkTheme) {
-    document.documentElement.classList.add("dark");
-    document.documentElement.setAttribute("data-theme", "dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-    document.documentElement.setAttribute("data-theme", "light");
-  }
+  onMount(() => {
+    const unsubscribe = darkTheme.subscribe((value) => {
+      if (value) {
+        document.documentElement.classList.add("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    });
+    
+    return unsubscribe;
+  });
 </script>
 
 <svelte:head>

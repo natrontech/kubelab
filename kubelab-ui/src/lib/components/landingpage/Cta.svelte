@@ -9,18 +9,16 @@
     />
   </div>
   <div class="mx-auto max-w-2xl text-center">
-    <h2 class="text-3xl font-bold tracking-tight  sm:text-4xl">
+    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
       Ready to Dive into Kubernetes Mastery?
     </h2>
-    <p class="mx-auto mt-6 max-w-xl text-lg leading-8 ">
+    <p class="mx-auto mt-6 max-w-xl text-lg leading-8">
       Join KubeLab today and elevate your learning experience with hands-on, real-world Kubernetes
       labs and workshops.
     </p>
     <div class="mt-10 flex items-center justify-center gap-x-6">
-      <a href="/signup/" class="btn btn-neutral ">Get started</a>
-      <a
-        href="https://github.com/natrontech/kubelab"
-        class="text-sm font-semibold leading-6 "
+      <a href="/signup/" class="btn btn-neutral">Get started</a>
+      <a href="https://github.com/natrontech/kubelab" class="text-sm font-semibold leading-6"
         >Learn more <span aria-hidden="true">→</span></a
       >
     </div>

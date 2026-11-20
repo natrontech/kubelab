@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/natrontech/kubelab/pkg/util"
-	"github.com/pocketbase/pocketbase/models"
+	"github.com/pocketbase/pocketbase/core"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -26,7 +26,7 @@ func GetTotalNamespaces() (string, error) {
 
 type NamespaceParams struct {
 	Name       string
-	UserRecord *models.Record
+	UserRecord *core.Record
 }
 
 func CreateNamespace(params NamespaceParams) error {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "svelte-icons-pack";
+  import { Icon } from "svelte-icons-pack";
   import { ArrowBigLeft } from "lucide-svelte";
 
   function onClick() {

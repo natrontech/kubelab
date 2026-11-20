@@ -7,7 +7,7 @@ import (
 
 	"github.com/natrontech/kubelab/pkg/env"
 	"github.com/natrontech/kubelab/pkg/util"
-	"github.com/pocketbase/pocketbase/models"
+	"github.com/pocketbase/pocketbase/core"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +23,7 @@ type DeploymentParams struct {
 	Bootstrap      string
 	Check          string
 	Host           string
-	UserRecord     *models.Record
+	UserRecord     *core.Record
 	CodeServerPath string
 }
 
@@ -54,7 +54,7 @@ func createConfigMap(namespace, name string, data map[string]string) {
 	}
 }
 
-func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *models.Record, codeServerPath string) *appsv1.Deployment {
+func constructDeployment(name, namespace, image string, replicas int32, host string, userRecord *core.Record, codeServerPath string) *appsv1.Deployment {
 	scriptVolumeName := "scripts-" + name
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
