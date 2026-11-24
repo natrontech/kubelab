@@ -151,7 +151,6 @@
           client
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
-            .then((response) => {})
             .catch((error) => {
               console.log(error);
             });

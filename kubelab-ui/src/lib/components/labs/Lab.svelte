@@ -1,13 +1,10 @@
 <script lang="ts">
   import type {
-    ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse,
     LabSessionsResponse,
     LabsResponse
   } from "$lib/pocketbase/generated-types";
-  import { getExerciseSessionByExercise } from "$lib/stores/data";
-  import { loadingExercises } from "$lib/stores/loading";
   import {
     sidebar_exercise_sessions,
     sidebar_exercises,

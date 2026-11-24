@@ -4,8 +4,7 @@
   import {
     exercise_sessions,
     exercises,
-    getExerciseSessionByExercise,
-    lab
+    getExerciseSessionByExercise
   } from "$lib/stores/data";
   import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
   import { client } from "$lib/pocketbase";
@@ -78,8 +77,6 @@
           client
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
-            .then((response) => {
-            })
             .catch((error) => {
               console.log(error);
             });

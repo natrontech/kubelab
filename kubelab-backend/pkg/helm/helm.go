@@ -7,8 +7,8 @@ import (
 
 	helmclient "github.com/mittwald/go-helm-client"
 	"github.com/natrontech/kubelab/pkg/util"
-	"helm.sh/helm/v3/pkg/release"
-	"helm.sh/helm/v3/pkg/repo"
+	release "helm.sh/helm/v4/pkg/release/v1"
+	repo "helm.sh/helm/v4/pkg/repo/v1"
 )
 
 const Prefix = "kubelab"

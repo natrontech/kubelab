@@ -1,8 +1,7 @@
 import { client } from "$lib/pocketbase";
 import type {
     CompaniesResponse,
-    FaqsResponse,
-    PlansResponse
+    FaqsResponse
 } from "$lib/pocketbase/generated-types.js";
 
 export const load = async () => {

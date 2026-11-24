@@ -32,7 +32,6 @@
   import codeView from "$lib/stores/codeView";
   let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
 
-  let loadingMD = "";
   let showSolution = "";
 
   let docs: string;
@@ -64,7 +63,6 @@
   }
 
   async function getMarkdown() {
-    loadingMD = window.location.pathname.split("/")[3];
 
     new Promise((resolve, reject) => {
       fetch($exercise.docs)
@@ -94,7 +92,6 @@
           reject(error);
         });
     }).finally(() => {
-      loadingMD = "";
     });
   }
 

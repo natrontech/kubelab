@@ -1,24 +1,24 @@
-FROM golang:1.22-alpine AS backend-builder
+FROM golang:1.27.4-alpine AS backend-builder
 WORKDIR /build
 COPY kubelab-backend/go.mod kubelab-backend/go.sum kubelab-backend/main.go ./
 COPY kubelab-backend/hooks ./hooks
 COPY kubelab-backend/pkg ./pkg
 COPY kubelab-backend/vcluster-values.yaml ./vcluster-values.yaml
 RUN apk --no-cache add upx make git gcc libtool musl-dev ca-certificates dumb-init \
-  && go mod tidy \
+  && go mod download \
   && CGO_ENABLED=0 go build \
   && upx kubelab
 
-FROM node:lts-slim as ui-builder
+FROM node:26-slim AS ui-builder
 WORKDIR /build
 COPY ./kubelab-ui/package*.json ./
 RUN rm -rf ./node_modules
 RUN rm -rf ./build
 COPY ./kubelab-ui .
-RUN npm install --legacy-peer-deps
+RUN npm ci
 RUN npm run build
 
-FROM alpine as runtime
+FROM alpine AS runtime
 WORKDIR /app/kubelab
 COPY --from=backend-builder /build/kubelab /app/kubelab/kubelab
 COPY --from=backend-builder /build/vcluster-values.yaml /app/kubelab/vcluster-values.yaml

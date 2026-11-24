@@ -17,6 +17,35 @@ updates:
     multi-ecosystem-group: "all-dependencies"
     cooldown:
       default-days: 7
+    ignore:
+      - dependency-name: "svelte"
+        versions: [">=5"]
+      - dependency-name: "@sveltejs/kit"
+        versions: [">=3"]
+      - dependency-name: "@sveltejs/adapter-static"
+        versions: [">=4"]
+      - dependency-name: "@sveltejs/vite-plugin-svelte"
+        versions: [">=4"]
+      - dependency-name: "vite"
+        versions: [">=6"]
+      - dependency-name: "pocketbase"
+        versions: [">=0.22"]
+      - dependency-name: "svelte-splitpanes"
+        versions: [">=8.0.10"]
+      - dependency-name: "tailwindcss"
+        versions: [">=4"]
+      - dependency-name: "tailwind-scrollbar"
+        versions: [">=4"]
+      - dependency-name: "daisyui"
+        versions: [">=5"]
+      - dependency-name: "flowbite"
+        versions: [">=3"]
+      - dependency-name: "flowbite-svelte"
+        versions: [">=1"]
+      - dependency-name: "svelte-confetti"
+        versions: [">=2"]
+      - dependency-name: "prettier-plugin-svelte"
+        versions: [">=4"]
 
   - package-ecosystem: "gomod"
     directory: "kubelab-backend/"
@@ -24,6 +53,13 @@ updates:
     multi-ecosystem-group: "all-dependencies"
     cooldown:
       default-days: 7
+    ignore:
+      - dependency-name: "github.com/pocketbase/pocketbase"
+        versions: [">=0.23.0"]
+      - dependency-name: "github.com/labstack/echo/v5"
+        versions: [">=5.0.0"]
+      - dependency-name: "gocloud.dev"
+        versions: [">=0.47.0"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

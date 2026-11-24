@@ -5,8 +5,8 @@
   import darkTheme from "$lib/stores/theme";
   import { onDestroy, onMount } from "svelte";
 
-  import { Terminal } from "xterm";
-  import { FitAddon } from "xterm-addon-fit";
+  import { Terminal } from "@xterm/xterm";
+  import { FitAddon } from "@xterm/addon-fit";
 
   export const terminal = new Terminal({
     convertEol: true,
@@ -118,7 +118,6 @@
   };
 
   function ab2str(buf: any) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return String.fromCharCode.apply(null, new Uint8Array(buf));
   }

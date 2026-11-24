@@ -6,7 +6,6 @@
     CheckCircle,
     FileCode2,
     HelpCircle,
-    LifeBuoy,
     RotateCw,
     StopCircle,
     StretchHorizontal,
@@ -21,8 +20,7 @@
     exercise_session,
     exercise_sessions,
     exercises,
-    filterExercisesByLab,
-    loadingCodeEditor
+    filterExercisesByLab
   } from "$lib/stores/data.js";
 
   // @ts-ignore
@@ -204,7 +202,7 @@
     client
       .collection("notifications")
       .create(notification_data)
-      .then((response) => {
+      .then(() => {
         toast.success("Help requested, please wait for your trainer.");
         helpRequested = true;
       })
@@ -265,12 +263,6 @@
         console.error(error);
         toast.error("Exercise failed to stop");
       });
-  }
-
-  function handleOpenVSCode() {
-    // window.open(codeUrl, "_blank");
-    $codeView = !$codeView;
-    $loadingCodeEditor = true;
   }
 
   function isCurrentExercise(exercise_id: string) {
@@ -357,8 +349,8 @@
                 x={[-5, 5]}
                 y={[0, 0.1]}
                 delay={[0, 2000]}
-                duration="3000"
-                amount="100"
+                duration={3000}
+                amount={100}
                 fallDistance="100vh"
               />
             {/if}

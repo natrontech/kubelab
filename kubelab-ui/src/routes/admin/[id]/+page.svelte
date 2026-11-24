@@ -6,6 +6,7 @@
     type NotificationsResponse,
     type ExerciseSessionsResponse,
     type CompaniesResponse,
+    type UsersResponse,
     type ExercisesResponse
   } from "$lib/pocketbase/generated-types";
   import { exercise_session_logs } from "$lib/stores/data";
@@ -33,7 +34,7 @@
   }
 
   let activities: Activity[] = [];
-  let notifications: NotificationsResponse[] = [];
+  let notifications: NotificationsResponse<{ user: UsersResponse; exercise: ExercisesResponse }>[] = [];
   export let data: any;
   let company_id = data.props.id || "";
   let all_exercise_sessions: ExerciseSessionsResponse[] = [];
@@ -263,7 +264,7 @@
   }
 
   async function getNotifications() {
-    let notifications_response: NotificationsResponse[] = await client
+    let notifications_response: NotificationsResponse<{ user: UsersResponse; exercise: ExercisesResponse }>[] = await client
       .collection("notifications")
       .getFullList(3, {
         expand: "user,user.company,exercise",
@@ -408,7 +409,7 @@
       </div>
       <ul class="-mb-8">
         {#if notifications.length > 0}
-          {#each notifications as notification, idx}
+          {#each notifications as notification}
             <li>
               <div class="relative pb-8">
                 <div class="relative flex space-x-3">

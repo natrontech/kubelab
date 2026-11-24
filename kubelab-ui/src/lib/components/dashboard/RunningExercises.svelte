@@ -3,15 +3,14 @@
   import { client } from "$lib/pocketbase";
   import type {
     ExerciseSessionsRecord,
-    ExerciseSessionsResponse
+    ExerciseSessionsResponse,
+    ExercisesResponse
   } from "$lib/pocketbase/generated-types";
   import {
     exercise,
     exercise_sessions,
-    exercise_session,
     getExerciseSessionByExercise,
-    exercises,
-    lab
+    exercises
   } from "$lib/stores/data";
   import { loadingExercises } from "$lib/stores/loading";
   import { Card } from "flowbite-svelte";
@@ -19,11 +18,13 @@
   import toast from "svelte-french-toast";
 
 
-  let running_exercises: ExerciseSessionsResponse[] = $exercise_sessions.filter(
-    (exercise_session) => exercise_session.agentRunning
-  );
+  type RunningSession = Required<ExerciseSessionsResponse<{ exercise: ExercisesResponse }>>;
 
-  function openExercise(local_exercise_session: ExerciseSessionsResponse) {
+  let running_exercises = $exercise_sessions.filter(
+    (exercise_session) => exercise_session.agentRunning
+  ) as RunningSession[];
+
+  function openExercise(local_exercise_session: RunningSession) {
     // TODO: fix roadmap
     let exercises_by_lab = $exercises.filter(
       (exercise) => exercise.lab === local_exercise_session.expand.exercise.lab
@@ -47,7 +48,7 @@
       agentRunning: false
     };
 
-    $loadingExercises = $loadingExercises.concat(exercise_id);
+    $loadingExercises = new Set($loadingExercises).add(exercise_id);
 
     const exercise_session_id = getExerciseSessionByExercise(exercise_id)?.id;
 
@@ -76,7 +77,8 @@
           toast.error(error.message);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+          $loadingExercises.delete(exercise_id);
+          $loadingExercises = new Set($loadingExercises);
         });
     }
   }

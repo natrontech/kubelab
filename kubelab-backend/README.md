@@ -9,7 +9,7 @@ Out of the box, the project assumes #2 (custom compiled with my customizations).
 
 ## standard (official) release of pocketbase
 
-Download from release archive from https://github.com/pocketbase/pocketbase/releases/latest, unzip it and place the `pocketbase` binary in this folder, and you're done.
+Download the matching 0.22 patch release from https://github.com/pocketbase/pocketbase/releases, unzip it and place the `pocketbase` binary in this folder, and you're done.
 
 ## custom build
 
@@ -30,7 +30,7 @@ Assuming you have Go language tools installed ...
 
 `go build`
 
-If you don't have Go and don't want to install it, you can use docker-compose setup. Otherwise, your only choice is to download the binary from https://github.com/pocketbase/pocketbase/releases/latest, and placing it in this folder. But then you will not be able to use any of the custom code (such as "config-driven hooks")
+If you don't have Go and don't want to install it, you can use docker-compose setup. Otherwise, download the matching 0.22 patch binary from https://github.com/pocketbase/pocketbase/releases and place it in this folder. But then you will not be able to use any of the custom code (such as "config-driven hooks")
 
 ## Run migrations
 

@@ -1,7 +1,6 @@
 <script lang="ts">
   import darkTheme from "$lib/stores/theme";
   import type { ComponentType, SvelteComponentTyped } from "svelte";
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   export let Console: ComponentType<SvelteComponentTyped>;
 </script>
 

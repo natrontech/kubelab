@@ -29,10 +29,6 @@ The file `generated-types.ts` contains TypeScript definitions of `Record` types 
 
 To create a production version of your app (static HTML/JS app):
 
-_NOTE_: The build below will fail unless the backend has at least 1
-post created. So please create a "posts" record using the app UI or
-the admin UI before running build below.
-
 ```bash
 # compile frontend
 npm run build

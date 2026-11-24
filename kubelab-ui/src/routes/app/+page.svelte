@@ -136,7 +136,7 @@
     <TableBody tableBodyClass="divide-y">
       {#if companies.length == 0}
         <TableBodyRow>
-          <TableBodyCell colspan="2" class="text-center">No companies yet</TableBodyCell>
+          <TableBodyCell colspan={2} class="text-center">No companies yet</TableBodyCell>
         </TableBodyRow>
       {:else}
         {#each companies as company}

@@ -38,12 +38,8 @@
 
 <div>
   <Toaster position="bottom-center" />
-  <!-- only display nav when not on /login -->
-  {#if $page.route.id !== "/login" && $page.route.id !== "/" && $page.route.id !== "/signup" && $page.route.id !== "/admin/%5Bid%5D"}
-    <!-- also not display nav when any subpath of /admin with regex /admin\/.*$/ -->
-    {#if !$page.route.id.match(/\/admin\/.*$/)}
-      <Nav />
-    {/if}
+  {#if $page.route.id && !["/", "/login"].includes($page.route.id) && !$page.route.id.startsWith("/admin")}
+    <Nav />
   {/if}
   <slot />
 </div>

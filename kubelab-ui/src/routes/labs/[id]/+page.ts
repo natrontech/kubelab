@@ -1,7 +1,5 @@
 import {
     UpdateFilterEnum,
-    filterExerciseSessionsByLab,
-    filterExercisesByLab,
     updateDataStores
 } from "$lib/stores/data";
 import toast from "svelte-french-toast";

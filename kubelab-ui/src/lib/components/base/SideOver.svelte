@@ -16,7 +16,6 @@
   import { client } from "$lib/pocketbase";
   import { sidebar_exercise_sessions, sidebar_lab, sidebar_lab_session } from "$lib/stores/sidebar";
   import Exercise from "../labs/Exercise.svelte";
-  import { Button, Modal } from "flowbite-svelte";
 
   let docs: string;
   export let drawerHidden = true;
@@ -294,8 +293,8 @@
         <div
           class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none pb-4"
         >
-          {#each $sidebar_exercise_sessions as exercise_session, idx}
-            <Exercise this_exercise_session={exercise_session} index={idx} />
+          {#each $sidebar_exercise_sessions as exercise_session}
+            <Exercise this_exercise_session={exercise_session} />
           {/each}
         </div>
       {/key}

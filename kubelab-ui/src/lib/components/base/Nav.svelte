@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { navigating } from "$app/stores";
   import { client, logout } from "$lib/pocketbase";
     import { avatarUrl } from "$lib/stores/data";
   import darkTheme from "$lib/stores/theme";
   import type { NavRoute } from "$lib/types";
   import {
     TerminalSquare,
-    Github,
+    GitFork,
     Presentation,
     Sun,
     Moon,
@@ -24,32 +23,7 @@
       client.authStore.model?.avatar;
   }
 
-  let routes: NavRoute[] = [
-    {
-      id: "1",
-      name: "Dashboard",
-      href: "/app/",
-      icon: BarChart2
-    },
-    {
-      id: "2",
-      name: "Labs",
-      href: "/labs/",
-      icon: TerminalSquare
-    },
-    {
-      id: "3",
-      name: "Material",
-      href: "/material/",
-      icon: Presentation
-    },
-    {
-      id: "4",
-      name: "About",
-      href: "https://github.com/natrontech/kubelab",
-      icon: Github
-    }
-  ];
+  let routes: NavRoute[];
 
   if (client.authStore.model?.role != "admin") {
     routes = [
@@ -75,7 +49,7 @@
         id: "4",
         name: "About",
         href: "https://github.com/natrontech/kubelab",
-        icon: Github
+        icon: GitFork
       }
     ];
   } else {

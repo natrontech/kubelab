@@ -1,5 +1,5 @@
 <script>
-  import { Download, ExternalLink, Presentation } from "lucide-svelte";
+  import { Download, ExternalLink } from "lucide-svelte";
 </script>
 
 <h1 class="text-center text-4xl font-bold my-4">Material</h1>
