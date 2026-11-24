@@ -41,8 +41,8 @@
     type NotificationsRecord,
     NotificationsTypeOptions
   } from "$lib/pocketbase/generated-types.js";
-  import { Tooltip } from "flowbite-svelte";
   import codeView from "$lib/stores/codeView.js";
+  import { Button } from "$lib/components/ui/button";
 
   $metadata.title = "Exercises";
 
@@ -279,11 +279,11 @@
 </script>
 
 {#key $exercise}
-  <div class="absolute top-0 h-20 left-0 right-0 ">
+  <div class="absolute top-0 h-20 left-0 right-0">
     <div class="mt-5 flex justify-between px-2">
       <div class="grid grid-cols-2 gap-2">
-        <button
-          class="btn btn-neutral"
+        <Button
+          variant="outline"
           on:click={() => {
             if ($sidebar_lab) {
               sidebarOpen.set(true);
@@ -293,62 +293,54 @@
         >
           <ArrowLeft class="inline-block w-4 h-4 mr-2" />
           Labs
-        </button>
-        <div class="join ">
-          <button
-            on:click={() => {
-              codeView.set(false);
-            }}
-            class="join-item btn {!$codeView
-              ? ' btn-neutral dark:btn-primary dark:text-neutral'
-              : 'btn-outline'} "
+        </Button>
+        <div class="flex rounded-md border">
+          <Button
+            variant={!$codeView ? "default" : "ghost"}
+            size="sm"
+            class="rounded-none rounded-l-md border-r"
+            on:click={() => codeView.set(false)}
           >
-            <Terminal class="inline-block" />
-          </button>
-          <button
-            on:click={() => {
-              codeView.set(true);
-            }}
-            class="join-item btn {!$codeView
-              ? 'btn-outline'
-              : ' btn-neutral dark:btn-primary dark:text-neutral '}"
+            <Terminal class="h-4 w-4" />
+          </Button>
+          <Button
+            variant={!$codeView ? "ghost" : "default"}
+            size="sm"
+            class="rounded-none rounded-r-md"
+            on:click={() => codeView.set(true)}
           >
-            <FileCode2 class="inline-block" />
-          </button>
+            <FileCode2 class="h-4 w-4" />
+          </Button>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-2">
-        <div class="join grid grid-cols-2">
-          <button
-            on:click={() => {
-              horizontalView.set(true);
-            }}
-            class="join-item btn {$horizontalView
-              ? ' btn-neutral dark:btn-primary dark:text-neutral'
-              : 'btn-outline'} "
+        <div class="flex rounded-md border">
+          <Button
+            variant={$horizontalView ? "default" : "ghost"}
+            size="sm"
+            class="rounded-none rounded-l-md border-r"
+            on:click={() => horizontalView.set(true)}
           >
-            <StretchHorizontal />
-          </button>
-          <button
-            on:click={() => {
-              horizontalView.set(false);
-            }}
-            class="join-item btn {$horizontalView
-              ? 'btn-outline'
-              : ' btn-neutral dark:btn-primary dark:text-neutral '}"
+            <StretchHorizontal class="h-4 w-4" />
+          </Button>
+          <Button
+            variant={$horizontalView ? "ghost" : "default"}
+            size="sm"
+            class="rounded-none rounded-r-md"
+            on:click={() => horizontalView.set(false)}
           >
-            <StretchVertical />
-          </button>
+            <StretchVertical class="h-4 w-4" />
+          </Button>
         </div>
         <ToggleConfetti>
-          <button
+          <Button
             slot="label"
-            class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
+            class={!$exercise_session.agentRunning ? 'hidden' : 'bg-green-600 hover:bg-green-700'}
             on:click={() => handleCheckExercise()}
           >
-            <CheckCircle class="inline-block mr-2" />
+            <CheckCircle class="inline-block mr-2 h-4 w-4" />
             <span> Check </span>
-          </button>
+          </Button>
           <div
             style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
           >
@@ -376,26 +368,35 @@
       <div>
         {#if $exercise_session.agentRunning}
           {#if client.authStore.model?.workshop == true}
-            <button
-              class="btn btn-accent dark:text-black {helpRequested ? 'btn-disabled' : 'btn-accent'}"
-              on:click={() => {
-                askForHelp();
-              }}
+            <Button
+              variant="outline"
+              size="icon"
+              class="bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={helpRequested}
+              on:click={() => askForHelp()}
             >
-              <HelpCircle class="inline-block" />
-            </button>
-            <Tooltip class="bg-neutral">Call for Help</Tooltip>
+              <HelpCircle class="h-5 w-5" />
+            </Button>
           {/if}
 
-          <button class="btn btn-error" on:click={() => handleStopExercise()}>
-            <StopCircle class="inline-block" />
-          </button>
-          <Tooltip class="bg-neutral">Stop Exercise</Tooltip>
+          <Button
+            variant="outline"
+            size="icon"
+            class="bg-red-600 hover:bg-red-700 text-white border-red-600"
+            on:click={() => handleStopExercise()}
+          >
+            <StopCircle class="h-5 w-5" />
+          </Button>
 
-          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
-            <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
-          </button>
-          <Tooltip class="bg-neutral">Reset Exercise</Tooltip>
+          <Button
+            variant="outline"
+            size="icon"
+            class="bg-yellow-600 hover:bg-yellow-700 text-white border-yellow-600"
+            on:click={() => handleRestartExercise()}
+          >
+            <RotateCw class="h-5 w-5 {restartLoading ? 'animate-spin' : ''}" />
+          </Button>
+        
         {/if}
       </div>
       <div class="">
@@ -411,7 +412,7 @@
                       class="step
       {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
       "
-                    />
+                    ></button>
                   {/each}
                 {:else if $sidebar_exercises}
                   {#each $sidebar_exercises as currentExercise, i}
@@ -421,7 +422,7 @@
                       class="step
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
-                    />
+                    ></button>
                   {/each}
                 {/if}
               {/key}

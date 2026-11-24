@@ -11,13 +11,13 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 )
 
-func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
-	exercise, err := app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
+func setupExerciseResources(e *core.RecordRequestEvent, app *pocketbase.PocketBase) error {
+	exercise, err := app.FindRecordById("exercises", e.Record.GetString("exercise"))
 	if err != nil {
 		return logAndReturnErr(err)
 	}
 
-	user, err := app.Dao().FindRecordById("users", e.Record.GetString("user"))
+	user, err := app.FindRecordById("users", e.Record.GetString("user"))
 	if err != nil {
 		return err
 	}
@@ -116,8 +116,8 @@ func setupExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBas
 	return nil
 }
 
-func deleteExerciseResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
-	exercise, err := app.Dao().FindRecordById("exercises", e.Record.GetString("exercise"))
+func deleteExerciseResources(e *core.RecordRequestEvent, app *pocketbase.PocketBase) error {
+	exercise, err := app.FindRecordById("exercises", e.Record.GetString("exercise"))
 	if err != nil {
 		return logAndReturnErr(err)
 	}

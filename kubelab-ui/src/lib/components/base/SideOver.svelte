@@ -16,11 +16,13 @@
   import { client } from "$lib/pocketbase";
   import { sidebar_exercise_sessions, sidebar_lab, sidebar_lab_session } from "$lib/stores/sidebar";
   import Exercise from "../labs/Exercise.svelte";
-  import { Button, Modal } from "flowbite-svelte";
+  import { Button } from "$lib/components/ui/button";
+  import { Badge } from "$lib/components/ui/badge";
 
   let docs: string;
   export let drawerHidden = true;
   let confirmation = false;
+  let aboutExpanded = false;
 
   async function getMarkdown() {
     fetch($sidebar_lab.docs)
@@ -206,88 +208,94 @@
             {$sidebar_lab.title}
           </h2>
         </div>
-        <div
-          class="badge badge-outline {$sidebar_lab_session.clusterRunning ? 'badge-success' : ''}"
+        <Badge 
+          variant={$sidebar_lab_session.clusterRunning ? "default" : "outline"}
+          class={$sidebar_lab_session.clusterRunning ? "bg-green-600 gap-1" : "gap-1"}
         >
           {#if $sidebar_lab_session.clusterRunning}
-            <Play class="w-4 h-4 mr-1 inline-block" />
+            <Play class="w-3 h-3" />
           {:else}
-            <Pause class="w-4 h-4 mr-1 inline-block" />
+            <Pause class="w-3 h-3" />
           {/if}
           {$sidebar_lab_session.clusterRunning ? "Running" : "Stopped"}
-        </div>
+        </Badge>
         <div class="grid grid-cols-1 gap-2 mt-4">
           {#if !$sidebar_lab_session.clusterRunning}
-            <button
-              class="btn btn-outline btn-success"
+            <Button
+              variant="outline"
+              class="text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
               on:click={() => startLab($sidebar_lab_session.id)}
+              disabled={$loadingLabs.has($sidebar_lab_session.id)}
             >
               {#if $loadingLabs.has($sidebar_lab_session.id)}
-                <span class="loading loading-dots loading-md" />
+                <span class="loading loading-dots loading-sm mr-2"></span>
+                Starting...
               {:else}
-                <Play class="w-5 h-5 mr-2 inline-block" />
+                <Play class="w-5 h-5 mr-2" />
                 Start lab
               {/if}
-            </button>
+            </Button>
+          {:else if $loadingLabs.has($sidebar_lab_session.id)}
+            <Button variant="outline" disabled>
+              <span class="loading loading-dots loading-sm mr-2"></span>
+              Stopping lab
+            </Button>
+          {:else if confirmation}
+            <Button
+              variant="outline"
+              class="text-yellow-600 border-yellow-600 hover:bg-yellow-600 hover:text-white"
+              on:click={() => stopLab($sidebar_lab_session.id)}
+            >
+              <AlertTriangle class="w-5 h-5 mr-2" />
+              Are you sure?
+            </Button>
           {:else}
-            {#if $loadingLabs.has($sidebar_lab_session.id)}
-              <button class="btn btn-outline btn-disabled">
-                <span class="loading loading-dots loading-md" />
-                Stopping lab
-              </button>
-            {:else if confirmation}
-              <button
-                class="btn btn-outline btn-warning"
-                on:click={() => stopLab($sidebar_lab_session.id)}
-              >
-                <AlertTriangle class="w-5 h-5 mr-2 inline-block" />
-                Are you sure?
-              </button>
-            {:else}
-              <button class="btn btn-outline btn-error" on:click={() => (confirmation = true)}>
-                <Pause class="w-5 h-5 mr-2 inline-block" />
-                Stop lab
-              </button>
-            {/if}
+            <Button
+              variant="outline"
+              class="text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+              on:click={() => (confirmation = true)}
+            >
+              <Pause class="w-5 h-5 mr-2" />
+              Stop lab
+            </Button>
           {/if}
         </div>
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <div
-          tabindex="0"
-          class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4  rounded-lg shadow-md"
-        >
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div
-            class="collapse-title text-md font-medium"
+        <div class="border-2 border-primary rounded-lg my-4 shadow-sm overflow-hidden">
+          <button
+            class="w-full px-4 py-3 text-left font-medium hover:bg-accent transition-colors flex items-center justify-between"
             on:click={() => {
-              getMarkdown();
+              aboutExpanded = !aboutExpanded;
+              if (!docs) getMarkdown();
             }}
           >
-            About the lab
-          </div>
-          <div class="collapse-content">
-            <SvelteMarkdown
-              source={docs}
-              renderers={{
-                codespan: CodeSpanComponent,
-                code: CodeComponent,
-                link: LinkComponent
-              }}
-            />
-          </div>
+            <span>About the lab</span>
+            <span class="transform transition-transform {aboutExpanded ? 'rotate-180' : ''}">
+              ▼
+            </span>
+          </button>
+          {#if aboutExpanded}
+            <div class="px-4 py-3 border-t">
+              <SvelteMarkdown
+                source={docs}
+                renderers={{
+                  codespan: CodeSpanComponent,
+                  code: CodeComponent,
+                  link: LinkComponent
+                }}
+              />
+            </div>
+          {/if}
         </div>
         <div class="absolute top-5 right-6">
-          <div class="tooltip tooltip-left" data-tip="close">
-            <button
-              type="button"
-              on:click={() => {
-                drawerHidden = !drawerHidden;
-              }}
-              class="btn btn-outline border-none btn-sm btn-square"
-            >
-              <X />
-            </button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            on:click={() => {
+              drawerHidden = !drawerHidden;
+            }}
+          >
+            <X class="h-5 w-5" />
+          </Button>
         </div>
       </div>
       {#key $sidebar_exercise_sessions}

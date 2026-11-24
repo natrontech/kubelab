@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"github.com/natrontech/kubelab/pkg/util"
-	"github.com/pocketbase/pocketbase/models"
+	"github.com/pocketbase/pocketbase/core"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -11,7 +11,7 @@ type ServiceParams struct {
 	Namespace  string
 	Name       string
 	Port       int32
-	UserRecord *models.Record
+	UserRecord *core.Record
 }
 
 func CreateService(params ServiceParams) (*v1.Service, error) {

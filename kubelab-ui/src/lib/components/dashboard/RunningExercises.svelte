@@ -14,10 +14,10 @@
     lab
   } from "$lib/stores/data";
   import { loadingExercises } from "$lib/stores/loading";
-  import { Card } from "flowbite-svelte";
+  import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { Button } from "$lib/components/ui/button";
   import { Pause, Terminal } from "lucide-svelte";
   import toast from "svelte-french-toast";
-
 
   let running_exercises: ExerciseSessionsResponse[] = $exercise_sessions.filter(
     (exercise_session) => exercise_session.agentRunning
@@ -82,35 +82,48 @@
   }
 </script>
 
-<Card
-  padding="xl"
-  class="bg-white dark:bg-base-100 rounded-xl mt-4 shadow hover:shadow-md transition-all duration-150 ease-in-out overflow-x-hidden"
->
-  <div class="flex justify-between items-center mb-4">
-    <h5 class="text-xl font-bold leading-none ">Running Exercises</h5>
-    <a href="/labs" class="text-sm font-medium "> View all </a>
-  </div>
-  {#if running_exercises.length === 0}
-    <div class="text-center text-sm font-medium leading-6 ">No running exercises</div>
-  {/if}
-  <div class="overflow-y-auto max-h-96 space-y-2">
-    {#each running_exercises as running_exercise}
-      <div class="flex items-center">
-        <div class="text-sm font-medium leading-6 ">{running_exercise.expand.exercise.title}</div>
-        <div class="relative ml-auto gap-2">
-          <button class="btn-sm btn btn-outline" on:click={() => openExercise(running_exercise)}>
-            <Terminal class="w-4 h-4 mr-1 inline-block" />
-            Shell</button
-          >
-          <button
-            class="btn-sm btn btn-outline btn-error"
-            on:click={() => stopExercise(running_exercise.expand.exercise.id)}
-          >
-            <Pause class="w-4 h-4 mr-1 inline-block" />
-            Stop Exercise</button
-          >
-        </div>
+<Card class="hover:shadow-lg transition-shadow">
+  <CardHeader>
+    <div class="flex justify-between items-center">
+      <CardTitle>Running Exercises</CardTitle>
+      <a href="/labs" class="text-sm font-medium text-primary hover:underline">
+        View all
+      </a>
+    </div>
+  </CardHeader>
+  <CardContent>
+    {#if running_exercises.length === 0}
+      <div class="text-center text-muted-foreground py-8">
+        No running exercises
       </div>
-    {/each}
-  </div>
+    {:else}
+      <div class="space-y-4 max-h-96 overflow-y-auto">
+        {#each running_exercises as running_exercise}
+          <div class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+            <div class="flex-1">
+              <p class="font-medium">{running_exercise.expand.exercise.title}</p>
+            </div>
+            <div class="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                on:click={() => openExercise(running_exercise)}
+              >
+                <Terminal class="w-4 h-4 mr-2" />
+                Shell
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                on:click={() => stopExercise(running_exercise.expand.exercise.id)}
+              >
+                <Pause class="w-4 h-4 mr-2" />
+                Stop
+              </Button>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </CardContent>
 </Card>
