@@ -1,15 +1,5 @@
 # KubeLab Backend
 
-## Dependency compatibility
-
-PocketBase stays on the latest 0.22 patch release (currently 0.22.57) to retain the DAO/hooks API and the existing JavaScript migration history.
-Use the version in `go.mod` when building or downloading PocketBase; 0.23 and later require an application and database migration.
-Keep `gocloud.dev` below 0.47 because its changed blob driver API is incompatible with this PocketBase line.
-
-The legacy Echo v5 prerelease required by PocketBase 0.22 cannot be replaced with current Echo v5 releases without changing PocketBase's API integration.
-`govulncheck ./...` currently reports seven reachable Echo advisories, so this compatibility update does not resolve every vulnerability.
-Dependabot excludes these incompatible version lines until the PocketBase migration is done separately.
-
 There are two flavors of the backend:
 
 1. standard release downloaded from https://github.com/pocketbase/pocketbase/releases. This one is a good start, but most real-world applications would require more (see next).

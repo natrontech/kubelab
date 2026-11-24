@@ -1,18 +1,5 @@
 # KubeLab UI
 
-## Dependency compatibility
-
-The UI stays on Svelte 4.2.20, SvelteKit 2, Vite 5, Tailwind 3 and their compatible component libraries to retain the existing Svelte component syntax and styling.
-The PocketBase SDK stays on 0.21 to match the backend's 0.22 API, and splitpanes stays on 8.0.9 because later releases require Svelte 5.
-Dependabot excludes the incompatible version lines so these migrations can be handled separately.
-
-The cookie dependency is overridden to its compatible 0.7 security patch line.
-`npm audit` still reports findings in Svelte, SvelteKit and Vite and their dependent packages; resolving all of them requires the deferred framework upgrades.
-
-Use Node 24 or later and `npm ci` to install the locked dependency versions.
-Run `npm run check`, `npm run lint` and `npm test` to validate changes; the Playwright regression test mocks PocketBase and uses a local production preview.
-Install its isolated browser engine with `npx playwright install chromium` before the first test run.
-
 ## Setup
 
 ```bash
