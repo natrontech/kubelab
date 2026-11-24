@@ -1,130 +1,143 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
 
-        // add
-        collection.fields.add(
-            new RelationField({
-                system: false,
-                id: "eldb7j7p",
-                name: "features",
-                type: "relation",
-                required: true,
-                collectionId: "vknl4jpc8e5wlbv",
-                cascadeDelete: false,
-                minSelect: null,
-                maxSelect: 2147483647,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "eldb7j7p",
+    "name": "features",
+    "type": "relation",
+    "required": true,
+    "unique": false,
+    "options": {
+      "collectionId": "vknl4jpc8e5wlbv",
+      "cascadeDelete": false,
+      "minSelect": null,
+      "maxSelect": null,
+      "displayFields": [
+        "feature"
+      ]
+    }
+  }))
 
-        // add
-        collection.fields.add(
-            new RelationField({
-                system: false,
-                id: "srzysrtq",
-                name: "optionalFeatures",
-                type: "relation",
-                required: false,
-                collectionId: "vknl4jpc8e5wlbv",
-                cascadeDelete: false,
-                minSelect: null,
-                maxSelect: 2147483647,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "srzysrtq",
+    "name": "optionalFeatures",
+    "type": "relation",
+    "required": false,
+    "unique": false,
+    "options": {
+      "collectionId": "vknl4jpc8e5wlbv",
+      "cascadeDelete": false,
+      "minSelect": null,
+      "maxSelect": null,
+      "displayFields": [
+        "feature"
+      ]
+    }
+  }))
 
-        // update
-        collection.fields.add(
-            new TextField({
-                system: false,
-                id: "jhgt65nx",
-                name: "name",
-                type: "text",
-                required: true,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "jhgt65nx",
+    "name": "name",
+    "type": "text",
+    "required": true,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null,
+      "pattern": ""
+    }
+  }))
 
-        // update
-        collection.fields.add(
-            new TextField({
-                system: false,
-                id: "mbuxpqro",
-                name: "description",
-                type: "text",
-                required: true,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "mbuxpqro",
+    "name": "description",
+    "type": "text",
+    "required": true,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null,
+      "pattern": ""
+    }
+  }))
 
-        // update
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "qe5g2utb",
-                name: "price",
-                type: "number",
-                required: true,
-                min: null,
-                max: null,
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "qe5g2utb",
+    "name": "price",
+    "type": "number",
+    "required": true,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
 
-        // remove
-        collection.fields.removeById("eldb7j7p");
+  // remove
+  collection.schema.removeField("eldb7j7p")
 
-        // remove
-        collection.fields.removeById("srzysrtq");
+  // remove
+  collection.schema.removeField("srzysrtq")
 
-        // update
-        collection.fields.add(
-            new TextField({
-                system: false,
-                id: "jhgt65nx",
-                name: "name",
-                type: "text",
-                required: false,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "jhgt65nx",
+    "name": "name",
+    "type": "text",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null,
+      "pattern": ""
+    }
+  }))
 
-        // update
-        collection.fields.add(
-            new TextField({
-                system: false,
-                id: "mbuxpqro",
-                name: "description",
-                type: "text",
-                required: false,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "mbuxpqro",
+    "name": "description",
+    "type": "text",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null,
+      "pattern": ""
+    }
+  }))
 
-        // update
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "qe5g2utb",
-                name: "price",
-                type: "number",
-                required: false,
-                min: null,
-                max: null,
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "qe5g2utb",
+    "name": "price",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

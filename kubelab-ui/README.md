@@ -1,11 +1,22 @@
 # KubeLab UI
 
+## Dependency compatibility
+
+The UI stays on Svelte 4.2.20, SvelteKit 2, Vite 5, Tailwind 3 and their compatible component libraries to retain the existing Svelte component syntax and styling.
+The PocketBase SDK stays on 0.21 to match the backend's 0.22 API, and splitpanes stays on 8.0.9 because later releases require Svelte 5.
+Dependabot excludes the incompatible version lines so these migrations can be handled separately.
+
+The cookie dependency is overridden to its compatible 0.7 security patch line.
+`npm audit` still reports findings in Svelte, SvelteKit and Vite and their dependent packages; resolving all of them requires the deferred framework upgrades.
+
+Use Node 24 or later and `npm ci` to install the locked dependency versions.
+Run `npm run check`, `npm run lint` and `npm test` to validate changes; the Playwright regression test mocks PocketBase and uses a local production preview.
+Install its isolated browser engine with `npx playwright install chromium` before the first test run.
+
 ## Setup
 
-Requires Node.js 24 or newer; CI and container builds use Node.js 26.
-
 ```bash
-npm ci # install the locked dependencies
+npm install # install dependencies
 npm run build # compile frontend
 ```
 
@@ -39,9 +50,3 @@ npm run backend
 ```
 
 The above generates output in the `build` folder. Now you can serve production compiled version of the frontend using the backend (with `--publicDir ../frontend/build`), any static file web server, or `npm preview`.
-
-## Dependency compatibility
-
-TypeScript remains on 6.0 because SvelteKit 3 requires TypeScript 6 and the ESLint TypeScript parser supports versions below 6.1.
-
-The standalone UI container serves the static SPA on port 3000; route `/api` to the backend in your reverse proxy, or use the combined image from the repository root.

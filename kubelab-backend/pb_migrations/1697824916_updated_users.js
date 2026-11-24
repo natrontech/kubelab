@@ -1,30 +1,33 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // add
-        collection.fields.add(
-            new SelectField({
-                system: false,
-                id: "tep58ydu",
-                name: "role",
-                type: "select",
-                required: false,
-                presentable: false,
-                maxSelect: 1,
-                values: ["user", "admin"],
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "tep58ydu",
+    "name": "role",
+    "type": "select",
+    "required": false,
+    "presentable": false,
+    "unique": false,
+    "options": {
+      "maxSelect": 1,
+      "values": [
+        "user",
+        "admin"
+      ]
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // remove
-        collection.fields.removeById("tep58ydu");
+  // remove
+  collection.schema.removeField("tep58ydu")
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

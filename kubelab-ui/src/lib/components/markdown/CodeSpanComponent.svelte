@@ -1,21 +1,27 @@
 <script lang="ts">
-  import { Copy } from "@lucide/svelte";
-  import { getAstNode } from "svelte-exmarkdown";
-  import { toast } from "svelte-sonner";
+  import { Copy } from "lucide-svelte";
+    import toast from "svelte-french-toast";
 
-  const node = getAstNode();
-  let text = $derived(node.current.children?.map((child) => child.value ?? "").join("") ?? "");
+  export let raw: string;
 
   function copyCode() {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(raw.replace(/`/g, ""));
     toast.success("Code copied to clipboard");
   }
 </script>
 
 <button
-  class="btn btn-sm btn-neutral dark:btn-primary dark:text-neutral normal-case"
-  onclick={copyCode}
+  class="btn btn-sm btn-neutral dark:btn-primary dark:text-neutral"
+  on:click={copyCode}
 >
-  <code>{text}</code>
+  <code>{raw.replace(/`/g, "")}</code>
   <Copy class="inline ml-2" size={16} />
 </button>
+
+<style>
+  .btn {
+    /* disable caps lock */
+    text-transform: none;
+  }
+
+</style>

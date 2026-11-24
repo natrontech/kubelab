@@ -1,5 +1,5 @@
-import { browser } from "$app/env";
-import { client } from "#lib/pocketbase/index.ts";
+import { browser } from "$app/environment";
+import { client } from "$lib/pocketbase";
 import { redirect } from "@sveltejs/kit";
 
 // turn off SSR - we're JAMstack here
@@ -13,7 +13,7 @@ export const load = ({ url }) => {
     const { pathname } = url;
 
     if (browser) {
-        if (client.authStore.record) {
+        if (client.authStore.model) {
             if (pathname === "/login/" || pathname === "/signup/") {
                 throw redirect(307, "/app");
             }

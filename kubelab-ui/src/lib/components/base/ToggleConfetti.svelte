@@ -1,16 +1,10 @@
-<script lang="ts">
+<script>
   import { onMount, tick } from "svelte";
 
-  interface Props {
-    toggleOnce?: boolean;
-    relative?: boolean;
-    label?: import("svelte").Snippet;
-    children?: import("svelte").Snippet;
-  }
+  export let toggleOnce = false;
+  export let relative = true;
 
-  let { toggleOnce = false, relative = true, label, children }: Props = $props();
-
-  let active = $state(false);
+  let active = false;
 
   async function click() {
     if (toggleOnce) {
@@ -30,13 +24,14 @@
 
     click();
   });
+
 </script>
 
-<span onclick={click} class:relative>
-  {@render label?.()}
+<span on:click={click} class:relative>
+  <slot name="label" />
   {#if active}
     <div class="confetti">
-      {@render children?.()}
+      <slot />
     </div>
   {/if}
 </span>

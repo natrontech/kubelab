@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/natrontech/kubelab/pkg/helm"
-	"ganigeorgiev.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/core"
 )
 
-func namespaceName(e *core.RecordRequestEvent, lab string) string {
+func namespaceName(e *core.RecordUpdateEvent, lab string) string {
 	return helm.GetNamespaceName(lab, e.Record.GetString("user"))
 }
 

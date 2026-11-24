@@ -1,38 +1,39 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("qj6ssich32lcxru");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("qj6ssich32lcxru")
 
-        // update
-        collection.fields.add(
-            new DateField({
-                system: false,
-                id: "g8s5seza",
-                name: "startTime",
-                type: "date",
-                required: false,
-                min: "",
-                max: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "g8s5seza",
+    "name": "startTime",
+    "type": "date",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": "",
+      "max": ""
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("qj6ssich32lcxru");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("qj6ssich32lcxru")
 
-        // update
-        collection.fields.add(
-            new DateField({
-                system: false,
-                id: "g8s5seza",
-                name: "startTime",
-                type: "date",
-                required: true,
-                min: "",
-                max: "",
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "g8s5seza",
+    "name": "startTime",
+    "type": "date",
+    "required": true,
+    "unique": false,
+    "options": {
+      "min": "",
+      "max": ""
+    }
+  }))
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

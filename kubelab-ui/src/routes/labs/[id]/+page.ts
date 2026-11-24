@@ -1,5 +1,8 @@
-import { UpdateFilterEnum, updateDataStores } from "#lib/stores/data.ts";
-import { toast } from "svelte-sonner";
+import {
+    UpdateFilterEnum,
+    updateDataStores
+} from "$lib/stores/data";
+import toast from "svelte-french-toast";
 import type { PageLoad } from "../$types";
 
 export const load: PageLoad = async ({ params }: any) => {

@@ -1,43 +1,50 @@
 migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("3fhw2mfr9zrgodj");
+    (db) => {
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("3fhw2mfr9zrgodj");
 
         // add
-        collection.fields.add(
-            new TextField({
+        collection.schema.addField(
+            new SchemaField({
                 system: false,
                 id: "balsaeka",
                 name: "expands",
                 type: "text",
                 required: false,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
+                unique: false,
+                options: {
+                    min: null,
+                    max: null,
+                    pattern: "",
+                },
+            })
         );
 
         // add
-        collection.fields.add(
-            new BoolField({
+        collection.schema.addField(
+            new SchemaField({
                 system: false,
                 id: "emgxgcok",
                 name: "disabled",
                 type: "bool",
                 required: false,
-            }),
+                unique: false,
+                options: {},
+            })
         );
 
-        return app.save(collection);
+        return dao.saveCollection(collection);
     },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("3fhw2mfr9zrgodj");
+    (db) => {
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("3fhw2mfr9zrgodj");
 
         // remove
-        collection.fields.removeById("balsaeka");
+        collection.schema.removeField("balsaeka");
 
         // remove
-        collection.fields.removeById("emgxgcok");
+        collection.schema.removeField("emgxgcok");
 
-        return app.save(collection);
-    },
+        return dao.saveCollection(collection);
+    }
 );

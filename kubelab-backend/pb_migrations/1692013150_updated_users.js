@@ -1,31 +1,32 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // add
-        collection.fields.add(
-            new RelationField({
-                system: false,
-                id: "qrhpiuil",
-                name: "plan",
-                type: "relation",
-                required: false,
-                collectionId: "twr8eflpoom78k9",
-                cascadeDelete: false,
-                minSelect: null,
-                maxSelect: 1,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "qrhpiuil",
+    "name": "plan",
+    "type": "relation",
+    "required": false,
+    "unique": false,
+    "options": {
+      "collectionId": "twr8eflpoom78k9",
+      "cascadeDelete": false,
+      "minSelect": null,
+      "maxSelect": 1,
+      "displayFields": []
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // remove
-        collection.fields.removeById("qrhpiuil");
+  // remove
+  collection.schema.removeField("qrhpiuil")
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

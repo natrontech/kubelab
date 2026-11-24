@@ -1,43 +1,50 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
 
-        // update
-        collection.fields.add(
-            new RelationField({
-                system: false,
-                id: "eldb7j7p",
-                name: "features",
-                type: "relation",
-                required: true,
-                collectionId: "vknl4jpc8e5wlbv",
-                cascadeDelete: false,
-                minSelect: null,
-                maxSelect: 1,
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "eldb7j7p",
+    "name": "features",
+    "type": "relation",
+    "required": true,
+    "unique": false,
+    "options": {
+      "collectionId": "vknl4jpc8e5wlbv",
+      "cascadeDelete": false,
+      "minSelect": null,
+      "maxSelect": 1,
+      "displayFields": [
+        "feature"
+      ]
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
 
-        // update
-        collection.fields.add(
-            new RelationField({
-                system: false,
-                id: "eldb7j7p",
-                name: "features",
-                type: "relation",
-                required: true,
-                collectionId: "vknl4jpc8e5wlbv",
-                cascadeDelete: false,
-                minSelect: null,
-                maxSelect: 2147483647,
-            }),
-        );
+  // update
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "eldb7j7p",
+    "name": "features",
+    "type": "relation",
+    "required": true,
+    "unique": false,
+    "options": {
+      "collectionId": "vknl4jpc8e5wlbv",
+      "cascadeDelete": false,
+      "minSelect": null,
+      "maxSelect": null,
+      "displayFields": [
+        "feature"
+      ]
+    }
+  }))
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

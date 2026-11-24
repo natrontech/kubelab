@@ -1,50 +1,53 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("c0gc1ph97tdim19");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("c0gc1ph97tdim19")
 
-        collection.viewQuery =
-            "SELECT COALESCE(NULLIF(exercise_sessions.user, ''), 'score0000000000') as id, COUNT(exercise_sessions.id) as sum\nFROM exercise_sessions WHERE exercise_sessions.endTime NOTNULL;";
+  collection.options = {
+    "query": "SELECT exercise_sessions.user as id, COUNT(exercise_sessions.id) as sum\nFROM exercise_sessions WHERE exercise_sessions.endTime NOTNULL;"
+  }
 
-        // remove
-        collection.fields.removeById("swlqrmos");
+  // remove
+  collection.schema.removeField("swlqrmos")
 
-        // add
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "dvvwd0w4",
-                name: "sum",
-                type: "number",
-                required: false,
-                min: null,
-                max: null,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "dvvwd0w4",
+    "name": "sum",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("c0gc1ph97tdim19");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("c0gc1ph97tdim19")
 
-        collection.viewQuery =
-            "SELECT printf('%015d', ROW_NUMBER() OVER()) as id, COUNT(exercise_sessions.id) as sum\nFROM exercise_sessions WHERE exercise_sessions.endTime NOTNULL;";
+  collection.options = {
+    "query": "SELECT (ROW_NUMBER() OVER()) as id, COUNT(exercise_sessions.id) as sum\nFROM exercise_sessions WHERE exercise_sessions.endTime NOTNULL;"
+  }
 
-        // add
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "swlqrmos",
-                name: "sum",
-                type: "number",
-                required: false,
-                min: null,
-                max: null,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "swlqrmos",
+    "name": "sum",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        // remove
-        collection.fields.removeById("dvvwd0w4");
+  // remove
+  collection.schema.removeField("dvvwd0w4")
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

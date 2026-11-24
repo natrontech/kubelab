@@ -19,19 +19,19 @@
                 <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Hosting</a>
               </li>
               <li>
-                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                  Data Services
-                </a>
+                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900"
+                  >Data Services</a
+                >
               </li>
               <li>
-                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                  Uptime Monitoring
-                </a>
+                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900"
+                  >Uptime Monitoring</a
+                >
               </li>
               <li>
-                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                  Enterprise Services
-                </a>
+                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900"
+                  >Enterprise Services</a
+                >
               </li>
             </ul>
           </div>
@@ -42,17 +42,17 @@
                 <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Pricing</a>
               </li>
               <li>
-                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                  Documentation
-                </a>
+                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900"
+                  >Documentation</a
+                >
               </li>
               <li>
                 <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">Guides</a>
               </li>
               <li>
-                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                  API Reference
-                </a>
+                <a href="#" class="text-sm leading-6 text-gray-600 hover:text-gray-900"
+                  >API Reference</a
+                >
               </li>
             </ul>
           </div>

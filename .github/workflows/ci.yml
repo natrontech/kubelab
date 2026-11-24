@@ -44,6 +44,8 @@ jobs:
         run: npm run check
       - name: Lint
         run: npm run lint
+      - name: Install browser for regression test
+        run: npx playwright install --with-deps chromium
       - name: Test
         run: npm test
       - name: Build

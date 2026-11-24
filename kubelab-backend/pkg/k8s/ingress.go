@@ -3,7 +3,7 @@ package k8s
 import (
 	"github.com/natrontech/kubelab/pkg/env"
 	"github.com/natrontech/kubelab/pkg/util"
-	"ganigeorgiev.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/models"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -14,7 +14,7 @@ type IngressParams struct {
 	Host         string
 	ServiceName  string
 	Path         string
-	UserRecord   *core.Record
+	UserRecord   *models.Record
 	UseFirstRule bool
 }
 

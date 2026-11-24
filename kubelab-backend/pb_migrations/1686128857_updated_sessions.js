@@ -1,42 +1,42 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
 
-        // add
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "6zraywm2",
-                name: "score",
-                type: "number",
-                required: false,
-                min: 0,
-                max: null,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "6zraywm2",
+    "name": "score",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": 0,
+      "max": null
+    }
+  }))
 
-        // add
-        collection.fields.add(
-            new BoolField({
-                system: false,
-                id: "tr8kf1qh",
-                name: "clusterRunning",
-                type: "bool",
-                required: false,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "tr8kf1qh",
+    "name": "clusterRunning",
+    "type": "bool",
+    "required": false,
+    "unique": false,
+    "options": {}
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
 
-        // remove
-        collection.fields.removeById("6zraywm2");
+  // remove
+  collection.schema.removeField("6zraywm2")
 
-        // remove
-        collection.fields.removeById("tr8kf1qh");
+  // remove
+  collection.schema.removeField("tr8kf1qh")
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

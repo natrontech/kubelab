@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metadata } from "#lib/stores/metadata.ts";
+  import { metadata } from "$lib/stores/metadata";
   import { goto } from "$app/navigation";
   import {
     ArrowLeft,
@@ -11,9 +11,9 @@
     StretchHorizontal,
     StretchVertical,
     Terminal
-  } from "@lucide/svelte";
-  import { client } from "#lib/pocketbase/index.js";
-  import { toast } from "svelte-sonner";
+  } from "lucide-svelte";
+  import { client } from "$lib/pocketbase/index.js";
+  import toast from "svelte-french-toast";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -21,32 +21,32 @@
     exercise_sessions,
     exercises,
     filterExercisesByLab
-  } from "#lib/stores/data.js";
+  } from "$lib/stores/data.js";
 
   // @ts-ignore
   import { Confetti } from "svelte-confetti";
-  import ToggleConfetti from "#lib/components/base/ToggleConfetti.svelte";
-  import horizontalView from "#lib/stores/tableView.js";
+  import ToggleConfetti from "$lib/components/base/ToggleConfetti.svelte";
+  import horizontalView from "$lib/stores/tableView.js";
   import {
     sidebarOpen,
     sidebar_exercise_sessions,
     sidebar_exercises,
     sidebar_lab
-  } from "#lib/stores/sidebar.js";
+  } from "$lib/stores/sidebar.js";
   import {
     ExerciseSessionLogsTypeOptions,
     type ExerciseSessionLogsRecord,
     type NotificationsRecord,
     NotificationsTypeOptions
-  } from "#lib/pocketbase/generated-types.js";
+  } from "$lib/pocketbase/generated-types.js";
   import { Tooltip } from "flowbite-svelte";
-  import codeView from "#lib/stores/codeView.js";
+  import codeView from "$lib/stores/codeView.js";
 
   $metadata.title = "Exercises";
 
-  let { data, children } = $props();
-  let restartLoading = $state(false);
-  let helpRequested = $state(false);
+  export let data;
+  let restartLoading = false;
+  let helpRequested = false;
 
   function handleSwitchExercise(exercise_session_id: string) {
     let lab_session_id = data.pathname.split("/")[2];
@@ -74,7 +74,7 @@
       "-" +
       exercise_id +
       "-" +
-      client.authStore.record?.id;
+      client.authStore.model?.id;
 
     await fetch("https://" + agentUrl + "/check")
       .then((response) =>
@@ -93,7 +93,11 @@
                 let diffString = Math.floor(duration / 1000 / 60) + "m ";
                 diffString += Math.floor((duration / 1000) % 60) + "s";
                 toast.success("Exercise completed in " + diffString, {
-                  style: "border: 1px solid #008000; padding: 16px; color: #008000;"
+                  style: "border: 1px solid #008000; padding: 16px; color: #008000;", // green-themed style
+                  iconTheme: {
+                    primary: "#008000",
+                    secondary: "#F0FFF0" // light green background
+                  }
                 });
 
                 exercise_session.set(record);
@@ -124,7 +128,7 @@
 
                 const exercise_session_log_data: ExerciseSessionLogsRecord = {
                   // @ts-ignore
-                  user: client.authStore.record?.id,
+                  user: client.authStore.model?.id,
                   exercise_session: $exercise_session.id,
                   type: ExerciseSessionLogsTypeOptions.end,
                   timestamp: new Date().toISOString()
@@ -143,7 +147,11 @@
           } else {
             let filteredText = filterDuplicateLines(text);
             toast.error("Not completed: " + filteredText, {
-              style: "border: 1px solid #B22222; padding: 16px; color: #B22222;"
+              style: "border: 1px solid #B22222; padding: 16px; color: #B22222;", // red-themed style
+              iconTheme: {
+                primary: "#B22222",
+                secondary: "#FFE4E1" // light red background
+              }
             });
           }
         })
@@ -164,7 +172,7 @@
       .then((response) => {
         return response.find((notification) => {
           return (
-            notification.user === client.authStore.record?.id &&
+            notification.user === client.authStore.model?.id &&
             notification.type === NotificationsTypeOptions.help
           );
         });
@@ -186,7 +194,7 @@
 
     const notification_data: NotificationsRecord = {
       // @ts-ignore
-      user: client.authStore.record?.id,
+      user: client.authStore.model?.id,
       exercise: $exercise.id,
       type: NotificationsTypeOptions.help
     };
@@ -220,7 +228,7 @@
       "-" +
       exercise_id +
       "-" +
-      client.authStore.record?.id;
+      client.authStore.model?.id;
 
     await fetch("https://" + agentUrl + "/bootstrap", {
       method: "POST"
@@ -263,12 +271,12 @@
 </script>
 
 {#key $exercise}
-  <div class="absolute top-0 h-20 left-0 right-0">
+  <div class="absolute top-0 h-20 left-0 right-0 ">
     <div class="mt-5 flex justify-between px-2">
       <div class="grid grid-cols-2 gap-2">
         <button
           class="btn btn-neutral"
-          onclick={() => {
+          on:click={() => {
             if ($sidebar_lab) {
               sidebarOpen.set(true);
             }
@@ -278,9 +286,9 @@
           <ArrowLeft class="inline-block w-4 h-4 mr-2" />
           Labs
         </button>
-        <div class="join">
+        <div class="join ">
           <button
-            onclick={() => {
+            on:click={() => {
               codeView.set(false);
             }}
             class="join-item btn {!$codeView
@@ -290,7 +298,7 @@
             <Terminal class="inline-block" />
           </button>
           <button
-            onclick={() => {
+            on:click={() => {
               codeView.set(true);
             }}
             class="join-item btn {!$codeView
@@ -304,7 +312,7 @@
       <div class="grid grid-cols-2 gap-2">
         <div class="join grid grid-cols-2">
           <button
-            onclick={() => {
+            on:click={() => {
               horizontalView.set(true);
             }}
             class="join-item btn {$horizontalView
@@ -314,7 +322,7 @@
             <StretchHorizontal />
           </button>
           <button
-            onclick={() => {
+            on:click={() => {
               horizontalView.set(false);
             }}
             class="join-item btn {$horizontalView
@@ -325,15 +333,14 @@
           </button>
         </div>
         <ToggleConfetti>
-          {#snippet label()}
-            <button
-              class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
-              onclick={() => handleCheckExercise()}
-            >
-              <CheckCircle class="inline-block mr-2" />
-              <span> Check </span>
-            </button>
-          {/snippet}
+          <button
+            slot="label"
+            class="btn {!$exercise_session.agentRunning ? 'hidden' : 'btn-success'}"
+            on:click={() => handleCheckExercise()}
+          >
+            <CheckCircle class="inline-block mr-2" />
+            <span> Check </span>
+          </button>
           <div
             style="position: fixed; top: -10px; left: 0; height: 100vh; width: 100vw; display: flex; justify-content: center; overflow: hidden; z-index: 10;"
           >
@@ -353,17 +360,17 @@
     </div>
   </div>
   <div class="absolute top-16 bottom-16 left-0 right-0 z-0">
-    {@render children?.()}
+    <slot />
   </div>
 
   <div class="absolute h-16 bottom-0 left-0 right-0">
     <div class="mt-2 flex justify-between px-2">
       <div>
         {#if $exercise_session.agentRunning}
-          {#if client.authStore.record?.workshop == true}
+          {#if client.authStore.model?.workshop == true}
             <button
               class="btn btn-accent dark:text-black {helpRequested ? 'btn-disabled' : 'btn-accent'}"
-              onclick={() => {
+              on:click={() => {
                 askForHelp();
               }}
             >
@@ -372,12 +379,12 @@
             <Tooltip class="bg-neutral">Call for Help</Tooltip>
           {/if}
 
-          <button class="btn btn-error" onclick={() => handleStopExercise()}>
+          <button class="btn btn-error" on:click={() => handleStopExercise()}>
             <StopCircle class="inline-block" />
           </button>
           <Tooltip class="bg-neutral">Stop Exercise</Tooltip>
 
-          <button class="btn btn-warning" onclick={() => handleRestartExercise()}>
+          <button class="btn btn-warning" on:click={() => handleRestartExercise()}>
             <RotateCw class="inline-block {restartLoading ? 'animate-spin' : ''}" />
           </button>
           <Tooltip class="bg-neutral">Reset Exercise</Tooltip>
@@ -391,22 +398,22 @@
                 {#if $exercises.length > 0}
                   {#each $exercises as currentExercise, i}
                     <button
-                      onclick={() => handleSwitchExercise(currentExercise.id)}
+                      on:click={() => handleSwitchExercise(currentExercise.id)}
                       data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
                       class="step
       {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
       "
-                    ></button>
+                    />
                   {/each}
                 {:else if $sidebar_exercises}
                   {#each $sidebar_exercises as currentExercise, i}
                     <button
-                      onclick={() => handleSwitchExercise(currentExercise.id)}
+                      on:click={() => handleSwitchExercise(currentExercise.id)}
                       data-content={isCurrentExercise(currentExercise.id) ? "●" : i + 1}
                       class="step
           {checkIfExerciseIsDone(currentExercise.id) ? 'step-success' : ''}
           "
-                    ></button>
+                    />
                   {/each}
                 {/if}
               {/key}

@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
-  import { client } from "#lib/pocketbase/index.ts";
-  import { layout_store } from "#lib/stores/layout_store.ts";
-  import { terminal_size } from "#lib/stores/terminal.ts";
-  import darkTheme from "#lib/stores/theme.ts";
+  import { client } from "$lib/pocketbase";
+  import { layout_store } from "$lib/stores/layout_store";
+  import { terminal_size } from "$lib/stores/terminal";
+  import darkTheme from "$lib/stores/theme";
   import { onDestroy, onMount } from "svelte";
 
   import { Terminal } from "@xterm/xterm";
@@ -80,7 +78,7 @@
       "-" +
       exercise_id +
       "-" +
-      client.authStore.record?.id;
+      client.authStore.model?.id;
 
     // Close the socket only if it is opened
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -141,11 +139,11 @@
     }
   });
 
-  let div: HTMLDivElement | undefined = $state();
+  let div: HTMLDivElement;
 
   onMount(() => {
     initializeWebSocket();
-    terminal.open(div!);
+    terminal.open(div);
     setTimeout(() => {
       update_height();
     }, 300);
@@ -155,13 +153,13 @@
     fitAddon.fit();
   };
 
-  run(() => {
+  $: {
     $terminal_size;
     $layout_store.terminal;
     setTimeout(() => {
       update_height();
     }, 300);
-  });
+  }
 
   onDestroy(() => {
     socket?.close();
@@ -169,7 +167,7 @@
   });
 </script>
 
-<div bind:this={div}></div>
+<div bind:this={div} />
 
 <style>
   div {

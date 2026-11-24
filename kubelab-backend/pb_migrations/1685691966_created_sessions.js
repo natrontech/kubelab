@@ -1,47 +1,44 @@
 migrate(
-    (app) => {
+    (db) => {
         const collection = new Collection({
             id: "n7tne53bbobf2bt",
+            created: "2023-06-02 07:46:06.017Z",
+            updated: "2023-06-02 07:46:06.017Z",
             name: "sessions",
             type: "base",
             system: false,
-            indexes: [],
-            listRule: null,
-            viewRule: null,
-            createRule: null,
-            updateRule: null,
-            deleteRule: null,
-            fields: [
+            schema: [
                 {
                     system: false,
                     id: "rse3zear",
                     name: "user",
                     type: "relation",
                     required: false,
-                    collectionId: "_pb_users_auth_",
-                    cascadeDelete: false,
-                    minSelect: null,
-                    maxSelect: 1,
-                },
-                {
-                    name: "created",
-                    type: "autodate",
-                    onCreate: true,
-                },
-                {
-                    name: "updated",
-                    type: "autodate",
-                    onCreate: true,
-                    onUpdate: true,
+                    unique: false,
+                    options: {
+                        collectionId: "_pb_users_auth_",
+                        cascadeDelete: false,
+                        minSelect: null,
+                        maxSelect: 1,
+                        displayFields: [],
+                    },
                 },
             ],
+            indexes: [],
+            listRule: null,
+            viewRule: null,
+            createRule: null,
+            updateRule: null,
+            deleteRule: null,
+            options: {},
         });
 
-        return app.save(collection);
+        return Dao(db).saveCollection(collection);
     },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
+    (db) => {
+        const dao = new Dao(db);
+        const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt");
 
-        return app.delete(collection);
-    },
+        return dao.deleteCollection(collection);
+    }
 );

@@ -1,12 +1,14 @@
 # KubeLab Backend
 
-Requires Go 1.27 or newer.
+## Dependency compatibility
 
-## Upgrading an existing installation
+PocketBase stays on the latest 0.22 patch release (currently 0.22.57) to retain the DAO/hooks API and the existing JavaScript migration history.
+Use the version in `go.mod` when building or downloading PocketBase; 0.23 and later require an application and database migration.
+Keep `gocloud.dev` below 0.47 because its changed blob driver API is incompatible with this PocketBase line.
 
-Back up `pb_data` before starting this version: PocketBase upgrades the database from 0.22 to the current format automatically, and the old binary cannot use the upgraded database.
-The existing migration filenames and collection IDs are preserved, so previously applied application migrations are not replayed.
-New installations use the converted migration history, including the legacy username field.
+The legacy Echo v5 prerelease required by PocketBase 0.22 cannot be replaced with current Echo v5 releases without changing PocketBase's API integration.
+`govulncheck ./...` currently reports seven reachable Echo advisories, so this compatibility update does not resolve every vulnerability.
+Dependabot excludes these incompatible version lines until the PocketBase migration is done separately.
 
 There are two flavors of the backend:
 
@@ -17,7 +19,7 @@ Out of the box, the project assumes #2 (custom compiled with my customizations).
 
 ## standard (official) release of pocketbase
 
-Download from release archive from https://github.com/pocketbase/pocketbase/releases/latest, unzip it and place the `pocketbase` binary in this folder, and you're done.
+Download the matching 0.22 patch release from https://github.com/pocketbase/pocketbase/releases, unzip it and place the `pocketbase` binary in this folder, and you're done.
 
 ## custom build
 
@@ -38,7 +40,7 @@ Assuming you have Go language tools installed ...
 
 `go build`
 
-If you don't have Go and don't want to install it, you can use docker-compose setup. Otherwise, your only choice is to download the binary from https://github.com/pocketbase/pocketbase/releases/latest, and placing it in this folder. But then you will not be able to use any of the custom code (such as "config-driven hooks")
+If you don't have Go and don't want to install it, you can use docker-compose setup. Otherwise, download the matching 0.22 patch binary from https://github.com/pocketbase/pocketbase/releases and place it in this folder. But then you will not be able to use any of the custom code (such as "config-driven hooks")
 
 ## Run migrations
 
@@ -101,9 +103,3 @@ Possible use cases:
   send email upon success/failure
 - Recalculate inventory levels as "orders" table is inserted to, and then
   send notifications when inventory becomes low.
-
-## Dependency compatibility
-
-The vCluster chart remains on 0.16.4, the latest patch compatible with the bundled values and the controller's pod/secret names; its K3s image is updated to the final 1.28 patch. Upgrading the vCluster architecture and Kubernetes minor version requires a separate cluster integration check.
-The Kubernetes libraries currently require the v6 structured-merge schema, so `k8s.io/kube-openapi` stays on their compatible revision. SQLite's libc dependency is kept at the exact version required by the selected SQLite release.
-The dbx dependency remains on 1.13 because 1.14 adds a builder method that PocketBase 0.42 does not implement yet.

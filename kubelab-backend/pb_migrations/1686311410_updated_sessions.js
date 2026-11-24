@@ -1,29 +1,29 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
 
-        // remove
-        collection.fields.removeById("ituarijg");
+  // remove
+  collection.schema.removeField("ituarijg")
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
 
-        // add
-        collection.fields.add(
-            new TextField({
-                system: false,
-                id: "ituarijg",
-                name: "title",
-                type: "text",
-                required: false,
-                min: null,
-                max: null,
-                pattern: "",
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "ituarijg",
+    "name": "title",
+    "type": "text",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null,
+      "pattern": ""
+    }
+  }))
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

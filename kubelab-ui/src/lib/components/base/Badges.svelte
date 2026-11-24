@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { Color } from "#lib/utils/enums.ts";
+  import { Color } from "$lib/utils/enums";
 
-  interface Props {
-    color?: Color;
-    size?: "xs" | "sm" | "md" | "lg";
-    rounded?: boolean;
-    text?: string;
-  }
-
-  let { color = Color.Gray, size = "md", rounded = true, text = "Badge" }: Props = $props();
+  export let color: Color = Color.Gray;
+  export let size: "xs" | "sm" | "md" | "lg" = "md";
+  export let rounded: boolean = true;
+  export let text: string = "Badge";
 
   let bgColorClass: string = "bg-" + color + "-100";
   let textColorClass: string = "text-" + color + "-800";

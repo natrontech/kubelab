@@ -1,29 +1,24 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("r2q6rrbyred18kq");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("r2q6rrbyred18kq")
 
-        collection.listRule =
-            '@request.auth.id != "" && @request.auth.role = "admin"';
-        collection.viewRule =
-            '@request.auth.id != "" && @request.auth.role = "admin"';
-        collection.createRule = '@request.auth.id != ""';
-        collection.updateRule =
-            '@request.auth.id != "" && @request.auth.role = "admin"';
-        collection.deleteRule =
-            '@request.auth.id != "" && @request.auth.role = "admin"';
+  collection.listRule = "@request.auth.id != \"\" && @request.auth.role = \"admin\""
+  collection.viewRule = "@request.auth.id != \"\" && @request.auth.role = \"admin\""
+  collection.createRule = "@request.auth.id != \"\""
+  collection.updateRule = "@request.auth.id != \"\" && @request.auth.role = \"admin\""
+  collection.deleteRule = "@request.auth.id != \"\" && @request.auth.role = \"admin\""
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("r2q6rrbyred18kq");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("r2q6rrbyred18kq")
 
-        collection.listRule = null;
-        collection.viewRule = null;
-        collection.createRule = null;
-        collection.updateRule = null;
-        collection.deleteRule = null;
+  collection.listRule = null
+  collection.viewRule = null
+  collection.createRule = null
+  collection.updateRule = null
+  collection.deleteRule = null
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

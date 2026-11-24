@@ -1,44 +1,45 @@
-migrate(
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // add
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "1hbozave",
-                name: "totalScore",
-                type: "number",
-                required: false,
-                min: null,
-                max: null,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "1hbozave",
+    "name": "totalScore",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        // add
-        collection.fields.add(
-            new NumberField({
-                system: false,
-                id: "q6psj4sr",
-                name: "avgMinutesToSolution",
-                type: "number",
-                required: false,
-                min: null,
-                max: null,
-            }),
-        );
+  // add
+  collection.schema.addField(new SchemaField({
+    "system": false,
+    "id": "q6psj4sr",
+    "name": "avgMinutesToSolution",
+    "type": "number",
+    "required": false,
+    "unique": false,
+    "options": {
+      "min": null,
+      "max": null
+    }
+  }))
 
-        return app.save(collection);
-    },
-    (app) => {
-        const collection = app.findCollectionByNameOrId("_pb_users_auth_");
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("_pb_users_auth_")
 
-        // remove
-        collection.fields.removeById("1hbozave");
+  // remove
+  collection.schema.removeField("1hbozave")
 
-        // remove
-        collection.fields.removeById("q6psj4sr");
+  // remove
+  collection.schema.removeField("q6psj4sr")
 
-        return app.save(collection);
-    },
-);
+  return dao.saveCollection(collection)
+})

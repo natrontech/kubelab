@@ -1,16 +1,11 @@
 <script lang="ts">
-  import darkTheme from "#lib/stores/theme.ts";
-  import type { Component } from "svelte";
-
-  interface Props {
-    Console: Component<Record<string, never>>;
-  }
-
-  let { Console }: Props = $props();
+  import darkTheme from "$lib/stores/theme";
+  import type { ComponentType, SvelteComponentTyped } from "svelte";
+  export let Console: ComponentType<SvelteComponentTyped>;
 </script>
 
 {#key $darkTheme}
   <div class="h-full overflow-y-auto">
-    <Console />
+    <svelte:component this={Console} />
   </div>
 {/key}

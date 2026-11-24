@@ -9,17 +9,17 @@ import (
 	"github.com/natrontech/kubelab/pkg/helm"
 	"github.com/natrontech/kubelab/pkg/k8s"
 	"github.com/natrontech/kubelab/pkg/util"
-	"ganigeorgiev.com/pocketbase/pocketbase"
-	"ganigeorgiev.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/core"
 )
 
-func deployVCluster(e *core.RecordRequestEvent, app *pocketbase.PocketBase) error {
+func deployVCluster(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
 	helmclient, err := helm.CreateHelmClient(e.Record.GetString("lab"), e.Record.GetString("user"))
 	if err != nil {
 		return logAndReturnErr(err)
 	}
 
-	user, err := app.FindRecordById("users", e.Record.GetString("user"))
+	user, err := app.Dao().FindRecordById("users", e.Record.GetString("user"))
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func deployVCluster(e *core.RecordRequestEvent, app *pocketbase.PocketBase) erro
 	return nil
 }
 
-func deleteClusterResources(e *core.RecordRequestEvent, app *pocketbase.PocketBase) error {
+func deleteClusterResources(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
 	if err := k8s.DeleteNamespace(namespaceName(e, e.Record.GetString("lab"))); err != nil {
 		log.Println(err)
 	}
