@@ -1,20 +1,22 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import PlaceholderComponent from "$lib/components/base/PlaceholderComponent.svelte";
-  import { onMount, type ComponentType, type SvelteComponentTyped, onDestroy } from "svelte";
-  import Desktop from "$lib/components/base/Desktop.svelte";
-  import { metadata } from "$lib/stores/metadata";
-  import { terminal_size } from "$lib/stores/terminal";
-  import SvelteMarkdown from "svelte-markdown";
-  import { page } from "$app/stores";
+  import PlaceholderComponent from "#lib/components/base/PlaceholderComponent.svelte";
+  import { onMount, type Component, onDestroy } from "svelte";
+  import Desktop from "#lib/components/base/Desktop.svelte";
+  import { metadata } from "#lib/stores/metadata.ts";
+  import { terminal_size } from "#lib/stores/terminal.ts";
+  import Markdown from "#lib/components/markdown/Markdown.svelte";
+  import { page } from "$app/state";
   import {
     ExerciseSessionLogsTypeOptions,
     type ExerciseSessionLogsRecord,
     type ExerciseSessionsRecord
-  } from "$lib/pocketbase/generated-types.js";
-  import { client } from "$lib/pocketbase/index.js";
-  import toast from "svelte-french-toast";
-  import { CheckCircle, InfoIcon, Lightbulb, Play } from "lucide-svelte";
+  } from "#lib/pocketbase/generated-types.js";
+  import { client } from "#lib/pocketbase/index.js";
+  import { toast } from "svelte-sonner";
+  import { CheckCircle, InfoIcon, Lightbulb, Play } from "@lucide/svelte";
   import {
     checkIfExerciseIsDone,
     exercise,
@@ -22,98 +24,43 @@
     exercise_sessions,
     filterExercisesByLab,
     loadingCodeEditor
-  } from "$lib/stores/data";
-  import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
-  import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
-  import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
-  import ListComponent from "$lib/components/markdown/ListComponent.svelte";
-  import horizontalView from "$lib/stores/tableView";
-  import { loadingExercises } from "$lib/stores/loading";
-  import codeView from "$lib/stores/codeView";
-  let Console: ComponentType<SvelteComponentTyped> = PlaceholderComponent;
+  } from "#lib/stores/data.ts";
+  import horizontalView from "#lib/stores/tableView.ts";
+  import { loadingExercises } from "#lib/stores/loading.ts";
+  import codeView from "#lib/stores/codeView.ts";
+  let Console: Component<Record<string, never>> = $state(PlaceholderComponent);
 
-  let loadingMD = "";
-  let showSolution = "";
+  let showSolution = $state("");
 
-  let docs: string;
-  let hint: string;
-  let solution: string;
-  let clear: any;
+  let docs = $state("");
+  let hint = $state("");
+  let solution = $state("");
+  let clear: ReturnType<typeof setInterval> | undefined;
 
-  export let data: any;
-  let codeUrl: string;
+  interface Props {
+    data: any;
+  }
+
+  let { data }: Props = $props();
+  let codeUrl = $state("");
 
   function handleIframeLoad() {
     $loadingCodeEditor = false;
   }
 
-  $: {
-    // open target blank new tab with the url
-    let lab_session_id = data.pathname.split("/")[2];
-    let exercise_id = window.location.pathname.split("/")[3];
-    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
-    codeUrl =
-      "https://kubelab-" +
-      lab_session_id +
-      "-" +
-      exercise_id +
-      "-" +
-      client.authStore.model?.id +
-      "." +
-      agentHost;
-  }
-
   async function getMarkdown() {
-    loadingMD = window.location.pathname.split("/")[3];
-
-    new Promise((resolve, reject) => {
-      fetch($exercise.docs)
-        .then((response) => response.text())
-        .then((text) => {
-          docs = text;
-        })
-        .catch((error) => {
-          reject(error);
-        });
-
-      fetch($exercise.hint)
-        .then((response) => response.text())
-        .then((text) => {
-          hint = text;
-        })
-        .catch((error) => {
-          reject(error);
-        });
-
-      fetch($exercise.solution)
-        .then((response) => response.text())
-        .then((text) => {
-          solution = text;
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    }).finally(() => {
-      loadingMD = "";
-    });
-  }
-
-  $: {
-    $page.params.id;
-    if (exercise) {
-      getMarkdown();
-    }
-    clearInterval(clear);
-    clear = setInterval(() => {
-      if (isRecentlyStarted($exercise_session.startTime)) {
-        showSolution = window.location.pathname.split("/")[3];
-      }
-    }, 1000);
+    // Fetch the exercise content together so a route change updates every document
+    [docs, hint, solution] = await Promise.all(
+      [$exercise.docs, $exercise.hint, $exercise.solution].map(async (url) => {
+        const response = await fetch(url);
+        return response.text();
+      })
+    );
   }
 
   onMount(async () => {
     $loadingCodeEditor = true;
-    Console = (await import("$lib/components/Console.svelte")).default;
+    Console = (await import("#lib/components/Console.svelte")).default;
   });
 
   onDestroy(() => {
@@ -127,7 +74,7 @@
   async function handleStartExercise() {
     const data: ExerciseSessionsRecord = {
       // @ts-ignore
-      user: client.authStore.model?.id,
+      user: client.authStore.record?.id,
       exercise: $exercise.id,
       startTime: new Date().toISOString(),
       endTime: "",
@@ -141,8 +88,7 @@
 
     await client
       .collection("exercise_sessions")
-      .update($exercise_session.id, data)
-      // @ts-ignore
+      .update($exercise_session.id, data) // @ts-ignore
       .then((record: LabSessionsResponse) => {
         toast.success("Exercise started");
         exercise_session.set(record);
@@ -164,7 +110,7 @@
 
         const exercise_session_log_data: ExerciseSessionLogsRecord = {
           // @ts-ignore
-          user: client.authStore.model?.id,
+          user: client.authStore.record?.id,
           exercise_session: $exercise_session.id,
           type: ExerciseSessionLogsTypeOptions.start,
           timestamp: new Date().toISOString()
@@ -209,9 +155,36 @@
     // @ts-ignore
     window.my_modal_2.showModal();
   }
+  run(() => {
+    // open target blank new tab with the url
+    let lab_session_id = data.pathname.split("/")[2];
+    let exercise_id = window.location.pathname.split("/")[3];
+    let agentHost = window.location.host === "localhost:5173" ? "kubelab.ch" : window.location.host;
+    codeUrl =
+      "https://kubelab-" +
+      lab_session_id +
+      "-" +
+      exercise_id +
+      "-" +
+      client.authStore.record?.id +
+      "." +
+      agentHost;
+  });
+  run(() => {
+    page.params.id;
+    if (exercise) {
+      getMarkdown();
+    }
+    clearInterval(clear);
+    clear = setInterval(() => {
+      if (isRecentlyStarted($exercise_session.startTime)) {
+        showSolution = window.location.pathname.split("/")[3];
+      }
+    }, 1000);
+  });
 </script>
 
-{#key ($page.params, $loadingExercises)}
+{#key (page.params, $loadingExercises)}
   {#if $horizontalView}
     <Splitpanes horizontal class="p-2 mt-2 pb-2">
       <Pane class=" rounded-lg">
@@ -220,25 +193,16 @@
             <div
               class="py-6 px-8 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
             >
-              {#key $page.params}
-                <SvelteMarkdown
-                  source={docs}
-                  renderers={{
-                    codespan: CodeSpanComponent,
-                    code: CodeComponent,
-                    link: LinkComponent,
-                    list: ListComponent
-                  }}
-                />
+              {#key page.params}
+                <Markdown source={docs} />
               {/key}
             </div>
             <div class="bottom-0 flex w-full justify-between absolute p-2">
               <div>
-                <!-- svelte-ignore missing-declaration -->
                 <div class="tooltip" data-tip="Hint">
                   <button
                     class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
-                    on:click={() => openModal2()}
+                    onclick={() => openModal2()}
                   >
                     <InfoIcon size={16} />
                   </button>
@@ -246,22 +210,14 @@
                 <dialog id="my_modal_2" class="modal">
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Hint</h3>
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
-                    >
-                    <SvelteMarkdown
-                      source={hint}
-                      renderers={{
-                        codespan: CodeSpanComponent,
-                        code: CodeComponent,
-                        link: LinkComponent,
-                        list: ListComponent
-                      }}
-                    />
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                      ✕
+                    </button>
+                    <Markdown source={hint} />
                   </form>
                 </dialog>
               </div>
               <div>
-                <!-- svelte-ignore missing-declaration -->
                 <div class="tooltip" data-tip="Solution">
                   <button
                     class="btn btn-circle {(showSolution ===
@@ -270,7 +226,7 @@
                     $exercise_session.endTime
                       ? 'btn-neutral  dark:btn-primary dark:text-neutral'
                       : 'btn-disabled'}"
-                    on:click={() => openModal()}
+                    onclick={() => openModal()}
                   >
                     <Lightbulb size={16} />
                   </button>
@@ -278,17 +234,10 @@
                 <dialog id="my_modal_1" class="modal">
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Solution</h3>
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
-                    >
-                    <SvelteMarkdown
-                      source={solution}
-                      renderers={{
-                        codespan: CodeSpanComponent,
-                        code: CodeComponent,
-                        link: LinkComponent,
-                        list: ListComponent
-                      }}
-                    />
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                      ✕
+                    </button>
+                    <Markdown source={solution} />
                   </form>
                 </dialog>
               </div>
@@ -298,20 +247,20 @@
       </Pane>
       <Pane bind:size={$terminal_size.height} class="rounded-lg">
         {#if $exercise_session.agentRunning}
-          {#key $page.params}
+          {#key page.params}
             {#if $exercise_session.exercise === $exercise.id}
               {#if $codeView}
                 {#if $loadingCodeEditor}
                   <div class="flex justify-center items-center h-full dark:bg-neutral">
-                    <span class="loading loading-dots loading-lg" />
+                    <span class="loading loading-dots loading-lg"></span>
                   </div>
                 {/if}
                 <iframe
                   src={codeUrl}
-                  on:load={() => handleIframeLoad()}
+                  onload={() => handleIframeLoad()}
                   title="Code Editor"
-                  class="w-full h-full  bg-transparent"
-                />
+                  class="w-full h-full bg-transparent"
+                ></iframe>
               {:else}
                 <Desktop {Console} />
               {/if}
@@ -319,7 +268,7 @@
           {/key}
         {:else}
           <!-- button to start the agent -->
-          {#key $page.params}
+          {#key page.params}
             <div
               class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone(
                 $exercise.id
@@ -338,10 +287,10 @@
                     class="btn {checkIfExerciseIsDone($exercise.id)
                       ? 'btn-warning'
                       : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
-                    on:click={() => handleStartExercise()}
+                    onclick={() => handleStartExercise()}
                   >
                     {#if $loadingExercises.has($exercise.id)}
-                      <span class="loading loading-dots loading-md" /> starting...
+                      <span class="loading loading-dots loading-md"></span> starting...
                     {:else}
                       <Play /> Start Terminal
                     {/if}
@@ -357,21 +306,21 @@
     <Splitpanes class="p-2 mt-2">
       <Pane bind:size={$terminal_size.height} class="rounded-lg">
         {#if $exercise_session.agentRunning}
-          {#key $page.params}
+          {#key page.params}
             {#if $exercise_session.exercise === $exercise.id}
               {#if $codeView}
                 {#if $loadingCodeEditor}
                   <div class="flex justify-center items-center h-full dark:bg-neutral">
-                    <span class="loading loading-dots loading-lg" />
+                    <span class="loading loading-dots loading-lg"></span>
                   </div>
                 {/if}
-                {#key ($page.params, codeUrl)}
+                {#key (page.params, codeUrl)}
                   <iframe
                     src={codeUrl}
-                    on:load={() => handleIframeLoad()}
+                    onload={() => handleIframeLoad()}
                     title="Code Editor"
-                    class="w-full h-full  bg-transparent"
-                  />
+                    class="w-full h-full bg-transparent"
+                  ></iframe>
                 {/key}
               {:else}
                 <Desktop {Console} />
@@ -380,7 +329,7 @@
           {/key}
         {:else}
           <!-- button to start the agent -->
-          {#key $page.params}
+          {#key page.params}
             <div
               class="flex justify-center items-center h-full dark:bg-neutral {checkIfExerciseIsDone(
                 $exercise.id
@@ -399,10 +348,10 @@
                     class="btn {checkIfExerciseIsDone($exercise.id)
                       ? 'btn-warning'
                       : 'btn-neutral  dark:btn-primary dark:text-neutral'} mt-4"
-                    on:click={() => handleStartExercise()}
+                    onclick={() => handleStartExercise()}
                   >
                     {#if $loadingExercises.has($exercise.id)}
-                      <span class="loading loading-dots loading-md" /> starting...
+                      <span class="loading loading-dots loading-md"></span> starting...
                     {:else}
                       <Play /> Start Terminal
                     {/if}
@@ -419,25 +368,16 @@
             <div
               class="p-6 leading-8 h-full overflow-y-scroll dark:bg-base-100 bg-white scrollbar-none"
             >
-              {#key $page.params}
-                <SvelteMarkdown
-                  source={docs}
-                  renderers={{
-                    codespan: CodeSpanComponent,
-                    code: CodeComponent,
-                    link: LinkComponent,
-                    list: ListComponent
-                  }}
-                />
+              {#key page.params}
+                <Markdown source={docs} />
               {/key}
             </div>
             <div class="bottom-0 flex w-full justify-between absolute p-2">
               <div>
-                <!-- svelte-ignore missing-declaration -->
                 <div class="tooltip" data-tip="Hint">
                   <button
                     class="btn btn-circle btn-neutral dark:btn-primary dark:text-neutral"
-                    on:click={() => openModal2()}
+                    onclick={() => openModal2()}
                   >
                     <InfoIcon size={16} />
                   </button>
@@ -445,22 +385,14 @@
                 <dialog id="my_modal_2" class="modal">
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Hint</h3>
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button
-                    >
-                    <SvelteMarkdown
-                      source={hint}
-                      renderers={{
-                        codespan: CodeSpanComponent,
-                        code: CodeComponent,
-                        link: LinkComponent,
-                        list: ListComponent
-                      }}
-                    />
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                      ✕
+                    </button>
+                    <Markdown source={hint} />
                   </form>
                 </dialog>
               </div>
               <div>
-                <!-- svelte-ignore missing-declaration -->
                 <div class="tooltip" data-tip="Solution">
                   <button
                     class="btn btn-circle {(showSolution ===
@@ -469,7 +401,7 @@
                     $exercise_session.endTime
                       ? 'btn-neutral  dark:btn-primary dark:text-neutral'
                       : 'btn-disabled'}"
-                    on:click={() => openModal()}
+                    onclick={() => openModal()}
                   >
                     <Lightbulb size={16} />
                   </button>
@@ -478,15 +410,7 @@
                   <form method="dialog" class="modal-box">
                     <h3 class="font-bold text-lg">Solution</h3>
 
-                    <SvelteMarkdown
-                      source={solution}
-                      renderers={{
-                        codespan: CodeSpanComponent,
-                        code: CodeComponent,
-                        link: LinkComponent,
-                        list: ListComponent
-                      }}
-                    />
+                    <Markdown source={solution} />
                     <div class="modal-action">
                       <!-- if there is a button in form, it will close the modal -->
                       <button class="btn">Close</button>

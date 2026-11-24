@@ -11,35 +11,28 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/pocketbase/dbx"
-	"github.com/pocketbase/pocketbase"
-	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/models"
+	"ganigeorgiev.com/pocketbase/dbx"
+	"ganigeorgiev.com/pocketbase/pocketbase"
+	"ganigeorgiev.com/pocketbase/pocketbase/core"
 )
 
-func PocketBaseInit(app *pocketbase.PocketBase) error {
-	modelHandler := func(event string) func(e *core.ModelEvent) error {
-		return func(e *core.ModelEvent) error {
-			table := e.Model.TableName()
-			// we don't want to executeEventActions if the event is a system event (e.g. "_collections" changes)
-			if record, ok := e.Model.(*models.Record); ok {
-				executeEventActions(app, event, table, record)
-			} else {
-				log.Println("Skipping executeEventActions for table:", table)
+func PocketBaseInit(app *pocketbase.PocketBase) {
+	// Dispatch configured actions only after record changes succeed
+	modelHandler := func(event string) func(*core.RecordEvent) error {
+		return func(e *core.RecordEvent) error {
+			if err := e.Next(); err != nil {
+				return err
 			}
+			executeEventActions(e.App, event, e.Record.Collection().Name, e.Record)
 			return nil
 		}
 	}
-	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		app.OnModelAfterCreate().Add(modelHandler("insert"))
-		app.OnModelAfterUpdate().Add(modelHandler("update"))
-		app.OnModelAfterDelete().Add(modelHandler("delete"))
-		return nil
-	})
-	return nil
+	app.OnRecordAfterCreateSuccess().BindFunc(modelHandler("insert"))
+	app.OnRecordAfterUpdateSuccess().BindFunc(modelHandler("update"))
+	app.OnRecordAfterDeleteSuccess().BindFunc(modelHandler("delete"))
 }
 
-func executeEventActions(app *pocketbase.PocketBase, event string, table string, record *models.Record) {
+func executeEventActions(app core.App, event string, table string, record *core.Record) {
 	// TODO: Load and cache this. Reload only on changes to "hooks" table
 	rows := []dbx.NullStringMap{}
 	app.DB().Select("action_type", "action", "action_params", "expands").
@@ -51,8 +44,8 @@ func executeEventActions(app *pocketbase.PocketBase, event string, table string,
 		action := row["action"].String
 		action_params := row["action_params"].String
 		expands := strings.Split(row["expands"].String, ",")
-		app.Dao().ExpandRecord(record, expands, func(c *models.Collection, ids []string) ([]*models.Record, error) {
-			return app.Dao().FindRecordsByIds(c.Name, ids, nil)
+		app.ExpandRecord(record, expands, func(c *core.Collection, ids []string) ([]*core.Record, error) {
+			return app.FindRecordsByIds(c.Name, ids, nil)
 		})
 		if err := executeEventAction(event, table, action_type, action, action_params, record); err != nil {
 			log.Println("ERROR", err)
@@ -60,7 +53,7 @@ func executeEventActions(app *pocketbase.PocketBase, event string, table string,
 	}
 }
 
-func executeEventAction(event, table, action_type, action, action_params string, record *models.Record) error {
+func executeEventAction(event, table, action_type, action, action_params string, record *core.Record) error {
 	log.Printf("event:%s, table: %s, action: %s\n", event, table, action)
 	switch action_type {
 	case "command":
@@ -72,7 +65,7 @@ func executeEventAction(event, table, action_type, action, action_params string,
 	}
 }
 
-func doCommand(action, action_params string, record *models.Record) error {
+func doCommand(action, action_params string, record *core.Record) error {
 	cmd := exec.Command(action, action_params)
 	if w, err := cmd.StdinPipe(); err != nil {
 		return err
@@ -103,7 +96,7 @@ func doCommand(action, action_params string, record *models.Record) error {
 	return nil
 }
 
-func doPost(action, action_params string, record *models.Record) error {
+func doPost(action, action_params string, record *core.Record) error {
 	r, w := io.Pipe()
 	defer w.Close()
 	go func() {

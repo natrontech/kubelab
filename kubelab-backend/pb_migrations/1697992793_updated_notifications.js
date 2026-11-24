@@ -1,33 +1,32 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("r2q6rrbyred18kq")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("r2q6rrbyred18kq");
 
-  // add
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "qoqrd85a",
-    "name": "exercise",
-    "type": "relation",
-    "required": false,
-    "presentable": false,
-    "unique": false,
-    "options": {
-      "collectionId": "s4f0lpy3ibkgfqp",
-      "cascadeDelete": false,
-      "minSelect": null,
-      "maxSelect": 1,
-      "displayFields": null
-    }
-  }))
+        // add
+        collection.fields.add(
+            new RelationField({
+                system: false,
+                id: "qoqrd85a",
+                name: "exercise",
+                type: "relation",
+                required: false,
+                presentable: false,
+                collectionId: "s4f0lpy3ibkgfqp",
+                cascadeDelete: false,
+                minSelect: null,
+                maxSelect: 1,
+            }),
+        );
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("r2q6rrbyred18kq")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("r2q6rrbyred18kq");
 
-  // remove
-  collection.schema.removeField("qoqrd85a")
+        // remove
+        collection.fields.removeById("qoqrd85a");
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

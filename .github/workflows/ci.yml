@@ -1,45 +1,29 @@
 name: CI
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ '*' ]
+    branches: ['*']
 
 jobs:
-
   go-build:
     name: Backend Build
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: kubelab-backend
-    strategy:
-      matrix:
-        goVer: [1.22]
-
     steps:
-    - name: Set up Go ${{ matrix.goVer }}
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ matrix.goVer }}
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        go mod vendor
-
-    - name: Test
-      run: |
-        go test -v ./...
-
-    - name: Build
-      run: |
-        go build -v ./...
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: kubelab-backend/go.mod
+          cache-dependency-path: kubelab-backend/go.sum
+      - name: Verify dependencies
+        run: go mod verify
+      - name: Test
+        run: go test ./...
+      - name: Build
+        run: go build ./...
 
   ui-build:
     name: Frontend Build
@@ -48,9 +32,19 @@ jobs:
       run:
         working-directory: kubelab-ui
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: kubelab-ui/package-lock.json
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
+      - name: Check
+        run: npm run check
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
       - name: Build
         run: npm run build

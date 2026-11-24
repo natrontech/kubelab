@@ -1,25 +1,26 @@
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("s4f0lpy3ibkgfqp")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("s4f0lpy3ibkgfqp");
 
-  // remove
-  collection.schema.removeField("uao3gxwr")
+        // remove
+        collection.fields.removeById("uao3gxwr");
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("s4f0lpy3ibkgfqp")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("s4f0lpy3ibkgfqp");
 
-  // add
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "uao3gxwr",
-    "name": "agentRunning",
-    "type": "bool",
-    "required": false,
-    "unique": false,
-    "options": {}
-  }))
+        // add
+        collection.fields.add(
+            new BoolField({
+                system: false,
+                id: "uao3gxwr",
+                name: "agentRunning",
+                type: "bool",
+                required: false,
+            }),
+        );
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

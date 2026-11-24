@@ -1,5 +1,5 @@
 <script>
-  import { Download, ExternalLink, Presentation } from "lucide-svelte";
+  import { Download, ExternalLink } from "@lucide/svelte";
 </script>
 
 <h1 class="text-center text-4xl font-bold my-4">Material</h1>
@@ -9,10 +9,7 @@
       <h2 class="card-title">Presentation Slides Day 1</h2>
       <p class="text-white">Here you can find the slides for the presentation of the first day.</p>
       <div class="card-actions justify-end">
-        <button
-          class="btn btn-neutral"
-          on:click={() => window.open("/assets/slides_day_1.pdf")}
-        >
+        <button class="btn btn-neutral" onclick={() => window.open("/assets/slides_day_1.pdf")}>
           <Download /> Download
         </button>
       </div>
@@ -23,10 +20,7 @@
       <h2 class="card-title">Presentation Slides Day 2</h2>
       <p class="text-white">Here you can find the slides for the presentation of the second day.</p>
       <div class="card-actions justify-end">
-        <button
-          class="btn btn-neutral"
-          on:click={() => window.open("/assets/slides_day_2.pdf")}
-        >
+        <button class="btn btn-neutral" onclick={() => window.open("/assets/slides_day_2.pdf")}>
           <Download /> Download
         </button>
       </div>
@@ -39,7 +33,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("/assets/cheat-sheet-compressed.pdf")}
+          onclick={() => window.open("/assets/cheat-sheet-compressed.pdf")}
         >
           <Download /> Download
         </button>
@@ -55,7 +49,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("https://kubernetes.io/docs/home/")}
+          onclick={() => window.open("https://kubernetes.io/docs/home/")}
         >
           <ExternalLink /> Go to Docs
         </button>
@@ -69,7 +63,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() =>
+          onclick={() =>
             window.open("https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/")}
         >
           <ExternalLink /> Go to Docs
@@ -86,7 +80,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() =>
+          onclick={() =>
             window.open(
               "https://gandrille.github.io/tech-notes/Docker_and_Kubernetes/Kubernetes_Core/Security_and_monitoring/Monitoring,_Logging,_Troubleshooting/troubleshooting-kubernetes.pdf"
             )}
@@ -108,7 +102,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("https://github.com/MuhammedKalkan/OpenLens")}
+          onclick={() => window.open("https://github.com/MuhammedKalkan/OpenLens")}
         >
           <ExternalLink /> Go to Website
         </button>
@@ -126,10 +120,7 @@
         interact with your observed resources.
       </p>
       <div class="card-actions justify-end">
-        <button
-          class="btn btn-neutral"
-          on:click={() => window.open("https://k9scli.io/", "_blank")}
-        >
+        <button class="btn btn-neutral" onclick={() => window.open("https://k9scli.io/", "_blank")}>
           <ExternalLink /> Go to Website
         </button>
       </div>
@@ -148,7 +139,7 @@
       <div class="card-actions justify-end">
         <button
           class="btn btn-neutral"
-          on:click={() => window.open("https://github.com/benc-uk/kubeview")}
+          onclick={() => window.open("https://github.com/benc-uk/kubeview")}
         >
           <ExternalLink /> Go to Website
         </button>
@@ -166,14 +157,10 @@
         as providing a visual way to interact with and diagnose their applications.
       </p>
       <div class="card-actions justify-end">
-        <button
-          class="btn btn-neutral"
-          on:click={() => window.open("https://kubeshark.co/")}
-        >
+        <button class="btn btn-neutral" onclick={() => window.open("https://kubeshark.co/")}>
           <ExternalLink /> Go to Website
         </button>
       </div>
     </div>
   </div>
-
 </div>

@@ -1,58 +1,55 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("juzwmxmth0oqv89")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("juzwmxmth0oqv89");
 
-  collection.name = "exercise_session_logs"
+        collection.name = "exercise_session_logs";
 
-  // remove
-  collection.schema.removeField("c94ndl04")
+        // remove
+        collection.fields.removeById("c94ndl04");
 
-  // add
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "flngas50",
-    "name": "exercise_session",
-    "type": "relation",
-    "required": false,
-    "presentable": false,
-    "unique": false,
-    "options": {
-      "collectionId": "qj6ssich32lcxru",
-      "cascadeDelete": false,
-      "minSelect": null,
-      "maxSelect": 1,
-      "displayFields": null
-    }
-  }))
+        // add
+        collection.fields.add(
+            new RelationField({
+                system: false,
+                id: "flngas50",
+                name: "exercise_session",
+                type: "relation",
+                required: false,
+                presentable: false,
+                collectionId: "qj6ssich32lcxru",
+                cascadeDelete: false,
+                minSelect: null,
+                maxSelect: 1,
+            }),
+        );
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("juzwmxmth0oqv89")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("juzwmxmth0oqv89");
 
-  collection.name = "exercise_logs"
+        collection.name = "exercise_logs";
 
-  // add
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "c94ndl04",
-    "name": "exercise",
-    "type": "relation",
-    "required": true,
-    "presentable": true,
-    "unique": false,
-    "options": {
-      "collectionId": "s4f0lpy3ibkgfqp",
-      "cascadeDelete": false,
-      "minSelect": null,
-      "maxSelect": 1,
-      "displayFields": null
-    }
-  }))
+        // add
+        collection.fields.add(
+            new RelationField({
+                system: false,
+                id: "c94ndl04",
+                name: "exercise",
+                type: "relation",
+                required: true,
+                presentable: true,
+                collectionId: "s4f0lpy3ibkgfqp",
+                cascadeDelete: false,
+                minSelect: null,
+                maxSelect: 1,
+            }),
+        );
 
-  // remove
-  collection.schema.removeField("flngas50")
+        // remove
+        collection.fields.removeById("flngas50");
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

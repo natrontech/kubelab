@@ -1,4 +1,4 @@
-import { client } from "$lib/pocketbase";
+import { client } from "#lib/pocketbase/index.ts";
 import type {
     CompaniesResponse,
     ExerciseSessionLogsResponse,
@@ -6,7 +6,7 @@ import type {
     ExercisesResponse,
     LabSessionsResponse,
     LabsResponse
-} from "$lib/pocketbase/generated-types";
+} from "#lib/pocketbase/generated-types.ts";
 import { get, writable, type Writable } from "svelte/store";
 
 export const loadingCodeEditor: Writable<boolean> = writable<boolean>(false);

@@ -2,8 +2,10 @@
 
 ## Setup
 
+Requires Node.js 24 or newer; CI and container builds use Node.js 26.
+
 ```bash
-npm install # install dependencies
+npm ci # install the locked dependencies
 npm run build # compile frontend
 ```
 
@@ -29,10 +31,6 @@ The file `generated-types.ts` contains TypeScript definitions of `Record` types 
 
 To create a production version of your app (static HTML/JS app):
 
-_NOTE_: The build below will fail unless the backend has at least 1
-post created. So please create a "posts" record using the app UI or
-the admin UI before running build below.
-
 ```bash
 # compile frontend
 npm run build
@@ -41,3 +39,9 @@ npm run backend
 ```
 
 The above generates output in the `build` folder. Now you can serve production compiled version of the frontend using the backend (with `--publicDir ../frontend/build`), any static file web server, or `npm preview`.
+
+## Dependency compatibility
+
+TypeScript remains on 6.0 because SvelteKit 3 requires TypeScript 6 and the ESLint TypeScript parser supports versions below 6.1.
+
+The standalone UI container serves the static SPA on port 3000; route `/api` to the backend in your reverse proxy, or use the combined image from the repository root.

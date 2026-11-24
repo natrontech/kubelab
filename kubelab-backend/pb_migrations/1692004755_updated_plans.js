@@ -1,39 +1,38 @@
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
 
-  // update
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "qe5g2utb",
-    "name": "price",
-    "type": "number",
-    "required": false,
-    "unique": false,
-    "options": {
-      "min": null,
-      "max": null
-    }
-  }))
+        // update
+        collection.fields.add(
+            new NumberField({
+                system: false,
+                id: "qe5g2utb",
+                name: "price",
+                type: "number",
+                required: false,
+                min: null,
+                max: null,
+            }),
+        );
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("twr8eflpoom78k9")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("twr8eflpoom78k9");
 
-  // update
-  collection.schema.addField(new SchemaField({
-    "system": false,
-    "id": "qe5g2utb",
-    "name": "price",
-    "type": "number",
-    "required": true,
-    "unique": false,
-    "options": {
-      "min": null,
-      "max": null
-    }
-  }))
+        // update
+        collection.fields.add(
+            new NumberField({
+                system: false,
+                id: "qe5g2utb",
+                name: "price",
+                type: "number",
+                required: true,
+                min: null,
+                max: null,
+            }),
+        );
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

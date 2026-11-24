@@ -1,13 +1,13 @@
 <script lang="ts">
-  import SideOver from "$lib/components/base/SideOver.svelte";
-  import Lab from "$lib/components/labs/Lab.svelte";
+  import SideOver from "#lib/components/base/SideOver.svelte";
+  import Lab from "#lib/components/labs/Lab.svelte";
   import type {
     ExerciseSessionsResponse,
     ExercisesResponse,
     LabSessionsResponse
-  } from "$lib/pocketbase/generated-types";
-  import { exercise_sessions, exercises, lab_sessions, labs } from "$lib/stores/data";
-  import { metadata } from "$lib/stores/metadata";
+  } from "#lib/pocketbase/generated-types.ts";
+  import { exercise_sessions, exercises, lab_sessions, labs } from "#lib/stores/data.ts";
+  import { metadata } from "#lib/stores/metadata.ts";
 
   import { Drawer } from "flowbite-svelte";
   import { sineIn } from "svelte/easing";
@@ -42,7 +42,7 @@
     return lab_exercises_sessions;
   }
 
-  let drawerHidden = true;
+  let drawerHidden = $state(true);
   let transitionParamsRight = {
     x: 320,
     duration: 200,
@@ -51,13 +51,11 @@
 </script>
 
 <Drawer
-  backdrop={true}
+  modal={true}
   placement="right"
-  transitionType="fly"
   transitionParams={transitionParamsRight}
   bind:hidden={drawerHidden}
-  width="w-full sm:w-2/5 "
-  class="absolute h-full overflow-y-scroll scrollbar-none shadow-lg p-0
+  class="w-full sm:w-2/5 absolute h-full overflow-y-scroll scrollbar-none shadow-lg p-0
     bg-base-100
     dark:bg-base-900
     dark:text-white
@@ -71,21 +69,23 @@
 <div
   class=" top-0 bottom-0 right-0 left-0 bg-black z-40 {drawerHidden
     ? ' bg-opacity-0'
-    : 'absolute bg-opacity-40 '} transition-all duration-200 ease-in-out  "
-/>
+    : 'absolute bg-opacity-40 '} transition-all duration-200 ease-in-out"
+></div>
 {#if $lab_sessions.length > 0}
   <h1 class="text-center text-4xl font-bold my-4 text-white">Labs</h1>
   {#key $lab_sessions}
     <p class="text-center text-xl my-4 text-white">
       <!-- display number of running labs x/1 -->
       Running labs:
-      <span class="font-bold"
-        >{$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}</span
-      > / 2
+      <span class="font-bold">
+        {$lab_sessions.filter((lab_session) => lab_session.clusterRunning).length}
+      </span> / 2
     </p>
   {/key}
   <!-- <SideOver /> -->
-  <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 overflow-y-scroll scrollbar-none absolute w-full top-36 bottom-0">
+  <div
+    class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 overflow-y-scroll scrollbar-none absolute w-full top-36 bottom-0"
+  >
     {#each $labs as this_lab}
       <Lab
         {this_lab}

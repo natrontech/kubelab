@@ -1,15 +1,16 @@
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
 
-  collection.viewRule = "@request.auth.id = user.id "
+        collection.viewRule = "@request.auth.id = user.id ";
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("n7tne53bbobf2bt")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("n7tne53bbobf2bt");
 
-  collection.viewRule = null
+        collection.viewRule = null;
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

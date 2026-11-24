@@ -1,25 +1,25 @@
 migrate(
-    (db) => {
+    (app) => {
         const collection = new Collection({
             id: "3fhw2mfr9zrgodj",
-            created: "2022-12-23 22:30:35.443Z",
-            updated: "2022-12-23 22:30:35.443Z",
             name: "hooks",
             type: "base",
             system: false,
-            schema: [
+            listRule: null,
+            viewRule: null,
+            createRule: null,
+            updateRule: null,
+            deleteRule: null,
+            fields: [
                 {
                     system: false,
                     id: "j8mewfur",
                     name: "collection",
                     type: "text",
                     required: true,
-                    unique: false,
-                    options: {
-                        min: null,
-                        max: null,
-                        pattern: "",
-                    },
+                    min: null,
+                    max: null,
+                    pattern: "",
                 },
                 {
                     system: false,
@@ -27,11 +27,8 @@ migrate(
                     name: "event",
                     type: "select",
                     required: true,
-                    unique: false,
-                    options: {
-                        maxSelect: 1,
-                        values: ["insert", "update", "delete"],
-                    },
+                    maxSelect: 1,
+                    values: ["insert", "update", "delete"],
                 },
                 {
                     system: false,
@@ -39,11 +36,8 @@ migrate(
                     name: "action_type",
                     type: "select",
                     required: true,
-                    unique: false,
-                    options: {
-                        maxSelect: 1,
-                        values: ["command", "post"],
-                    },
+                    maxSelect: 1,
+                    values: ["command", "post"],
                 },
                 {
                     system: false,
@@ -51,12 +45,9 @@ migrate(
                     name: "action",
                     type: "text",
                     required: true,
-                    unique: false,
-                    options: {
-                        min: null,
-                        max: null,
-                        pattern: "",
-                    },
+                    min: null,
+                    max: null,
+                    pattern: "",
                 },
                 {
                     system: false,
@@ -64,28 +55,29 @@ migrate(
                     name: "action_params",
                     type: "text",
                     required: false,
-                    unique: false,
-                    options: {
-                        min: null,
-                        max: null,
-                        pattern: "",
-                    },
+                    min: null,
+                    max: null,
+                    pattern: "",
+                },
+                {
+                    name: "created",
+                    type: "autodate",
+                    onCreate: true,
+                },
+                {
+                    name: "updated",
+                    type: "autodate",
+                    onCreate: true,
+                    onUpdate: true,
                 },
             ],
-            listRule: null,
-            viewRule: null,
-            createRule: null,
-            updateRule: null,
-            deleteRule: null,
-            options: {},
         });
 
-        return Dao(db).saveCollection(collection);
+        return app.save(collection);
     },
-    (db) => {
-        const dao = new Dao(db);
-        const collection = dao.findCollectionByNameOrId("3fhw2mfr9zrgodj");
+    (app) => {
+        const collection = app.findCollectionByNameOrId("3fhw2mfr9zrgodj");
 
-        return dao.deleteCollection(collection);
-    }
+        return app.delete(collection);
+    },
 );

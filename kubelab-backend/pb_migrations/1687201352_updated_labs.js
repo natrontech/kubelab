@@ -1,19 +1,20 @@
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("a1s1vqlm7141lcr")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("a1s1vqlm7141lcr");
 
-  collection.createRule = null
-  collection.updateRule = null
-  collection.deleteRule = null
+        collection.createRule = null;
+        collection.updateRule = null;
+        collection.deleteRule = null;
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("a1s1vqlm7141lcr")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("a1s1vqlm7141lcr");
 
-  collection.createRule = ""
-  collection.updateRule = ""
-  collection.deleteRule = ""
+        collection.createRule = "";
+        collection.updateRule = "";
+        collection.deleteRule = "";
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

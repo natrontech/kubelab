@@ -1,8 +1,8 @@
 <script lang="ts">
-  import RunningExercises from "$lib/components/dashboard/RunningExercises.svelte";
-  import { client } from "$lib/pocketbase";
-  import { exercise_sessions, exercises, labs } from "$lib/stores/data.js";
-  import { TerminalSquare } from "lucide-svelte";
+  import RunningExercises from "#lib/components/dashboard/RunningExercises.svelte";
+  import { client } from "#lib/pocketbase/index.ts";
+  import { exercise_sessions, exercises, labs } from "#lib/stores/data.js";
+  import { TerminalSquare } from "@lucide/svelte";
   import { onMount } from "svelte";
   import {
     Table,
@@ -12,9 +12,9 @@
     TableHead,
     TableHeadCell
   } from "flowbite-svelte";
-  import type { CompaniesResponse } from "$lib/pocketbase/generated-types";
+  import type { CompaniesResponse } from "#lib/pocketbase/generated-types.ts";
 
-  let companies: CompaniesResponse[] = [];
+  let companies: CompaniesResponse[] = $state([]);
 
   async function getCompanies() {
     let response: CompaniesResponse[] = await client.collection("companies").getFullList();
@@ -23,7 +23,7 @@
   }
 
   onMount(async () => {
-    if (client.authStore.model?.role == "admin") {
+    if (client.authStore.record?.role == "admin") {
       await getCompanies();
     }
   });
@@ -56,12 +56,12 @@
   }
 </script>
 
-{#if client.authStore.model?.role != "admin"}
+{#if client.authStore.record?.role != "admin"}
   <h1 class="text-center text-4xl text-white font-bold mb-8">Dashboard</h1>
   <div class="grid grid-cols-3 gap-4 justify-center items-center">
-    <div />
+    <div></div>
     <div
-      class="stats w-full col-span-3 sm:col-span-1 shadow  hover:shadow-md transition-all duration-150 ease-in-out"
+      class="stats w-full col-span-3 sm:col-span-1 shadow hover:shadow-md transition-all duration-150 ease-in-out"
     >
       <div class="stat">
         <div class="stat-title">Your <strong>average</strong> time to resolution</div>
@@ -90,13 +90,14 @@
             fill="none"
             viewBox="0 0 24 24"
             class="inline-block w-8 h-8 stroke-current"
-            ><path
+          >
+            <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M13 10V3L4 14h7v7l9-11h-7z"
-            /></svg
-          >
+            />
+          </svg>
         </div>
         <div class="stat-title">Total Exercises</div>
         <div class="stat-value text-accent">{$exercises.length}</div>
@@ -111,7 +112,7 @@
               ? Math.round((getDoneExercisesNumber() / $exercises.length) * 100)
               : 0}
             max="100"
-          />
+          ></progress>
         </div>
         <div class="stat-value">
           {Math.round((getDoneExercisesNumber() / $exercises.length) * 100)}%
@@ -133,10 +134,10 @@
       <TableHeadCell>Company</TableHeadCell>
       <TableHeadCell>Dashboard URL</TableHeadCell>
     </TableHead>
-    <TableBody tableBodyClass="divide-y">
+    <TableBody class="divide-y">
       {#if companies.length == 0}
         <TableBodyRow>
-          <TableBodyCell colspan="2" class="text-center">No companies yet</TableBodyCell>
+          <TableBodyCell colspan={2} class="text-center">No companies yet</TableBodyCell>
         </TableBodyRow>
       {:else}
         {#each companies as company}
@@ -153,8 +154,8 @@
                 alt=""
               />
               {" "}
-              {company.name}</TableBodyCell
-            >
+              {company.name}
+            </TableBodyCell>
             <TableBodyCell>
               <a href={`https://kubelab.ch/admin/${company.id}`}>kubelab.ch/admin/{company.id}</a>
             </TableBodyCell>

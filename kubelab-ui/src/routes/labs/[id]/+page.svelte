@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { metadata } from "$lib/stores/metadata";
-  import { ArrowLeft, Play, TerminalSquare } from "lucide-svelte";
+  import { metadata } from "#lib/stores/metadata.ts";
+  import { ArrowLeft, Play, TerminalSquare } from "@lucide/svelte";
+  import { exercise_sessions, exercises, getExerciseSessionByExercise } from "#lib/stores/data.ts";
   import {
-    exercise_sessions,
-    exercises,
-    getExerciseSessionByExercise,
-    lab
-  } from "$lib/stores/data";
-  import { ExerciseSessionLogsTypeOptions, type ExerciseSessionLogsRecord, type ExerciseSessionsRecord } from "$lib/pocketbase/generated-types";
-  import { client } from "$lib/pocketbase";
-  import toast from "svelte-french-toast";
-  import { loadingExercises } from "$lib/stores/loading";
+    ExerciseSessionLogsTypeOptions,
+    type ExerciseSessionLogsRecord,
+    type ExerciseSessionsRecord
+  } from "#lib/pocketbase/generated-types.ts";
+  import { client } from "#lib/pocketbase/index.ts";
+  import { toast } from "svelte-sonner";
+  import { loadingExercises } from "#lib/stores/loading.ts";
   import { onDestroy, onMount } from "svelte";
 
   $metadata.title = "Exercises";
@@ -19,7 +18,7 @@
     return getExerciseSessionByExercise(exercise_id)?.agentRunning;
   }
 
-  let show = false;
+  let show = $state(false);
 
   onMount(() => {
     show = true;
@@ -32,7 +31,7 @@
   async function startExercise(exercise_id: string) {
     const data: ExerciseSessionsRecord = {
       // @ts-ignore
-      user: client.authStore.model?.id,
+      user: client.authStore.record?.id,
       exercise: exercise_id,
       startTime: new Date().toISOString(),
       endTime: "",
@@ -69,7 +68,7 @@
 
           const exercise_session_log_data: ExerciseSessionLogsRecord = {
             // @ts-ignore
-            user: client.authStore.model?.id,
+            user: client.authStore.record?.id,
             exercise_session: exercise_session_id,
             type: ExerciseSessionLogsTypeOptions.start,
             timestamp: new Date().toISOString()
@@ -78,12 +77,10 @@
           client
             .collection("exercise_session_logs")
             .create(exercise_session_log_data)
-            .then((response) => {
-            })
+
             .catch((error) => {
               console.log(error);
             });
-
         })
         .catch((error) => {
           toast.error(error.message);
@@ -98,7 +95,7 @@
   }
 </script>
 
-<a class="btn btn-neutral  top-5 absolute" href="/labs/" on:click={() => show = false}>
+<a class="btn btn-neutral top-5 absolute" href="/labs/" onclick={() => (show = false)}>
   <ArrowLeft class="inline-block w-4 h-4 mr-2" />
   Labs
 </a>
@@ -113,7 +110,7 @@
             : 'bg-base-200'} border-4 border-neutral"
         >
           <div class="card-body">
-            <p class="badge badge-outline  absolute top-2 right-2">#{i + 1}</p>
+            <p class="badge badge-outline absolute top-2 right-2">#{i + 1}</p>
             <p
               class="badge badge-outline {getExerciseSessionByExercise(exercise.id)?.agentRunning
                 ? 'badge-success'
@@ -133,10 +130,10 @@
               <div class="tooltip" data-tip="start exercise">
                 <button
                   class="btn {isExerciseRunning(exercise.id) ? 'btn-disabled' : 'btn-neutral'}"
-                  on:click={() => startExercise(exercise.id)}
+                  onclick={() => startExercise(exercise.id)}
                 >
                   {#if $loadingExercises.has(exercise.id)}
-                    <span class="loading loading-dots loading-md" />
+                    <span class="loading loading-dots loading-md"></span>
                   {:else}
                     <Play />
                   {/if}

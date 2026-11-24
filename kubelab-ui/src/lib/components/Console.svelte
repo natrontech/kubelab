@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { client } from "$lib/pocketbase";
-  import { layout_store } from "$lib/stores/layout_store";
-  import { terminal_size } from "$lib/stores/terminal";
-  import darkTheme from "$lib/stores/theme";
+  import { run } from "svelte/legacy";
+
+  import { client } from "#lib/pocketbase/index.ts";
+  import { layout_store } from "#lib/stores/layout_store.ts";
+  import { terminal_size } from "#lib/stores/terminal.ts";
+  import darkTheme from "#lib/stores/theme.ts";
   import { onDestroy, onMount } from "svelte";
 
-  import { Terminal } from "xterm";
-  import { FitAddon } from "xterm-addon-fit";
+  import { Terminal } from "@xterm/xterm";
+  import { FitAddon } from "@xterm/addon-fit";
 
   export const terminal = new Terminal({
     convertEol: true,
@@ -78,7 +80,7 @@
       "-" +
       exercise_id +
       "-" +
-      client.authStore.model?.id;
+      client.authStore.record?.id;
 
     // Close the socket only if it is opened
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -118,7 +120,6 @@
   };
 
   function ab2str(buf: any) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return String.fromCharCode.apply(null, new Uint8Array(buf));
   }
@@ -140,11 +141,11 @@
     }
   });
 
-  let div: HTMLDivElement;
+  let div: HTMLDivElement | undefined = $state();
 
   onMount(() => {
     initializeWebSocket();
-    terminal.open(div);
+    terminal.open(div!);
     setTimeout(() => {
       update_height();
     }, 300);
@@ -154,13 +155,13 @@
     fitAddon.fit();
   };
 
-  $: {
+  run(() => {
     $terminal_size;
     $layout_store.terminal;
     setTimeout(() => {
       update_height();
     }, 300);
-  }
+  });
 
   onDestroy(() => {
     socket?.close();
@@ -168,7 +169,7 @@
   });
 </script>
 
-<div bind:this={div} />
+<div bind:this={div}></div>
 
 <style>
   div {

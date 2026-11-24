@@ -1,12 +1,16 @@
 <script lang="ts">
-  import darkTheme from "$lib/stores/theme";
-  import type { ComponentType, SvelteComponentTyped } from "svelte";
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  export let Console: ComponentType<SvelteComponentTyped>;
+  import darkTheme from "#lib/stores/theme.ts";
+  import type { Component } from "svelte";
+
+  interface Props {
+    Console: Component<Record<string, never>>;
+  }
+
+  let { Console }: Props = $props();
 </script>
 
 {#key $darkTheme}
   <div class="h-full overflow-y-auto">
-    <svelte:component this={Console} />
+    <Console />
   </div>
 {/key}

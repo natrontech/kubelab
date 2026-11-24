@@ -1,18 +1,21 @@
 /// <reference path="../pb_data/types.d.ts" />
-migrate((db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("qj6ssich32lcxru")
+migrate(
+    (app) => {
+        const collection = app.findCollectionByNameOrId("qj6ssich32lcxru");
 
-  collection.listRule = "@request.auth.id = user.id || @request.auth.role = \"admin\""
-  collection.viewRule = "@request.auth.id = user.id || @request.auth.role = \"admin\""
+        collection.listRule =
+            '@request.auth.id = user.id || @request.auth.role = "admin"';
+        collection.viewRule =
+            '@request.auth.id = user.id || @request.auth.role = "admin"';
 
-  return dao.saveCollection(collection)
-}, (db) => {
-  const dao = new Dao(db)
-  const collection = dao.findCollectionByNameOrId("qj6ssich32lcxru")
+        return app.save(collection);
+    },
+    (app) => {
+        const collection = app.findCollectionByNameOrId("qj6ssich32lcxru");
 
-  collection.listRule = "@request.auth.id = user.id"
-  collection.viewRule = "@request.auth.id = user.id"
+        collection.listRule = "@request.auth.id = user.id";
+        collection.viewRule = "@request.auth.id = user.id";
 
-  return dao.saveCollection(collection)
-})
+        return app.save(collection);
+    },
+);

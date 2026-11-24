@@ -4,23 +4,27 @@
     ExerciseSessionsResponse,
     LabSessionsRecord,
     LabSessionsResponse
-  } from "$lib/pocketbase/generated-types";
-  import { exercise_sessions, lab_sessions, updateDataStores } from "$lib/stores/data";
-  import { AlertTriangle, Pause, Play, TestTube2, X } from "lucide-svelte";
-  import SvelteMarkdown from "svelte-markdown";
-  import CodeSpanComponent from "$lib/components/markdown/CodeSpanComponent.svelte";
-  import CodeComponent from "$lib/components/markdown/CodeComponent.svelte";
-  import LinkComponent from "$lib/components/markdown/LinkComponent.svelte";
-  import toast from "svelte-french-toast";
-  import { loadingExercises, loadingLabs } from "$lib/stores/loading";
-  import { client } from "$lib/pocketbase";
-  import { sidebar_exercise_sessions, sidebar_lab, sidebar_lab_session } from "$lib/stores/sidebar";
+  } from "#lib/pocketbase/generated-types.ts";
+  import { exercise_sessions, lab_sessions, updateDataStores } from "#lib/stores/data.ts";
+  import { AlertTriangle, Pause, Play, TestTube2, X } from "@lucide/svelte";
+  import Markdown from "#lib/components/markdown/Markdown.svelte";
+  import { toast } from "svelte-sonner";
+  import { loadingExercises, loadingLabs } from "#lib/stores/loading.ts";
+  import { client } from "#lib/pocketbase/index.ts";
+  import {
+    sidebar_exercise_sessions,
+    sidebar_lab,
+    sidebar_lab_session
+  } from "#lib/stores/sidebar.ts";
   import Exercise from "../labs/Exercise.svelte";
-  import { Button, Modal } from "flowbite-svelte";
 
-  let docs: string;
-  export let drawerHidden = true;
-  let confirmation = false;
+  let docs = $state("");
+  interface Props {
+    drawerHidden?: boolean;
+  }
+
+  let { drawerHidden = $bindable(true) }: Props = $props();
+  let confirmation = $state(false);
 
   async function getMarkdown() {
     fetch($sidebar_lab.docs)
@@ -53,7 +57,7 @@
     const data: LabSessionsRecord = {
       clusterRunning: true,
       // @ts-ignore
-      user: client.authStore.model?.id,
+      user: client.authStore.record?.id,
       lab: $sidebar_lab.id,
       startTime: new Date().toISOString()
     };
@@ -101,7 +105,7 @@
     const data: LabSessionsRecord = {
       clusterRunning: false,
       // @ts-ignore
-      user: client.authStore.model?.id,
+      user: client.authStore.record?.id,
       lab: $sidebar_lab.id,
       endTime: new Date().toISOString()
     };
@@ -111,7 +115,7 @@
       const exercise_session_data: ExerciseSessionsRecord = {
         agentRunning: false,
         // @ts-ignore
-        user: client.authStore.model?.id,
+        user: client.authStore.record?.id,
         exercise: sidebar_exercise_session.exercise
       };
 
@@ -220,10 +224,10 @@
           {#if !$sidebar_lab_session.clusterRunning}
             <button
               class="btn btn-outline btn-success"
-              on:click={() => startLab($sidebar_lab_session.id)}
+              onclick={() => startLab($sidebar_lab_session.id)}
             >
               {#if $loadingLabs.has($sidebar_lab_session.id)}
-                <span class="loading loading-dots loading-md" />
+                <span class="loading loading-dots loading-md"></span>
               {:else}
                 <Play class="w-5 h-5 mr-2 inline-block" />
                 Start lab
@@ -232,55 +236,48 @@
           {:else}
             {#if $loadingLabs.has($sidebar_lab_session.id)}
               <button class="btn btn-outline btn-disabled">
-                <span class="loading loading-dots loading-md" />
+                <span class="loading loading-dots loading-md"></span>
                 Stopping lab
               </button>
             {:else if confirmation}
               <button
                 class="btn btn-outline btn-warning"
-                on:click={() => stopLab($sidebar_lab_session.id)}
+                onclick={() => stopLab($sidebar_lab_session.id)}
               >
                 <AlertTriangle class="w-5 h-5 mr-2 inline-block" />
                 Are you sure?
               </button>
             {:else}
-              <button class="btn btn-outline btn-error" on:click={() => (confirmation = true)}>
+              <button class="btn btn-outline btn-error" onclick={() => (confirmation = true)}>
                 <Pause class="w-5 h-5 mr-2 inline-block" />
                 Stop lab
               </button>
             {/if}
           {/if}
         </div>
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <div
           tabindex="0"
-          class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4  rounded-lg shadow-md"
+          class="collapse collapse-arrow bg-white dark:bg-neutral border-primary border-2 my-4 rounded-lg shadow-md"
         >
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <div
             class="collapse-title text-md font-medium"
-            on:click={() => {
+            onclick={() => {
               getMarkdown();
             }}
           >
             About the lab
           </div>
           <div class="collapse-content">
-            <SvelteMarkdown
-              source={docs}
-              renderers={{
-                codespan: CodeSpanComponent,
-                code: CodeComponent,
-                link: LinkComponent
-              }}
-            />
+            <Markdown source={docs} />
           </div>
         </div>
         <div class="absolute top-5 right-6">
           <div class="tooltip tooltip-left" data-tip="close">
             <button
               type="button"
-              on:click={() => {
+              onclick={() => {
                 drawerHidden = !drawerHidden;
               }}
               class="btn btn-outline border-none btn-sm btn-square"
@@ -294,8 +291,8 @@
         <div
           class=" space-y-2 px-6 absolute w-full top-64 bottom-0 overflow-y-scroll scrollbar-none pb-4"
         >
-          {#each $sidebar_exercise_sessions as exercise_session, idx}
-            <Exercise this_exercise_session={exercise_session} index={idx} />
+          {#each $sidebar_exercise_sessions as exercise_session}
+            <Exercise this_exercise_session={exercise_session} />
           {/each}
         </div>
       {/key}

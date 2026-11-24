@@ -1,4 +1,4 @@
-FROM node:lts-slim as build
+FROM node:26-slim AS build
 
 WORKDIR /app
 
@@ -6,15 +6,12 @@ COPY package*.json ./
 RUN rm -rf node_modules
 RUN rm -rf build
 COPY . .
-RUN npm install
+RUN npm ci
 RUN npm run build
 
-FROM node:lts-slim as run
+FROM nginx:stable-alpine AS run
 
-WORKDIR /app
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/build ./build
-RUN npm install --production
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
-ENTRYPOINT [ "npm", "run", "start" ]

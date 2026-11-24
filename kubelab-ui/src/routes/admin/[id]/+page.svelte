@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { client } from "$lib/pocketbase";
+  import { client } from "#lib/pocketbase/index.ts";
   import {
     NotificationsTypeOptions,
     type ExerciseSessionLogsResponse,
     type NotificationsResponse,
     type ExerciseSessionsResponse,
     type CompaniesResponse,
+    type UsersResponse,
     type ExercisesResponse
-  } from "$lib/pocketbase/generated-types";
-  import { exercise_session_logs } from "$lib/stores/data";
+  } from "#lib/pocketbase/generated-types.ts";
+  import { exercise_session_logs } from "#lib/stores/data.ts";
   import {
     Table,
     TableBody,
@@ -17,9 +18,9 @@
     TableHead,
     TableHeadCell
   } from "flowbite-svelte";
-  import { CheckCircle, HelpCircle, Play } from "lucide-svelte";
+  import { CheckCircle, HelpCircle, Play } from "@lucide/svelte";
   import { onDestroy, onMount } from "svelte";
-  import toast from "svelte-french-toast";
+  import { toast } from "svelte-sonner";
 
   interface Activity {
     exercise_title: string;
@@ -32,9 +33,16 @@
     type: "start" | "end";
   }
 
-  let activities: Activity[] = [];
-  let notifications: NotificationsResponse[] = [];
-  export let data: any;
+  let activities: Activity[] = $state([]);
+  let notifications: NotificationsResponse<{
+    user: UsersResponse<{ company: CompaniesResponse }>;
+    exercise: ExercisesResponse;
+  }>[] = $state([]);
+  interface Props {
+    data: any;
+  }
+
+  let { data }: Props = $props();
   let company_id = data.props.id || "";
   let all_exercise_sessions: ExerciseSessionsResponse[] = [];
   let all_exercises: ExercisesResponse[] = [];
@@ -45,11 +53,11 @@
     logo: string;
   }
 
-  let company: Company = {
+  let company: Company = $state({
     id: "",
     name: "",
     logo: ""
-  };
+  });
 
   async function getCompany() {
     let company_response: CompaniesResponse = await client
@@ -105,13 +113,12 @@
     solved_exercises_percentage: number;
   }
 
-  let all_ranking: Ranking[] = [];
+  let all_ranking: Ranking[] = $state([]);
 
   function getRanking() {
     // in exercise_sessions, we have all the exercise_sessions of the company. We need to group them by user
 
     let users: any = {};
-
 
     all_exercise_sessions.forEach((exercise_session: any) => {
       if (users[exercise_session.expand.user.id]) {
@@ -263,12 +270,13 @@
   }
 
   async function getNotifications() {
-    let notifications_response: NotificationsResponse[] = await client
-      .collection("notifications")
-      .getFullList(3, {
-        expand: "user,user.company,exercise",
-        sort: "-created"
-      });
+    let notifications_response: NotificationsResponse<{
+      user: UsersResponse<{ company: CompaniesResponse }>;
+      exercise: ExercisesResponse;
+    }>[] = await client.collection("notifications").getFullList(3, {
+      expand: "user,user.company,exercise",
+      sort: "-created"
+    });
     // filter notifications by company and only show the notifications where ther user notifications_response.expand.user.company.id == company_id
     // filter only the notifications last 3 notifications
     notifications_response = notifications_response.filter(
@@ -297,7 +305,6 @@
     client.collection("notifications").subscribe("*", function (e) {
       if (e.action === "create") {
         toast("New notification!", {
-          icon: "👋",
           position: "top-right",
           duration: 10000
         });
@@ -379,7 +386,7 @@
           <TableHeadCell>Average Time</TableHeadCell>
           <TableHeadCell>Solved Exercises</TableHeadCell>
         </TableHead>
-        <TableBody tableBodyClass="divide-y">
+        <TableBody class="divide-y">
           {#each all_ranking as item, idx}
             <TableBodyRow>
               <TableBodyCell>{idx + 1}</TableBodyCell>
@@ -390,8 +397,8 @@
                   alt=""
                 />
                 {" "}
-                {item.user_name}</TableBodyCell
-              >
+                {item.user_name}
+              </TableBodyCell>
               <TableBodyCell>{item.average_time}</TableBodyCell>
               <TableBodyCell>{item.solved_exercises_percentage}%</TableBodyCell>
             </TableBodyRow>
@@ -408,7 +415,7 @@
       </div>
       <ul class="-mb-8">
         {#if notifications.length > 0}
-          {#each notifications as notification, idx}
+          {#each notifications as notification}
             <li>
               <div class="relative pb-8">
                 <div class="relative flex space-x-3">
@@ -418,12 +425,12 @@
                       <span class="absolute -top-1.5 left-0">
                         <span
                           class="animate-ping absolute inline-flex h-4 w-4 rounded-full top-1 -left-0.5 bg-red-400 opacity-75"
-                        />
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                        ></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                       </span>
                     {:else}
                       <span class="absolute -top-1.5 left-0">
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                       </span>
                     {/if}
                   </div>
@@ -431,17 +438,16 @@
                     <div>
                       <span class="text-sm text-gray-500">
                         {#if notification.type == NotificationsTypeOptions.help}
-                          <span class="font-medium text-gray-900"
-                            >
-                            {notification.expand?.user.name}</span
-                          >{" "}
+                          <span class="font-medium text-gray-900">
+                            {notification.expand?.user.name}
+                          </span>{" "}
                           requested help
                         {/if}
                         {#if notification.exercise}
                           {" "} for the exercise{" "}
-                          <span class="font-medium text-gray-900"
-                            >{notification.expand?.exercise.title}</span
-                          >
+                          <span class="font-medium text-gray-900">
+                            {notification.expand?.exercise.title}
+                          </span>
                           {" "}
                         {/if}
                       </span>
@@ -454,7 +460,7 @@
                         </time>
                       </span>
                       {#if notification.done == false}
-                        <button class="btn btn-sm" on:click={() => setDone(notification)}>
+                        <button class="btn btn-sm" onclick={() => setDone(notification)}>
                           Mark as done
                         </button>
                       {:else}
@@ -486,7 +492,7 @@
                   <span
                     class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
                     aria-hidden="true"
-                  />
+                  ></span>
                 {/if}
                 <div class="relative flex items-start space-x-3">
                   <div class="relative">
@@ -515,7 +521,7 @@
                         </time>
                       </p>
                     </div>
-                    <div class="mt-2 text-sm ">
+                    <div class="mt-2 text-sm">
                       <p>
                         {activity.type === "start" ? "Started" : "Finished"}
                         {#if activity.type === "end"}

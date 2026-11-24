@@ -1,4 +1,4 @@
-import toast from "svelte-french-toast";
+import { toast } from "svelte-sonner";
 
 // wrapper to execute a pocketbase client request and generate alerts on failure
 export async function alertOnFailure(request: () => void) {

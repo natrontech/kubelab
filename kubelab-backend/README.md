@@ -1,5 +1,13 @@
 # KubeLab Backend
 
+Requires Go 1.27 or newer.
+
+## Upgrading an existing installation
+
+Back up `pb_data` before starting this version: PocketBase upgrades the database from 0.22 to the current format automatically, and the old binary cannot use the upgraded database.
+The existing migration filenames and collection IDs are preserved, so previously applied application migrations are not replayed.
+New installations use the converted migration history, including the legacy username field.
+
 There are two flavors of the backend:
 
 1. standard release downloaded from https://github.com/pocketbase/pocketbase/releases. This one is a good start, but most real-world applications would require more (see next).
@@ -93,3 +101,9 @@ Possible use cases:
   send email upon success/failure
 - Recalculate inventory levels as "orders" table is inserted to, and then
   send notifications when inventory becomes low.
+
+## Dependency compatibility
+
+The vCluster chart remains on 0.16.4, the latest patch compatible with the bundled values and the controller's pod/secret names; its K3s image is updated to the final 1.28 patch. Upgrading the vCluster architecture and Kubernetes minor version requires a separate cluster integration check.
+The Kubernetes libraries currently require the v6 structured-merge schema, so `k8s.io/kube-openapi` stays on their compatible revision. SQLite's libc dependency is kept at the exact version required by the selected SQLite release.
+The dbx dependency remains on 1.13 because 1.14 adds a builder method that PocketBase 0.42 does not implement yet.

@@ -1,28 +1,20 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import type {
-    ExerciseSessionsRecord,
     ExerciseSessionsResponse,
     ExercisesResponse,
     LabSessionsResponse,
     LabsResponse
-  } from "$lib/pocketbase/generated-types";
-  import { getExerciseSessionByExercise } from "$lib/stores/data";
-  import { loadingExercises } from "$lib/stores/loading";
+  } from "#lib/pocketbase/generated-types.ts";
   import {
     sidebar_exercise_sessions,
     sidebar_exercises,
     sidebar_lab,
     sidebar_lab_session
-  } from "$lib/stores/sidebar";
-  import { getTimeAgo } from "$lib/utils/time";
-  import { CheckCircle, Inspect, Pause, Play, XCircle } from "lucide-svelte";
-
-  export let this_lab: LabsResponse = $sidebar_lab || {};
-  export let this_lab_session: LabSessionsResponse = $sidebar_lab_session || {};
-  export let this_exercises: ExercisesResponse[] = $sidebar_exercises || [];
-  export let this_exercise_sessions: ExerciseSessionsResponse[] = $sidebar_exercise_sessions || [];
-
-  $: console.log(this_lab_session);
+  } from "#lib/stores/sidebar.ts";
+  import { getTimeAgo } from "#lib/utils/time.ts";
+  import { CheckCircle, Inspect, Pause, Play, XCircle } from "@lucide/svelte";
 
   function getDoneExercises() {
     let done_exercises: ExercisesResponse[] = [];
@@ -53,16 +45,33 @@
     sidebar_exercise_sessions.set(this_exercise_sessions);
   }
 
-  export let drawerHidden = true;
+  interface Props {
+    this_lab?: LabsResponse;
+    this_lab_session?: LabSessionsResponse;
+    this_exercises?: ExercisesResponse[];
+    this_exercise_sessions?: ExerciseSessionsResponse[];
+    drawerHidden?: boolean;
+  }
+
+  let {
+    this_lab = $sidebar_lab || {},
+    this_lab_session = $sidebar_lab_session || {},
+    this_exercises = $sidebar_exercises || [],
+    this_exercise_sessions = $sidebar_exercise_sessions || [],
+    drawerHidden = $bindable(true)
+  }: Props = $props();
+  run(() => {
+    console.log(this_lab_session);
+  });
 </script>
 
 {#if this_lab_session}
   {#key this_lab_session}
-    <div class="rounded-xl relative bg-white dark:bg-transparent dark:border-2 ">
+    <div class="rounded-xl relative bg-white dark:bg-transparent dark:border-2">
       <div class="flex items-center gap-x-4 border-b-2 p-6">
         <div class="text-lg font-bold leading-6">{this_lab.title}</div>
         <div class="relative ml-auto">
-          <button class="btn btn-outline" on:click={() => handleSideBar()}>
+          <button class="btn btn-outline" onclick={() => handleSideBar()}>
             <Inspect />
           </button>
 
@@ -70,8 +79,8 @@
             <span class="absolute flex h-4 w-4 -top-1 -right-1">
               <span
                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
-              />
-              <span class="relative inline-flex rounded-full h-4 w-4 bg-success" />
+              ></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-success"></span>
             </span>
           {/if}
         </div>

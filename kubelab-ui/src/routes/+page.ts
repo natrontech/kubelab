@@ -1,9 +1,5 @@
-import { client } from "$lib/pocketbase";
-import type {
-    CompaniesResponse,
-    FaqsResponse,
-    PlansResponse
-} from "$lib/pocketbase/generated-types.js";
+import { client } from "#lib/pocketbase/index.ts";
+import type { CompaniesResponse, FaqsResponse } from "#lib/pocketbase/generated-types.js";
 
 export const load = async () => {
     const faqs: FaqsResponse[] = await client.collection("faqs").getFullList(200, {});

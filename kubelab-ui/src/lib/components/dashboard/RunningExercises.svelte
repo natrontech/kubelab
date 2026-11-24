@@ -1,53 +1,45 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { client } from "$lib/pocketbase";
+  import { client } from "#lib/pocketbase/index.ts";
   import type {
     ExerciseSessionsRecord,
     ExerciseSessionsResponse
-  } from "$lib/pocketbase/generated-types";
+  } from "#lib/pocketbase/generated-types.ts";
   import {
     exercise,
     exercise_sessions,
-    exercise_session,
     getExerciseSessionByExercise,
-    exercises,
-    lab
-  } from "$lib/stores/data";
-  import { loadingExercises } from "$lib/stores/loading";
+    exercises
+  } from "#lib/stores/data.ts";
+  import { loadingExercises } from "#lib/stores/loading.ts";
   import { Card } from "flowbite-svelte";
-  import { Pause, Terminal } from "lucide-svelte";
-  import toast from "svelte-french-toast";
+  import { Pause, Terminal } from "@lucide/svelte";
+  import { toast } from "svelte-sonner";
 
-
-  let running_exercises: ExerciseSessionsResponse[] = $exercise_sessions.filter(
-    (exercise_session) => exercise_session.agentRunning
+  let running_exercises = $derived(
+    $exercise_sessions.filter((exercise_session) => exercise_session.agentRunning)
   );
 
   function openExercise(local_exercise_session: ExerciseSessionsResponse) {
-    // TODO: fix roadmap
-    let exercises_by_lab = $exercises.filter(
-      (exercise) => exercise.lab === local_exercise_session.expand.exercise.lab
-    );
-    exercise.set(local_exercise_session.expand.exercise);
-    exercises.set(exercises_by_lab);
-    new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-      goto(
-        `/labs/${local_exercise_session.expand.exercise.lab}/${local_exercise_session.expand.exercise.id}`
-      )
-    );
+    // Resolve the exercise from the loaded records so missing expansions do not break navigation
+    const currentExercise = $exercises.find((item) => item.id === local_exercise_session.exercise);
+    if (!currentExercise) return;
+    exercise.set(currentExercise);
+    exercises.set($exercises.filter((item) => item.lab === currentExercise.lab));
+    goto(`/labs/${currentExercise.lab}/${currentExercise.id}`);
   }
 
   async function stopExercise(exercise_id: string) {
     const data: ExerciseSessionsRecord = {
       // @ts-ignore
-      user: client.authStore.model?.id,
+      user: client.authStore.record?.id,
       exercise: exercise_id,
       startTime: new Date().toISOString(),
       endTime: "",
       agentRunning: false
     };
 
-    $loadingExercises = $loadingExercises.concat(exercise_id);
+    $loadingExercises = new Set($loadingExercises).add(exercise_id);
 
     const exercise_session_id = getExerciseSessionByExercise(exercise_id)?.id;
 
@@ -58,12 +50,6 @@
         // @ts-ignore
         .then((response: any) => {
           toast.success("Exercise stopped");
-
-          // @ts-ignore
-          // update running_exercises
-          running_exercises = running_exercises.filter(
-            (running_exercise) => running_exercise.id !== exercise_session_id
-          );
 
           $exercise_sessions = $exercise_sessions.map((exercise_session) => {
             if (exercise_session.id === exercise_session_id) {
@@ -76,39 +62,41 @@
           toast.error(error.message);
         })
         .finally(() => {
-          $loadingExercises = $loadingExercises.filter((id) => id !== exercise_id);
+          $loadingExercises.delete(exercise_id);
+          $loadingExercises = new Set($loadingExercises);
         });
     }
   }
 </script>
 
 <Card
-  padding="xl"
-  class="bg-white dark:bg-base-100 rounded-xl mt-4 shadow hover:shadow-md transition-all duration-150 ease-in-out overflow-x-hidden"
+  class="p-8 bg-white dark:bg-base-100 rounded-xl mt-4 shadow hover:shadow-md transition-all duration-150 ease-in-out overflow-x-hidden"
 >
   <div class="flex justify-between items-center mb-4">
-    <h5 class="text-xl font-bold leading-none ">Running Exercises</h5>
-    <a href="/labs" class="text-sm font-medium "> View all </a>
+    <h5 class="text-xl font-bold leading-none">Running Exercises</h5>
+    <a href="/labs" class="text-sm font-medium"> View all </a>
   </div>
   {#if running_exercises.length === 0}
-    <div class="text-center text-sm font-medium leading-6 ">No running exercises</div>
+    <div class="text-center text-sm font-medium leading-6">No running exercises</div>
   {/if}
   <div class="overflow-y-auto max-h-96 space-y-2">
     {#each running_exercises as running_exercise}
       <div class="flex items-center">
-        <div class="text-sm font-medium leading-6 ">{running_exercise.expand.exercise.title}</div>
+        <div class="text-sm font-medium leading-6">
+          {$exercises.find((item) => item.id === running_exercise.exercise)?.title}
+        </div>
         <div class="relative ml-auto gap-2">
-          <button class="btn-sm btn btn-outline" on:click={() => openExercise(running_exercise)}>
+          <button class="btn-sm btn btn-outline" onclick={() => openExercise(running_exercise)}>
             <Terminal class="w-4 h-4 mr-1 inline-block" />
-            Shell</button
-          >
+            Shell
+          </button>
           <button
             class="btn-sm btn btn-outline btn-error"
-            on:click={() => stopExercise(running_exercise.expand.exercise.id)}
+            onclick={() => stopExercise(running_exercise.exercise)}
           >
             <Pause class="w-4 h-4 mr-1 inline-block" />
-            Stop Exercise</button
-          >
+            Stop Exercise
+          </button>
         </div>
       </div>
     {/each}
